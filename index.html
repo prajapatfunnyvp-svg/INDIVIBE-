@@ -3,39 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE - Live Reels</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <title>INDIVIBE - Reels</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; }
         .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
+        .reel { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .caption { position: absolute; bottom: 80px; left: 20px; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
+        .caption { position: absolute; bottom: 30px; left: 20px; font-size: 18px; text-shadow: 2px 2px 5px #000; z-index: 10; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="reels-container" id="reels-list"></div>
-    <script>
-        const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const KEY = 'sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-        const supabaseClient = supabase.createClient(URL, KEY);
+    <div class="reels-container" id="reels"></div>
 
-        async function fetchMyVideos() {
-            const { data, error } = await supabaseClient.from('videos').select('*');
-            const container = document.getElementById('reels-list');
+    <script>
+        // Aapki Database details yahan hain
+        const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const SUPABASE_ANON_KEY = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        
+        // Supabase Connection chalu karna
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function fetchVideos() {
+            // 'videos' table se data mangwana
+            const { data, error } = await _supabase.from('videos').select('*');
+            
+            if (error) { 
+                console.error("Data nahi mil raha:", error); 
+                return; 
+            }
+
+            const container = document.getElementById('reels');
             if (data && data.length > 0) {
-                data.forEach(v => {
-                    container.innerHTML += `
-                        <div class="reel">
-                            <video src="${v.video_url}" autoplay loop muted playsinline></video>
-                            <div class="caption">${v.caption || ''}</div>
-                        </div>`;
+                data.forEach(video => {
+                    const div = document.createElement('div');
+                    div.className = 'reel';
+                    div.innerHTML = `
+                        <video src="${video.video_url}" loop muted autoplay playsinline></video>
+                        <div class="caption">${video.caption || 'Indivibe Reel'}</div>
+                    `;
+                    container.appendChild(div);
                 });
             } else {
-                container.innerHTML = '<div class="reel"><h1>Database mein video daalein!</h1></div>';
+                container.innerHTML = "<p style='text-align:center; padding-top:50px;'>Database mein koi video nahi mila!</p>";
             }
         }
-        fetchMyVideos();
+
+        // App chalu hote hi videos load karein
+        fetchVideos();
     </script>
 </body>
 </html>
