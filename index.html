@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE - Reels</title>
+    <title>INDIVIBE - Live Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; }
@@ -17,19 +17,17 @@
     <div class="reels-container" id="reels"></div>
 
     <script>
-        // Aapki Database details yahan hain
+        // Sahi Connection Details
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const SUPABASE_ANON_KEY = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
-        // Supabase Connection chalu karna
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function fetchVideos() {
-            // 'videos' table se data mangwana
             const { data, error } = await _supabase.from('videos').select('*');
             
             if (error) { 
-                console.error("Data nahi mil raha:", error); 
+                console.error("Error:", error); 
                 return; 
             }
 
@@ -40,16 +38,14 @@
                     div.className = 'reel';
                     div.innerHTML = `
                         <video src="${video.video_url}" loop muted autoplay playsinline></video>
-                        <div class="caption">${video.caption || 'Indivibe Reel'}</div>
+                        <div class="caption">${video.caption || 'Indivibe'}</div>
                     `;
                     container.appendChild(div);
                 });
             } else {
-                container.innerHTML = "<p style='text-align:center; padding-top:50px;'>Database mein koi video nahi mila!</p>";
+                container.innerHTML = "<p style='text-align:center; padding-top:50px;'>Database khali hai. Supabase mein video link daalein!</p>";
             }
         }
-
-        // App chalu hote hi videos load karein
         fetchVideos();
     </script>
 </body>
