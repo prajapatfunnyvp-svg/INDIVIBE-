@@ -19,9 +19,9 @@
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const SUPABASE_ANON_KEY = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        // Sahi API Key niche hai
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
-        // Connection create karna
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function fetchVideos() {
@@ -40,9 +40,7 @@
                 data.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'reel';
-                    div.innerHTML = `
-                        <video src="${item.video_url}" loop autoplay muted playsinline></video>
-                    `;
+                    div.innerHTML = `<video src="${item.video_url}" loop autoplay muted playsinline></video>`;
                     container.appendChild(div);
                 });
             } else {
