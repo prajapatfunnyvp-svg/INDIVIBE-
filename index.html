@@ -31,7 +31,7 @@
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Vishu, ye hai aapki asli poori key jo 'eyJ' se shuru hoti hai:
+        // Vishu, dhyan se dekhna, variable name 'SUPABASE_KEY' hona chahiye
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -50,7 +50,7 @@
                         container.appendChild(div);
                     });
                 } else {
-                    document.getElementById('loading').innerText = "Database mein video nahi hai!";
+                    document.getElementById('loading').innerText = "Koi video nahi mila!";
                 }
             } catch (e) {
                 document.getElementById('loading').innerText = "Error: " + e.message;
