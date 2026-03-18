@@ -6,40 +6,47 @@
     <title>INDIVIBE - Live Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; }
-        .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .reels-container { height: 100vh; width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .caption { position: absolute; bottom: 30px; left: 20px; font-size: 18px; text-shadow: 2px 2px 5px #000; z-index: 10; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="reels-container" id="reels"></div>
+    <div class="reels-container" id="reels">
+        <p id="loading" style="position: absolute;">Video Load Ho Raha Hai...</p>
+    </div>
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const SUPABASE_ANON_KEY = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
+        // Connection create karna
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function fetchVideos() {
-            // Check karein ki table ka naam 'videos' hi ho
             const { data, error } = await _supabase.from('videos').select('*');
             
-            if (error) { console.error("Error:", error); return; }
+            if (error) {
+                document.getElementById('loading').innerText = "Error: " + error.message;
+                return;
+            }
 
             const container = document.getElementById('reels');
+            const loader = document.getElementById('loading');
+            
             if (data && data.length > 0) {
+                loader.style.display = 'none';
                 data.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'reel';
-                    // Yahan column ke naam English wale 'video_url' aur 'caption' hi hone chahiye
                     div.innerHTML = `
-                        <video src="${item.video_url}" loop muted autoplay playsinline></video>
-                        <div class="caption">${item.caption || ''}</div>
+                        <video src="${item.video_url}" loop autoplay muted playsinline></video>
                     `;
                     container.appendChild(div);
                 });
+            } else {
+                loader.innerText = "Database mein koi video nahi mila!";
             }
         }
         fetchVideos();
