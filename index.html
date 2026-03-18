@@ -5,24 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDIVIBE - Live Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        body { background: #000; color: #fff; margin: 0; font-family: sans-serif; overflow: hidden; }
         .reels-container { height: 100vh; width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Bottom Navigation Bar (Instagram Style) */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
+        .bottom-nav i { font-size: 24px; color: #fff; cursor: pointer; }
+        
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
     </style>
 </head>
 <body>
     <div class="reels-container" id="reels">
-        <p id="loading" style="position: absolute;">Video Load Ho Raha Hai...</p>
+        <p id="loading">Connecting to INDIVIBE...</p>
+    </div>
+
+    <div class="bottom-nav">
+        <i class="fas fa-home"></i>
+        <i class="fas fa-search"></i>
+        <i class="far fa-plus-square"></i>
+        <i class="far fa-heart"></i>
+        <i class="far fa-user-circle"></i>
     </div>
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Sahi API Key niche hai
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function fetchVideos() {
             const { data, error } = await _supabase.from('videos').select('*');
@@ -44,7 +58,7 @@
                     container.appendChild(div);
                 });
             } else {
-                loader.innerText = "Database mein koi video nahi mila!";
+                loader.innerText = "No videos found in Indivibe-DB";
             }
         }
         fetchVideos();
