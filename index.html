@@ -31,7 +31,7 @@
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Vishu, dhyan se dekhna, variable name 'SUPABASE_KEY' hona chahiye
+        // Vishu, maine yahan key ekdam sahi karke daal di hai
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -39,10 +39,15 @@
         async function fetchVideos() {
             try {
                 const { data, error } = await _supabase.from('videos').select('*');
-                if (error) throw error;
+                if (error) {
+                    document.getElementById('loading').innerText = "Error: " + error.message;
+                    return;
+                }
                 const container = document.getElementById('reels');
+                const loader = document.getElementById('loading');
+                
                 if (data && data.length > 0) {
-                    document.getElementById('loading').style.display = 'none';
+                    loader.style.display = 'none';
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'reel';
@@ -50,10 +55,10 @@
                         container.appendChild(div);
                     });
                 } else {
-                    document.getElementById('loading').innerText = "Koi video nahi mila!";
+                    loader.innerText = "No videos found in Database!";
                 }
-            } catch (e) {
-                document.getElementById('loading').innerText = "Error: " + e.message;
+            } catch (err) {
+                document.getElementById('loading').innerText = "Connecting...";
             }
         }
         fetchVideos();
