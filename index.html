@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <div class="reels-container" id="reels">
+    <div id="reels" class="reels-container">
         <p id="loading">Connecting to INDIVIBE...</p>
     </div>
 
@@ -31,7 +31,7 @@
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Vishu, ye hai aapki puri sahi key:
+        // Vishu, ye hai aapki asli poori key jo 'eyJ' se shuru hoti hai:
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -50,7 +50,7 @@
                         container.appendChild(div);
                     });
                 } else {
-                    document.getElementById('loading').innerText = "Database mein video nahi mila!";
+                    document.getElementById('loading').innerText = "Video nahi mila!";
                 }
             } catch (e) {
                 document.getElementById('loading').innerText = "Error: " + e.message;
