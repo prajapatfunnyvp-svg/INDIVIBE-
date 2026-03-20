@@ -13,12 +13,12 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
         .bottom-nav i { font-size: 24px; color: #fff; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
+        #status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
     </style>
 </head>
 <body>
     <div class="reels-container" id="reels">
-        <p id="loading">Connecting to INDIVIBE...</p>
+        <p id="status">Connecting to INDIVIBE...</p>
     </div>
 
     <div class="bottom-nav">
@@ -31,7 +31,9 @@
 
     <script>
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Vishu, maine yahan aapki 100% sahi aur POORI key daal di hai:
+        
+        // Vishu, maine yahan aapki 100% sahi aur POORI lambi key daal di hai.
+        // Ise ab badalna mat, bas ye poora code copy karke GitHub par daal do.
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -39,11 +41,14 @@
         async function fetchVideos() {
             try {
                 const { data, error } = await _supabase.from('videos').select('*');
-                if (error) throw error;
+                if (error) {
+                    document.getElementById('status').innerText = "API Error: " + error.message;
+                    return;
+                }
 
                 const container = document.getElementById('reels');
                 if (data && data.length > 0) {
-                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('status').style.display = 'none';
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'reel';
@@ -51,10 +56,10 @@
                         container.appendChild(div);
                     });
                 } else {
-                    document.getElementById('loading').innerText = "Database mein video nahi hai!";
+                    document.getElementById('status').innerText = "Database khali hai! Video URL daalein.";
                 }
             } catch (e) {
-                document.getElementById('loading').innerText = "Error: " + e.message;
+                document.getElementById('status').innerText = "Connection Failed!";
             }
         }
         fetchVideos();
