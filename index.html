@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE - Live Reels</title>
+    <title>INDIVIBE - Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,67 +11,40 @@
         .reels-container { height: 100vh; width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
-        .bottom-nav i { font-size: 24px; color: #fff; cursor: pointer; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; font-size: 18px; }
+        .reel-actions { position: absolute; bottom: 100px; right: 15px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .reel-actions i { font-size: 28px; color: #fff; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
-
     <div id="reels" class="reels-container">
-        <p id="loading">INDIVIBE Connect ho raha hai...</p>
+        <p id="loading">Connecting...</p>
     </div>
-
     <div class="bottom-nav">
-        <i class="fas fa-home"></i>
-        <i class="fas fa-search"></i>
-        <i class="far fa-plus-square"></i>
-        <i class="far fa-heart"></i>
-        <i class="far fa-user-circle"></i>
+        <i class="fas fa-home"></i><i class="fas fa-search"></i><i class="far fa-plus-square"></i><i class="far fa-heart"></i><i class="far fa-user-circle"></i>
     </div>
-
     <script>
-        // 1. Aapki Supabase Details (Maine fix kar di hain)
         const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-        
-        // 2. Supabase Client Setup
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // 3. Videos Fetch karne ka function
         async function fetchVideos() {
             try {
-                // 'videos' table se saara data lena
                 const { data, error } = await _supabase.from('videos').select('*');
-                
-                if (error) {
-                    console.error("Supabase Error:", error.message);
-                    document.getElementById('loading').innerText = "Error: " + error.message;
-                    return;
-                }
-
+                if (error) throw error;
                 const container = document.getElementById('reels');
-                const loader = document.getElementById('loading');
-
                 if (data && data.length > 0) {
-                    loader.style.display = 'none'; // Loading text hatao
+                    document.getElementById('loading').style.display = 'none';
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'reel';
-                        // Video tag setup
-                        div.innerHTML = `<video src="${item.video_url}" loop autoplay muted playsinline></video>`;
+                        div.innerHTML = `<video src="${item.video_url}" loop autoplay muted playsinline></video>
+                        <div class="reel-actions"><i class="far fa-heart"></i><i class="far fa-comment"></i><i class="fas fa-paper-plane"></i></div>`;
                         container.appendChild(div);
                     });
-                } else {
-                    loader.innerText = "Database mein koi video nahi mila!";
-                }
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                document.getElementById('loading').innerText = "Connection Failed!";
-            }
+                } else { document.getElementById('loading').innerText = "No videos found!"; }
+            } catch (e) { document.getElementById('loading').innerText = "Error: " + e.message; }
         }
-
-        // Function chalao
         fetchVideos();
     </script>
 </body>
