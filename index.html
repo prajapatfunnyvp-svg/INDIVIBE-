@@ -19,13 +19,18 @@
     <div id="reels" class="reels-container"><p id="loading">Connecting...</p></div>
     <div class="bottom-nav"><i class="fas fa-home"></i><i class="fas fa-search"></i><i class="far fa-plus-square"></i><i class="far fa-heart"></i><i class="far fa-user-circle"></i></div>
     <script>
-        const SUPABASE_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const _URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        
+        // VISHU: Is niche wali line ko dhyan se dekho. 
+        // Isme 'eyJ' se lekar 'diwkhxpC' tak poora hona chahiye.
+        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+
+        const _supabase = supabase.createClient(_URL, _KEY);
+
         async function fetchVideos() {
             try {
                 const { data, error } = await _supabase.from('videos').select('*');
-                if (error) throw error;
+                if (error) { document.getElementById('loading').innerText = "Error: " + error.message; return; }
                 const container = document.getElementById('reels');
                 if (data && data.length > 0) {
                     document.getElementById('loading').style.display = 'none';
@@ -35,8 +40,8 @@
                         div.innerHTML = `<video src="${item.video_url}" loop autoplay muted playsinline></video>`;
                         container.appendChild(div);
                     });
-                } else { document.getElementById('loading').innerText = "No videos in DB!"; }
-            } catch (e) { document.getElementById('loading').innerText = "Error: " + e.message; }
+                } else { document.getElementById('loading').innerText = "Database is Empty!"; }
+            } catch (e) { document.getElementById('loading').innerText = "Failed!"; }
         }
         fetchVideos();
     </script>
