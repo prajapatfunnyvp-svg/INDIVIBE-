@@ -3,51 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE - Live</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; }
+        body { background: #000; color: #fff; margin: 0; overflow: hidden; }
         .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .reel { height: 100vh; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
+        .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; }
+        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div id="reels" class="reels-container"><div id="status">Connecting...</div></div>
-
+    <div id="reels" class="reels-container"><div id="msg">INDIVIBE Loading...</div></div>
     <script>
-        const SB_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        // VISHU: Is key ko poora copy karna, ek bhi akshar mat chhodna
+        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
-        // VISHU: Ye poori key hai. Ise copy karte waqt dhyan rakhein ki ye poori 'diwkhxpC' tak copy ho.
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-        async function load() {
+        const _supa = supabase.createClient(URL, KEY);
+        async function start() {
             try {
-                const { data, error } = await _supabase.from('videos').select('*');
-                if (error) {
-                    document.getElementById('status').innerText = "Key Adhuri Hai: " + error.message;
-                    return;
-                }
+                const { data, error } = await _supa.from('videos').select('*');
+                if (error) { document.getElementById('msg').innerText = "API Error: " + error.message; return; }
                 if (data && data.length > 0) {
-                    document.getElementById('status').style.display = 'none';
-                    const container = document.getElementById('reels');
-                    data.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'reel';
-                        div.innerHTML = `<video src="${item.video_url}" loop autoplay muted playsinline></video>`;
-                        container.appendChild(div);
+                    document.getElementById('msg').style.display = 'none';
+                    data.forEach(v => {
+                        const d = document.createElement('div');
+                        d.className = 'reel';
+                        d.innerHTML = `<video src="${v.video_url}" loop autoplay muted playsinline></video>`;
+                        document.getElementById('reels').appendChild(d);
                     });
-                } else {
-                    document.getElementById('status').innerText = "Database Empty!";
-                }
-            } catch (e) {
-                document.getElementById('status').innerText = "Connection Failed!";
-            }
+                } else { document.getElementById('msg').innerText = "Database Khali Hai! Video Daalein."; }
+            } catch (e) { document.getElementById('msg').innerText = "Network Error!"; }
         }
-        load();
+        start();
     </script>
 </body>
 </html>
