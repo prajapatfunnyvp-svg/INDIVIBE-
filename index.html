@@ -6,31 +6,30 @@
     <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; overflow: hidden; }
+        body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; }
         .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.8); padding: 20px; z-index: 10; }
+        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; z-index: 100; }
     </style>
 </head>
 <body>
     <div id="reels" class="reels-container"><div id="msg">INDIVIBE Loading...</div></div>
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        
-        // Vishu: Maine key ko 3 hisson mein joda hai taaki error na aaye
         const K1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.';
         const K2 = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-        const FULL_KEY = K1 + K2;
-
-        const _supa = supabase.createClient(URL, FULL_KEY);
+        
+        const _supa = supabase.createClient(URL, K1 + K2);
 
         async function start() {
+            const msg = document.getElementById('msg');
             try {
                 const { data, error } = await _supa.from('videos').select('*');
-                if (error) { document.getElementById('msg').innerText = "Key Error: " + error.message; return; }
+                if (error) { msg.innerText = "Error: " + error.message; return; }
+                
                 if (data && data.length > 0) {
-                    document.getElementById('msg').style.display = 'none';
+                    msg.style.display = 'none';
                     const container = document.getElementById('reels');
                     data.forEach(v => {
                         const d = document.createElement('div');
@@ -38,11 +37,12 @@
                         d.innerHTML = `<video src="${v.video_url}" loop autoplay muted playsinline></video>`;
                         container.appendChild(d);
                     });
-                } else { document.getElementById('msg').innerText = "Database Khali Hai! Video Daalein."; }
-            } catch (e) { document.getElementById('msg').innerText = "Network Error!"; }
+                } else {
+                    msg.innerText = "Database Connected! Par Videos nahi mile.";
+                }
+            } catch (e) { msg.innerText = "Network Error!"; }
         }
         start();
     </script>
 </body>
 </html>
-
