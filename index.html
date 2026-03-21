@@ -10,28 +10,33 @@
         .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
+        #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0,0,0,0.8); padding: 20px; z-index: 10; }
     </style>
 </head>
 <body>
     <div id="reels" class="reels-container"><div id="msg">INDIVIBE Loading...</div></div>
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // VISHU: Is key ko poora copy karna, ek bhi akshar mat chhodna
-        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         
-        const _supa = supabase.createClient(URL, KEY);
+        // Vishu: Maine key ko 3 hisson mein joda hai taaki error na aaye
+        const K1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.';
+        const K2 = 'Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        const FULL_KEY = K1 + K2;
+
+        const _supa = supabase.createClient(URL, FULL_KEY);
+
         async function start() {
             try {
                 const { data, error } = await _supa.from('videos').select('*');
-                if (error) { document.getElementById('msg').innerText = "API Error: " + error.message; return; }
+                if (error) { document.getElementById('msg').innerText = "Key Error: " + error.message; return; }
                 if (data && data.length > 0) {
                     document.getElementById('msg').style.display = 'none';
+                    const container = document.getElementById('reels');
                     data.forEach(v => {
                         const d = document.createElement('div');
                         d.className = 'reel';
                         d.innerHTML = `<video src="${v.video_url}" loop autoplay muted playsinline></video>`;
-                        document.getElementById('reels').appendChild(d);
+                        container.appendChild(d);
                     });
                 } else { document.getElementById('msg').innerText = "Database Khali Hai! Video Daalein."; }
             } catch (e) { document.getElementById('msg').innerText = "Network Error!"; }
@@ -40,3 +45,4 @@
     </script>
 </body>
 </html>
+
