@@ -3,46 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE TEST</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
-        #status { padding: 20px; }
-        video { width: 100%; height: 100vh; object-fit: cover; display: none; }
+        body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; }
+        .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        #status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div id="status">Connecting to Database...</div>
-    <video id="player" loop autoplay muted playsinline></video>
+    <div id="status">INDIVIBE लोड हो रहा है...</div>
+    <div id="reels" class="reels-container"></div>
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function check() {
+        async function loadReels() {
             const status = document.getElementById('status');
-            const player = document.getElementById('player');
+            const container = document.getElementById('reels');
 
             const { data, error } = await _supa.from('videos').select('*');
 
             if (error) {
-                status.innerHTML = "Database Error: " + error.message;
+                status.innerText = "Error: " + error.message;
             } else if (data && data.length > 0) {
                 status.style.display = 'none';
-                player.style.display = 'block';
-                player.src = data[0].video_url;
-                player.play().catch(e => {
-                    status.style.display = 'block';
-                    status.innerHTML = "Video mil gaya! Chalane ke liye screen par touch karein.";
+                data.forEach(v => {
+                    const d = document.createElement('div');
+                    d.className = 'reel';
+                    d.innerHTML = `<video src="${v.video_url}" loop autoplay muted playsinline></video>`;
+                    container.appendChild(d);
                 });
             } else {
-                status.innerHTML = "Database se connect ho gaya, par table khali hai!";
+                status.innerText = "Database कनेक्ट है, पर कोई वीडियो नहीं मिला!";
             }
         }
-        check();
-        window.onclick = () => { document.getElementById('player').play(); };
+        loadReels();
     </script>
 </body>
 </html>
-
