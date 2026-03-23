@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE LIVE</title>
+    <title>INDIVIBE REELS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; }
         .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; }
+        #status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; width: 80%; }
+        button { background: #ff0050; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -26,22 +27,32 @@
             const status = document.getElementById('status');
             const container = document.getElementById('reels');
 
+            // Database se video laana
             const { data, error } = await _supa.from('videos').select('*');
 
             if (error) {
-                status.innerText = "Error: " + error.message;
+                status.innerHTML = "Error: " + error.message;
             } else if (data && data.length > 0) {
-                status.style.display = 'none';
+                status.innerHTML = "वीडियो लोड हो गए हैं!<br><button onclick='startApp()'>देखने के लिए यहाँ टच करें</button>";
+                
                 data.forEach(v => {
                     const d = document.createElement('div');
                     d.className = 'reel';
-                    d.innerHTML = `<video src="${v.video_url}" loop autoplay muted playsinline></video>`;
+                    // Sahi Template Literals ka istemal (Backticks ` use kiye hain)
+                    d.innerHTML = `<video src="${v.video_url}" loop playsinline></video>`;
                     container.appendChild(d);
                 });
             } else {
-                status.innerText = "Database कनेक्ट है, पर कोई वीडियो नहीं मिला!";
+                status.innerText = "डेटाबेस में कोई वीडियो नहीं मिला। कृपया Supabase में Save करें!";
             }
         }
+
+        function startApp() {
+            document.getElementById('status').style.display = 'none';
+            const allVideos = document.querySelectorAll('video');
+            if(allVideos[0]) allVideos[0].play();
+        }
+
         loadReels();
     </script>
 </body>
