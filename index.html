@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-        #box { text-align: center; border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; }
-        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 20px; box-shadow: 0 0 10px #00f2ea; }
+        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; overflow: hidden; }
+        #status-box { text-align: center; border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; background: rgba(0,0,0,0.8); box-shadow: 0 0 20px rgba(0,242,234,0.2); }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 35px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; }
         video { width: 100%; height: 100vh; object-fit: cover; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="box">
-        <h2 id="msg">Checking Video...</h2>
+    <div id="status-box">
+        <h2 id="msg">INDIVIBE Connecting...</h2>
         <div id="btn-area"></div>
     </div>
 
-    <video id="vid" loop playsinline controls></video>
+    <video id="v" loop playsinline controls></video>
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
@@ -28,27 +28,28 @@
 
         async function init() {
             const msg = document.getElementById('msg');
-            // Hum table se data la rahe hain
+            // 'videos' table se data fetch karna
             const { data, error } = await _supa.from('videos').select('*');
 
             if (error) {
-                msg.innerText = "Error: " + error.message;
+                msg.innerText = "Connection Error: " + error.message;
             } else if (data && data.length > 0) {
-                msg.innerText = "INDIVIBE Ready!";
-                document.getElementById('btn-area').innerHTML = '<button onclick="start()">WATCH VIDEO</button>';
-                // Table ki sabse nayi row ka video link uthayenge
-                const videoUrl = data[data.length - 1].video_url;
-                document.getElementById('vid').src = videoUrl;
+                msg.innerText = "INDIVIBE is Ready!";
+                document.getElementById('btn-area').innerHTML = '<button onclick="run()">WATCH VIDEO</button>';
+                
+                // Sabse nayi ID wala video uthayenge (ID 10)
+                const lastVideo = data[data.length - 1].video_url;
+                document.getElementById('v').src = lastVideo;
             } else {
-                msg.innerText = "No Video Found!";
+                msg.innerText = "Database is Empty! Add a video link.";
             }
         }
 
-        function start() {
-            document.getElementById('box').style.display = 'none';
-            const v = document.getElementById('vid');
-            v.style.display = 'block';
-            v.play();
+        function run() {
+            document.getElementById('status-box').style.display = 'none';
+            const vid = document.getElementById('v');
+            vid.style.display = 'block';
+            vid.play();
         }
 
         init();
