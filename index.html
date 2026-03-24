@@ -10,22 +10,24 @@
         .reels-container { height: 100vh; width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; display: none; }
         .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #status-box { text-align: center; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; border: 1px solid #00f2ea; width: 80%; }
+        #status-box { text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 15px; border: 1px solid #00f2ea; width: 80%; }
         button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div id="status-box">
-        <h2 id="msg">INDIVIBE Loading...</h2>
+        <h2 id="msg">INDIVIBE Connecting...</h2>
         <div id="btn-area"></div>
     </div>
 
     <div id="reels" class="reels-container"></div>
 
     <script>
+        // Bilkul sahi connection details
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        
         const _supa = supabase.createClient(URL, KEY);
 
         async function loadVideos() {
@@ -40,16 +42,17 @@
                     msg.innerText = "Error: " + error.message;
                 } else if (data && data.length > 0) {
                     msg.innerText = "App is Ready!";
-                    btnArea.innerHTML = '<button onclick="startApp()">Watch Now</button>';
+                    btnArea.innerHTML = '<button onclick="startApp()">WATCH NOW</button>';
                     
                     data.forEach(v => {
                         const d = document.createElement('div');
                         d.className = 'reel';
+                        // Backticks (`) ka sahi use:
                         d.innerHTML = `<video src="${v.video_url}" loop playsinline></video>`;
                         container.appendChild(d);
                     });
                 } else {
-                    msg.innerText = "No videos found in Database!";
+                    msg.innerText = "Database is empty! Check Supabase.";
                 }
             } catch (e) {
                 msg.innerText = "Connection Failed!";
@@ -67,3 +70,4 @@
     </script>
 </body>
 </html>
+
