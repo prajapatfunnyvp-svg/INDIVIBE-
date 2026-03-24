@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <div id="status">INDIVIBE लोड हो रहा है...</div>
+    <div id="status">INDIVIBE Loading...</div>
     <div id="reels" class="reels-container"></div>
 
     <script>
@@ -26,21 +26,21 @@
         async function loadReels() {
             const status = document.getElementById('status');
             const container = document.getElementById('reels');
-
             const { data, error } = await _supa.from('videos').select('*');
 
             if (error) {
                 status.innerText = "Error: " + error.message;
             } else if (data && data.length > 0) {
-                status.innerHTML = "वीडियो तैयार हैं!<br><button onclick='startApp()'>देखने के लिए यहाँ टच करें</button>";
+                status.innerHTML = "Videos Ready!<br><button onclick='startApp()'>Click to Watch</button>";
                 data.forEach(v => {
                     const d = document.createElement('div');
                     d.className = 'reel';
+                    // BACKTICKS (`) use kiye hain yahan:
                     d.innerHTML = `<video src="${v.video_url}" loop playsinline></video>`;
                     container.appendChild(d);
                 });
             } else {
-                status.innerText = "डेटाबेस खाली है! Supabase में Save बटन दबाएं।";
+                status.innerText = "No data found in Supabase!";
             }
         }
 
