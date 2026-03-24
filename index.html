@@ -3,70 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE LIVE</title>
+    <title>INDIVIBE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; overflow: hidden; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .reels-container { height: 100vh; width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; display: none; }
-        .reel { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        #status-box { text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 15px; border: 1px solid #00f2ea; width: 80%; }
-        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 20px; }
+        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+        #box { text-align: center; border: 2px solid #00f2ea; padding: 40px; border-radius: 20px; width: 80%; }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; }
+        video { width: 100%; height: 100vh; object-fit: cover; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="status-box">
-        <h2 id="msg">INDIVIBE Connecting...</h2>
-        <div id="btn-area"></div>
+    <div id="box">
+        <h2 id="msg">Connecting to Database...</h2>
+        <div id="controls"></div>
     </div>
 
-    <div id="reels" class="reels-container"></div>
+    <video id="v" loop playsinline></video>
 
     <script>
-        // Bilkul sahi connection details
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-        
         const _supa = supabase.createClient(URL, KEY);
 
-        async function loadVideos() {
+        async function start() {
             const msg = document.getElementById('msg');
-            const btnArea = document.getElementById('btn-area');
-            const container = document.getElementById('reels');
+            const { data, error } = await _supa.from('videos').select('*');
 
-            try {
-                const { data, error } = await _supa.from('videos').select('*');
-
-                if (error) {
-                    msg.innerText = "Error: " + error.message;
-                } else if (data && data.length > 0) {
-                    msg.innerText = "App is Ready!";
-                    btnArea.innerHTML = '<button onclick="startApp()">WATCH NOW</button>';
-                    
-                    data.forEach(v => {
-                        const d = document.createElement('div');
-                        d.className = 'reel';
-                        // Backticks (`) ka sahi use:
-                        d.innerHTML = `<video src="${v.video_url}" loop playsinline></video>`;
-                        container.appendChild(d);
-                    });
-                } else {
-                    msg.innerText = "Database is empty! Check Supabase.";
-                }
-            } catch (e) {
-                msg.innerText = "Connection Failed!";
+            if (error) {
+                msg.innerText = "Error: " + error.message;
+            } else if (data && data.length > 0) {
+                msg.innerText = "App is Ready!";
+                document.getElementById('controls').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                document.getElementById('v').src = data[0].video_url;
+            } else {
+                msg.innerText = "Database is Empty!";
             }
         }
 
-        function startApp() {
-            document.getElementById('status-box').style.display = 'none';
-            document.getElementById('reels').style.display = 'block';
-            const vids = document.querySelectorAll('video');
-            if(vids[0]) vids[0].play();
+        function play() {
+            document.getElementById('box').style.display = 'none';
+            const vid = document.getElementById('v');
+            vid.style.display = 'block';
+            vid.play();
         }
 
-        loadVideos();
+        start();
     </script>
 </body>
 </html>
