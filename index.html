@@ -26,21 +26,24 @@
         async function loadReels() {
             const status = document.getElementById('status');
             const container = document.getElementById('reels');
+            
+            // Database se video fetch karna
             const { data, error } = await _supa.from('videos').select('*');
 
             if (error) {
                 status.innerText = "Error: " + error.message;
             } else if (data && data.length > 0) {
+                // Loading hatakar button dikhana
                 status.innerHTML = "Videos Ready!<br><button onclick='startApp()'>Click to Watch</button>";
                 data.forEach(v => {
                     const d = document.createElement('div');
                     d.className = 'reel';
-                    // BACKTICKS (`) use kiye hain yahan:
+                    // BACKTICKS (`) ka sahi istemal:
                     d.innerHTML = `<video src="${v.video_url}" loop playsinline></video>`;
                     container.appendChild(d);
                 });
             } else {
-                status.innerText = "No data found in Supabase!";
+                status.innerText = "No videos found! Check Supabase Save.";
             }
         }
 
@@ -53,3 +56,4 @@
     </script>
 </body>
 </html>
+
