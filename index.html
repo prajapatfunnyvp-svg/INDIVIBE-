@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-        #box { text-align: center; border: 2px solid #00f2ea; padding: 40px; border-radius: 20px; width: 80%; }
-        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; }
+        body { background: #000; color: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; overflow: hidden; }
+        #box { text-align: center; border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; background: rgba(0,0,0,0.9); }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 35px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; box-shadow: 0 0 15px #00f2ea; }
         video { width: 100%; height: 100vh; object-fit: cover; display: none; }
+        .error { color: #ff4b4b; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div id="box">
-        <h2 id="msg">Connecting to Database...</h2>
+        <h2 id="msg">INDIVIBE Connecting...</h2>
         <div id="controls"></div>
+        <div id="error-log" class="error"></div>
     </div>
 
     <video id="v" loop playsinline></video>
@@ -26,30 +28,37 @@
         const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function start() {
+        async function init() {
             const msg = document.getElementById('msg');
-            const { data, error } = await _supa.from('videos').select('*');
+            const errLog = document.getElementById('error-log');
+            
+            try {
+                const { data, error } = await _supa.from('videos').select('*');
 
-            if (error) {
-                msg.innerText = "Error: " + error.message;
-            } else if (data && data.length > 0) {
-                msg.innerText = "App is Ready!";
-                document.getElementById('controls').innerHTML = '<button onclick="play()">WATCH NOW</button>';
-                document.getElementById('v').src = data[0].video_url;
-            } else {
-                msg.innerText = "Database is Empty!";
+                if (error) {
+                    msg.innerText = "Connection Error";
+                    errLog.innerText = error.message;
+                } else if (data && data.length > 0) {
+                    msg.innerText = "App is Ready!";
+                    document.getElementById('controls').innerHTML = '<button onclick="playVideo()">WATCH NOW</button>';
+                    document.getElementById('v').src = data[0].video_url;
+                } else {
+                    msg.innerText = "Database is Empty!";
+                }
+            } catch (e) {
+                msg.innerText = "Failed to load.";
+                errLog.innerText = e.message;
             }
         }
 
-        function play() {
+        function playVideo() {
             document.getElementById('box').style.display = 'none';
             const vid = document.getElementById('v');
             vid.style.display = 'block';
-            vid.play();
+            vid.play().catch(e => alert("Please tap again to play"));
         }
 
-        start();
+        init();
     </script>
 </body>
 </html>
-
