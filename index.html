@@ -1,8 +1,61 @@
 <!DOCTYPE html>
-<html>
-<body style="background:black; color:white; text-align:center; padding-top:50px;">
-    <h1>INDIVIBE TEST LIVE</h1>
-    <p>Vishu, agar aap ye dekh rahe hain, toh aapka GitHub sahi kaam kar raha hai!</p>
-    <button style="padding:20px; background:cyan; border-radius:10px;">APP CHAL GAYA</button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDIVIBE v5</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #111; color: #00f2ea; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
+        .card { border: 2px solid #00f2ea; padding: 30px; border-radius: 15px; text-align: center; width: 80%; background: #000; }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 18px; }
+        video { width: 100%; height: 100vh; object-fit: cover; display: none; position: fixed; top: 0; left: 0; z-index: 100; }
+    </style>
+</head>
+<body>
+
+    <div id="main-ui" class="card">
+        <h1 id="status">Connecting...</h1>
+        <p id="sub-status">Checking Database ID 10</p>
+        <div id="action"></div>
+    </div>
+
+    <video id="player" loop playsinline controls></video>
+
+    <script>
+        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
+        const client = supabase.createClient(S_URL, S_KEY);
+
+        async function loadApp() {
+            try {
+                const { data, error } = await client.from('videos').select('*');
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    document.getElementById('status').innerText = "INDIVIBE READY";
+                    document.getElementById('sub-status').innerText = "Video Found in Database!";
+                    document.getElementById('action').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                    
+                    // Sabse naya video (ID 10)
+                    const videoLink = data[data.length - 1].video_url;
+                    document.getElementById('player').src = videoLink;
+                } else {
+                    document.getElementById('status').innerText = "Database Empty";
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = "Error!";
+                document.getElementById('sub-status').innerText = err.message;
+            }
+        }
+
+        function play() {
+            document.getElementById('player').style.display = 'block';
+            document.getElementById('player').play();
+        }
+
+        loadApp();
+    </script>
 </body>
 </html>
+
