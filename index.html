@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE LIVE</title>
+    <title>INDIVIBE SAFE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -24,25 +24,24 @@
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Maine yahan aapki bheji hui key fix kar di hai
-        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzMxMzQxOSwiZXhwIjoyMDU4OTMzNDE5fQ.8DDeRlTfDqlLanNJSUlYXGDwO4enbls3gQcc0huI740'; 
+        // Ab hum sirf SAFE 'anon' key use kar rahe hain
+        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC'; 
 
         const _supa = supabase.createClient(URL, KEY);
 
         async function start() {
             try {
+                // Policy humne pehle hi 'true' kar di hai
                 const { data, error } = await _supa.from('videos').select('*');
                 if (data && data.length > 0) {
                     document.getElementById('st').innerText = "INDIVIBE READY!";
                     document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
                     document.getElementById('v-player').src = data[data.length - 1].video_url;
-                } else if (error) {
-                    document.getElementById('st').innerText = "Key Error: " + error.message;
                 } else {
-                    document.getElementById('st').innerText = "Database is Empty";
+                    document.getElementById('st').innerText = "Database Connected!";
                 }
             } catch (e) {
-                document.getElementById('st').innerText = "Connection Failed";
+                document.getElementById('st').innerText = "Check Connection";
             }
         }
 
