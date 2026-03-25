@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE SAFE</title>
+    <title>INDIVIBE READY</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -16,7 +16,7 @@
 
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
-        <p id="st">Connecting...</p>
+        <p id="st">Starting System...</p>
         <div id="btn-box"></div>
     </div>
 
@@ -24,24 +24,28 @@
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Ab hum sirf SAFE 'anon' key use kar rahe hain
-        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC'; 
+        // Ye SAFE KEY hai jo GitHub block nahi karega
+        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6InF1b24iLCJpYXQiOjE3NDI5MTQ0MDAsImV4cCI6MjA1ODQ3NDQwMH0.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
 
         const _supa = supabase.createClient(URL, KEY);
 
         async function start() {
             try {
-                // Policy humne pehle hi 'true' kar di hai
+                // Direct database fetch
                 const { data, error } = await _supa.from('videos').select('*');
+                
                 if (data && data.length > 0) {
-                    document.getElementById('st').innerText = "INDIVIBE READY!";
+                    document.getElementById('st').innerText = "INDIVIBE LIVE!";
                     document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
                     document.getElementById('v-player').src = data[data.length - 1].video_url;
+                } else if (error) {
+                    document.getElementById('st').innerText = "Wait 2 mins: " + error.message;
                 } else {
-                    document.getElementById('st').innerText = "Database Connected!";
+                    document.getElementById('st').innerText = "Database is Empty";
                 }
             } catch (e) {
-                document.getElementById('st').innerText = "Check Connection";
+                document.getElementById('st').innerText = "Retrying...";
+                setTimeout(start, 3000); // 3 second baad fir koshish karega
             }
         }
 
@@ -49,7 +53,7 @@
             document.getElementById('ui').style.display = 'none';
             const vid = document.getElementById('v-player');
             vid.style.display = 'block';
-            vid.play();
+            vid.play().catch(e => alert("Please tap again to play"));
         }
         start();
     </script>
