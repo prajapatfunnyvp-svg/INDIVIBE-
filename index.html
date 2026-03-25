@@ -3,50 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE SUCCESS</title>
+    <title>INDIVIBE FINAL</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
-        .card { border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; background: rgba(0,0,0,0.9); }
-        button { background: #00f2ea; color: #000; border: none; padding: 15px 35px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; box-shadow: 0 0 15px #00f2ea; }
+        .card { border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; background: rgba(0,0,0,0.9); box-shadow: 0 0 15px #00f2ea; }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 35px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 20px; margin-top: 20px; }
         video { width: 100%; height: 100vh; object-fit: cover; display: none; position: fixed; top: 0; left: 0; z-index: 100; }
     </style>
 </head>
 <body>
 
     <div id="ui" class="card">
-        <h2 id="st">Checking Database...</h2>
-        <p id="msg">Searching for Video Link</p>
+        <h2 id="st">INDIVIBE</h2>
+        <p id="msg">Connecting...</p>
         <div id="action"></div>
     </div>
 
     <video id="player" loop playsinline controls></video>
 
     <script>
-        // Aapka Correct URL aur Key
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4amJtamJ1cmRrc2ZqeWhyeHAiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MTg1NjE3NiwiZXhwIjoyMDU3NDMyMTc2fQ.Sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC';
-
         const _supa = supabase.createClient(URL, KEY);
 
         async function init() {
             const st = document.getElementById('st');
-            // 'videos' table se data fetch karna
-            const { data, error } = await _supa.from('videos').select('*');
-
-            if (error) {
-                st.innerText = "Connection Error";
-                document.getElementById('msg').innerText = error.message;
-            } else if (data && data.length > 0) {
-                st.innerText = "INDIVIBE READY!";
-                document.getElementById('msg').innerText = "Video Found!";
-                document.getElementById('action').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+            const msg = document.getElementById('msg');
+            
+            try {
+                const { data, error } = await _supa.from('videos').select('*');
                 
-                // Aapka link: https://www.w3schools.com/html/mov_bbb.mp4
-                document.getElementById('player').src = data[data.length - 1].video_url;
-            } else {
-                st.innerText = "Database is Empty";
-                document.getElementById('msg').innerText = "Please check if row is saved.";
+                if (error) {
+                    st.innerText = "Error!";
+                    msg.innerText = error.message;
+                } else if (data && data.length > 0) {
+                    // Sabse naya data nikalna
+                    const lastRow = data[data.length - 1];
+                    // Link dhoondne ki koshish (chahe column name kuch bhi ho)
+                    const link = lastRow.video_url || lastRow.url || lastRow.link;
+
+                    if (link) {
+                        st.innerText = "READY!";
+                        msg.innerText = "Video Found!";
+                        document.getElementById('action').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                        document.getElementById('player').src = link;
+                    } else {
+                        msg.innerText = "Column name mismatch. Check Supabase.";
+                    }
+                } else {
+                    msg.innerText = "Table is Empty. Add a row!";
+                }
+            } catch (e) {
+                msg.innerText = "Failed: " + e.message;
             }
         }
 
