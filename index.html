@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE FINAL</title>
+    <title>INDIVIBE READY</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -23,27 +23,25 @@
     <video id="v-player" loop playsinline controls></video>
 
     <script>
-        // Aapka Screenshot wala naya URL aur Key
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const KEY = 'sb_publishable_JNJD6bR0P-R_GdV8yYdWKQ_diwkhxpC'; 
+        // Aapki bheji hui lambi key yahan hai
+        const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzMxMzQxOSwiZXhwIjoyMDU4OTMzNDE5fQ.8DDeRlTfDqlLanNJSUlYXGDwO4enbls3gQcc0huI740'; 
 
         const _supa = supabase.createClient(URL, KEY);
 
         async function start() {
             try {
                 const { data, error } = await _supa.from('videos').select('*');
-                
-                if (error) {
-                    document.getElementById('st').innerText = "System Error: " + error.message;
-                } else if (data && data.length > 0) {
-                    document.getElementById('st').innerText = "DATABASE CONNECTED!";
+                if (data && data.length > 0) {
+                    document.getElementById('st').innerText = "INDIVIBE READY!";
                     document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
                     document.getElementById('v-player').src = data[data.length - 1].video_url;
                 } else {
-                    document.getElementById('st').innerText = "Database is Empty";
+                    document.getElementById('st').innerText = "Database Connected!";
+                    console.log(error);
                 }
             } catch (e) {
-                document.getElementById('st').innerText = "Connection Failed";
+                document.getElementById('st').innerText = "Network Error";
             }
         }
 
@@ -53,7 +51,6 @@
             vid.style.display = 'block';
             vid.play();
         }
-
         start();
     </script>
 </body>
