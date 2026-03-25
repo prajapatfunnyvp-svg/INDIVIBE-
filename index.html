@@ -3,55 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE READY</title>
+    <title>INDIVIBE SYSTEM CHECK</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
-        .card { border: 2px solid #00f2ea; padding: 35px; border-radius: 25px; width: 85%; background: #111; box-shadow: 0 0 20px #00f2ea; }
-        button { background: #00f2ea; color: #000; border: none; padding: 18px 45px; border-radius: 40px; font-weight: bold; cursor: pointer; font-size: 22px; margin-top: 25px; }
-        video { width: 100%; height: 100vh; object-fit: cover; display: none; position: fixed; top: 0; left: 0; z-index: 1000; }
+        body { background: #111; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+        .log-box { background: #000; border: 1px solid #00f2ea; padding: 15px; text-align: left; border-radius: 10px; margin-top: 20px; font-family: monospace; overflow-x: auto; font-size: 14px; }
+        .green { color: #00ff00; }
+        .red { color: #ff4444; }
+        button { background: #00f2ea; color: #000; padding: 15px 30px; border-radius: 10px; border: none; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <div id="ui" class="card">
-        <h1>INDIVIBE</h1>
-        <p id="st">Connecting...</p>
-        <div id="btn-box"></div>
-    </div>
-
-    <video id="v-player" loop playsinline controls></video>
+    <h1>INDIVIBE CHECK</h1>
+    <div id="status">Connecting...</div>
+    <div id="log" class="log-box">System Initializing...<br></div>
+    <div id="btn-box"></div>
 
     <script>
-        const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Aapki bheji hui lambi key yahan hai
-        const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzMxMzQxOSwiZXhwIjoyMDU4OTMzNDE5fQ.8DDeRlTfDqlLanNJSUlYXGDwO4enbls3gQcc0huI740'; 
+        function logger(msg, color) {
+            const log = document.getElementById('log');
+            log.innerHTML += `<span class="${color}">${msg}</span><br>`;
+        }
 
-        const _supa = supabase.createClient(URL, KEY);
+        async function testConnection() {
+            // 1. Connection details
+            const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+            const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzMxMzQxOSwiZXhwIjoyMDU4OTMzNDE5fQ.8DDeRlTfDqlLanNJSUlYXGDwO4enbls3gQcc0huI740';
+            
+            logger("1. Connecting to Supabase...", "white");
+            const _supa = supabase.createClient(URL, KEY);
 
-        async function start() {
-            try {
-                const { data, error } = await _supa.from('videos').select('*');
-                if (data && data.length > 0) {
-                    document.getElementById('st').innerText = "INDIVIBE READY!";
-                    document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
-                    document.getElementById('v-player').src = data[data.length - 1].video_url;
-                } else {
-                    document.getElementById('st').innerText = "Database Connected!";
-                    console.log(error);
-                }
-            } catch (e) {
-                document.getElementById('st').innerText = "Network Error";
+            logger("2. Querying 'videos' table...", "white");
+            const { data, error } = await _supa.from('videos').select('*');
+
+            if (error) {
+                logger("❌ ERROR: " + error.message, "red");
+                logger("Code: " + error.code, "red");
+                document.getElementById('status').innerText = "FAILED";
+            } else if (data && data.length > 0) {
+                logger("✅ SUCCESS: Found " + data.length + " rows!", "green");
+                const videoLink = data[data.length-1].video_url;
+                logger("Link: " + videoLink, "green");
+                
+                document.getElementById('status').innerText = "READY!";
+                document.getElementById('btn-box').innerHTML = `<button onclick="window.location.href='${videoLink}'">TEST VIDEO LINK</button>`;
+            } else {
+                logger("⚠️ EMPTY: Table connected but no data found.", "red");
+                document.getElementById('status').innerText = "NO DATA";
             }
         }
-
-        function play() {
-            document.getElementById('ui').style.display = 'none';
-            const vid = document.getElementById('v-player');
-            vid.style.display = 'block';
-            vid.play();
-        }
-        start();
+        testConnection();
     </script>
 </body>
 </html>
