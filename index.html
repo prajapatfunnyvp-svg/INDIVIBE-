@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE READY</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -24,25 +24,19 @@
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Aapki bheji hui SAHI ANON KEY yahan hai
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4'; 
 
         const _supa = supabase.createClient(URL, KEY);
 
         async function start() {
-            try {
-                const { data, error } = await _supa.from('videos').select('*');
-                if (data && data.length > 0) {
-                    document.getElementById('st').innerText = "INDIVIBE READY!";
-                    document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
-                    document.getElementById('v-player').src = data[data.length - 1].video_url;
-                } else if (error) {
-                    document.getElementById('st').innerText = "Error: " + error.message;
-                } else {
-                    document.getElementById('st').innerText = "Database is Empty!";
-                }
-            } catch (e) {
-                document.getElementById('st').innerText = "Network Error";
+            const { data, error } = await _supa.from('videos').select('*');
+            if (data && data.length > 0) {
+                document.getElementById('st').innerText = "INDIVIBE READY!";
+                document.getElementById('btn-box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                document.getElementById('v-player').src = data[data.length - 1].video_url;
+            } else {
+                // Agar data nahi mila toh 2 second baad phir koshish karega
+                setTimeout(start, 2000);
             }
         }
 
