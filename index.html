@@ -7,46 +7,51 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; margin: 0; }
-        .card { border: 2px solid #00f2ea; padding: 35px; border-radius: 25px; width: 85%; background: #111; box-shadow: 0 0 20px #00f2ea; }
-        button { background: #00f2ea; color: #000; border: none; padding: 18px 45px; border-radius: 40px; font-weight: bold; cursor: pointer; font-size: 22px; margin-top: 25px; }
+        .card { border: 2px solid #00f2ea; padding: 30px; border-radius: 20px; width: 85%; background: #111; }
+        button { background: #00f2ea; color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; font-size: 20px; margin-top: 20px; }
+        #err { color: #ff4444; font-size: 12px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
-    <div id="ui" class="card">
+    <div class="card">
         <h1>INDIVIBE</h1>
-        <p id="st">Checking Connection...</p>
+        <p id="st">Connecting...</p>
         <div id="box"></div>
+        <p id="err"></p>
     </div>
     <video id="v" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover;" controls playsinline loop></video>
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        // Aapki bheji hui key bina kisi extra space ke
-        let RAW_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
-        
-        const KEY = RAW_KEY.trim(); // Ye line error saaf kar degi
+        const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function start() {
-            const { data, error } = await _supa.from('videos').select('*');
-            if (data && data.length > 0) {
-                document.getElementById('st').innerText = "INDIVIBE READY!";
-                document.getElementById('box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
-                document.getElementById('v').src = data[data.length - 1].video_url;
-            } else if (error) {
-                document.getElementById('st').innerText = "Status: " + error.message;
-            } else {
-                document.getElementById('st').innerText = "No Data in Table";
+        async function init() {
+            try {
+                const { data, error } = await _supa.from('videos').select('*');
+                if (error) {
+                    document.getElementById('st').innerText = "Error!";
+                    document.getElementById('err').style.display = "block";
+                    document.getElementById('err').innerText = error.message;
+                } else if (data && data.length > 0) {
+                    document.getElementById('st').innerText = "INDIVIBE READY!";
+                    document.getElementById('box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                    document.getElementById('v').src = data[data.length - 1].video_url;
+                } else {
+                    document.getElementById('st').innerText = "Database Khali Hai!";
+                }
+            } catch (e) {
+                document.getElementById('st').innerText = "Net Problem";
             }
         }
 
         function play() {
-            document.getElementById('ui').style.display = 'none';
+            document.querySelector('.card').style.display = 'none';
             const vid = document.getElementById('v');
             vid.style.display = 'block';
             vid.play();
         }
-        start();
+        init();
     </script>
 </body>
 </html>
