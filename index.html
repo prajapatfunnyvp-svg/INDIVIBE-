@@ -6,17 +6,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; overflow: hidden; }
-        .card { border: 2px solid #00f2ea; padding: 40px; border-radius: 30px; width: 85%; background: #111; box-shadow: 0 0 25px #00f2ea; z-index: 10; }
+        .card { border: 2px solid #00f2ea; padding: 40px; border-radius: 30px; width: 85%; background: #111; box-shadow: 0 0 25px #00f2ea; }
         h1 { font-size: 38px; margin-bottom: 10px; text-shadow: 0 0 10px #00f2ea; }
-        button { background: #00f2ea; color: #000; border: none; padding: 22px 55px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 26px; margin-top: 25px; box-shadow: 0 0 15px #00f2ea; -webkit-tap-highlight-color: transparent; }
-        video { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+        button { background: #00f2ea; color: #000; border: none; padding: 22px 55px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 26px; margin-top: 25px; box-shadow: 0 0 15px #00f2ea; }
+        video { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; z-index: 99; }
     </style>
 </head>
 <body>
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
         <p id="st">READY!</p>
-        <div id="box"><button id="btn">WATCH NOW</button></div>
+        <button onclick="playVideo()">WATCH NOW</button>
     </div>
     <video id="v" controls playsinline loop></video>
 
@@ -25,22 +25,31 @@
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function init() {
-            const { data } = await _supa.from('videos').select('video_url');
-            if (data && data.length > 0) {
-                const videoLink = data[data.length - 1].video_url;
-                const vid = document.getElementById('v');
-                vid.src = videoLink;
-                
-                // Click hone par video chalane ka naya tarika
-                document.getElementById('btn').addEventListener('click', function() {
+        async function playVideo() {
+            const vid = document.getElementById('v');
+            const status = document.getElementById('st');
+            
+            try {
+                const { data } = await _supa.from('videos').select('video_url');
+                if (data && data.length > 0) {
+                    const videoLink = data[data.length - 1].video_url;
+                    vid.src = videoLink;
+                    
+                    // UI chhupao aur video dikhao
                     document.getElementById('ui').style.display = 'none';
                     vid.style.display = 'block';
-                    vid.play();
-                });
+                    
+                    // Video chalao
+                    vid.play().catch(err => {
+                        console.log("Auto-play blocked, showing controls");
+                    });
+                } else {
+                    alert("No video link found in Supabase!");
+                }
+            } catch (e) {
+                alert("Connection Error!");
             }
         }
-        init();
     </script>
 </body>
 </html>
