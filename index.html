@@ -6,42 +6,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; font-family: sans-serif; }
-        
-        /* Yeh container videos ko upar-neeche scroll karwayega */
-        .feed-container { 
-            height: 100vh; 
-            overflow-y: scroll; 
-            scroll-snap-type: y mandatory; 
-            scroll-behavior: smooth;
-        }
-        .feed-container::-webkit-scrollbar { display: none; }
-
-        .video-card { 
-            height: 100vh; 
-            width: 100vw; 
-            scroll-snap-align: start; 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            background: #000;
-        }
-
+        .feed-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        .video-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
-
-        .overlay { position: absolute; bottom: 100px; left: 15px; color: white; z-index: 10; }
-        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 30px; z-index: 10; }
-        .icon { font-size: 28px; color: white; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        
-        /* Starting Button taaki browser video block na kare */
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; }
-        #start-btn { background: #00f2ea; color: #000; border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; font-size: 20px; }
+        #start-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#00f2ea; }
+        button { background:#00f2ea; color:#000; border:none; padding:20px 50px; border-radius:50px; font-weight:bold; font-size:22px; cursor:pointer; }
     </style>
 </head>
 <body>
 
     <div id="start-screen">
-        <button id="start-btn" onclick="initApp()">START WATCHING</button>
+        <h1>INDIVIBE</h1>
+        <button onclick="startNow()">START WATCHING</button>
     </div>
 
     <div id="feed" class="feed-container"></div>
@@ -51,46 +27,44 @@
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function initApp() {
+        async function startNow() {
             document.getElementById('start-screen').style.display = 'none';
-            const { data } = await _supa.from('videos').select('*');
             
-            if (data) {
-                const feed = document.getElementById('feed');
-                feed.innerHTML = data.map(item => `
-                    <div class="video-card">
-                        <video src="${item.video_url}" loop playsinline onclick="togglePlay(this)"></video>
-                        <div class="overlay"><h3>@IndiVibe_Music</h3><p>Instrumental Bliss</p></div>
-                        <div class="side-bar">
-                            <div class="icon">❤️</div>
-                            <div class="icon">🚀</div>
+            try {
+                const { data, error } = await _supa.from('videos').select('*');
+                if (data && data.length > 0) {
+                    const feed = document.getElementById('feed');
+                    feed.innerHTML = data.map((item, index) => `
+                        <div class="video-card">
+                            <video id="vid-${index}" src="${item.video_url}" loop playsinline muted onclick="unmute(this)"></video>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
 
-                // Auto play first video
-                const firstVid = document.querySelector('video');
-                if(firstVid) firstVid.play();
+                    // Pehle video ko chalu karein
+                    const v = document.querySelector('video');
+                    v.play();
+                    alert("Tip: Video par tap karein awaz ke liye!");
+                }
+            } catch (e) {
+                alert("Database Error!");
             }
         }
 
-        function togglePlay(vid) {
-            if (vid.paused) vid.play();
-            else vid.pause();
+        function unmute(v) {
+            v.muted = false;
+            if(v.paused) v.play();
         }
 
-        // Jab user scroll kare toh agla video apne aap chalu ho jaye
+        // Scroll hone par play/pause logic
         document.getElementById('feed').addEventListener('scroll', () => {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(v => {
-                const rect = v.getBoundingClientRect();
-                if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
-                    v.play();
-                } else {
-                    v.pause();
-                }
+            const vids = document.querySelectorAll('video');
+            vids.forEach(v => {
+                const r = v.getBoundingClientRect();
+                if(r.top >= 0 && r.top < window.innerHeight / 2) v.play();
+                else v.pause();
             });
         });
     </script>
 </body>
 </html>
+
