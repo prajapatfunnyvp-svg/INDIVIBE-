@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE FINAL WIN</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -14,7 +14,7 @@
 <body>
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
-        <p id="st">Connecting...</p>
+        <p id="st">Checking Connection...</p>
         <div id="box"></div>
     </div>
     <video id="v" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover;" controls playsinline loop></video>
@@ -24,36 +24,35 @@
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function loadApp() {
+        async function go() {
             const status = document.getElementById('st');
             try {
-                // Table se data mangte waqt hum 'created_at' se sort kar rahe hain
-                const { data, error } = await _supa.from('videos').select('*').order('id', { ascending: false }).limit(1);
+                // Hum seedha sabse naya video link utha rahe hain
+                let { data, error } = await _supa.from('videos').select('*');
                 
-                if (error) {
-                    status.innerText = "Check Supabase Table Name!";
-                    console.log(error);
-                } else if (data && data.length > 0) {
+                if (data && data.length > 0) {
                     status.innerText = "READY!";
-                    document.getElementById('box').innerHTML = '<button onclick="playVideo()">WATCH NOW</button>';
-                    document.getElementById('v').src = data[0].video_url;
+                    document.getElementById('box').innerHTML = '<button onclick="playNow()">WATCH NOW</button>';
+                    document.getElementById('v').src = data[data.length - 1].video_url;
+                } else if (error) {
+                    status.innerText = "Error: " + error.message;
                 } else {
-                    status.innerText = "Table is Empty! Please Add Row.";
+                    status.innerText = "Database is Empty! Save Row in Supabase.";
                 }
-            } catch (e) {
+            } catch (err) {
                 status.innerText = "Network Error!";
             }
         }
 
-        function playVideo() {
+        function playNow() {
             document.getElementById('ui').style.display = 'none';
-            const videoPlayer = document.getElementById('v');
-            videoPlayer.style.display = 'block';
-            videoPlayer.play();
+            const vid = document.getElementById('v');
+            vid.style.display = 'block';
+            vid.play().catch(e => alert("Please tap to play video"));
         }
-
-        // App ko start karein
-        loadApp();
+        
+        // Isse turant chalayenge
+        go();
     </script>
 </body>
 </html>
