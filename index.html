@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE FINAL SUCCESS</title>
+    <title>INDIVIBE LIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
@@ -14,7 +14,7 @@
 <body>
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
-        <p id="st">Checking Database...</p>
+        <p id="st">Checking Video Link...</p>
         <div id="box"></div>
     </div>
     <video id="v" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover;" controls playsinline loop></video>
@@ -25,20 +25,19 @@
         const _supa = supabase.createClient(URL, KEY);
 
         async function start() {
-            const st = document.getElementById('st');
             try {
+                // Seedha query bhej rahe hain
                 const { data, error } = await _supa.from('videos').select('*');
                 if (data && data.length > 0) {
-                    st.innerText = "Video Found!";
+                    document.getElementById('st').innerText = "SUCCESS!";
                     document.getElementById('box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
+                    // Column ka naam 'video_url' hai
                     document.getElementById('v').src = data[data.length - 1].video_url;
-                } else if (error) {
-                    st.innerText = "Error: " + error.message;
                 } else {
-                    st.innerText = "Table is Empty! Add a row.";
+                    document.getElementById('st').innerText = "Database is Empty! Save the Row.";
                 }
             } catch (e) {
-                st.innerText = "Connection Failed!";
+                document.getElementById('st').innerText = "Connection Failed!";
             }
         }
         function play() {
