@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDIVIBE SUCCESS</title>
@@ -7,15 +7,16 @@
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
         .card { border: 2px solid #00f2ea; padding: 40px; border-radius: 30px; width: 85%; background: #111; box-shadow: 0 0 25px #00f2ea; }
-        button { background: #00f2ea; color: #000; border: none; padding: 22px 55px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 26px; margin-top: 25px; }
-        video { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 100; }
+        h1 { font-size: 38px; margin-bottom: 10px; text-shadow: 0 0 10px #00f2ea; }
+        button { background: #00f2ea; color: #000; border: none; padding: 22px 55px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 26px; margin-top: 25px; box-shadow: 0 0 15px #00f2ea; }
+        video { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #000; z-index: 100; }
     </style>
 </head>
 <body>
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
         <p id="st">READY!</p>
-        <button onclick="play()">WATCH NOW</button>
+        <button onclick="startApp()">WATCH NOW</button>
     </div>
     <video id="v" controls playsinline></video>
 
@@ -24,22 +25,39 @@
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function play() {
+        async function startApp() {
+            const btn = document.querySelector('button');
+            const status = document.getElementById('st');
+            btn.innerText = "Loading...";
+
             try {
+                // Supabase se video link mang rahe hain
                 const { data, error } = await _supa.from('videos').select('video_url');
+                
                 if (data && data.length > 0) {
+                    const videoPath = data[data.length - 1].video_url;
                     const vid = document.getElementById('v');
-                    vid.src = data[data.length - 1].video_url;
+                    vid.src = videoPath;
+
+                    // UI hide karo aur video dikhao
                     document.getElementById('ui').style.display = 'none';
                     vid.style.display = 'block';
-                    vid.play();
+                    
+                    // Video play karo
+                    vid.play().catch(e => {
+                        console.log("Play failed, showing controls");
+                        btn.innerText = "Tap Video to Play";
+                    });
                 } else {
-                    alert("Supabase Row Check Karein!");
+                    alert("Supabase table khali hai! Row 3 check karein.");
+                    btn.innerText = "WATCH NOW";
                 }
-            } catch (e) {
-                location.reload(); // Agar error aaye toh apne aap refresh ho jaye
+            } catch (err) {
+                alert("Connection problem! Page refresh karein.");
+                btn.innerText = "WATCH NOW";
             }
         }
     </script>
 </body>
 </html>
+
