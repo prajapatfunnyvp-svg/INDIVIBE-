@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE SUCCESS</title>
+    <title>INDIVIBE FINAL</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; }
         .card { border: 2px solid #00f2ea; padding: 40px; border-radius: 30px; width: 85%; background: #111; box-shadow: 0 0 20px #00f2ea; }
-        h1 { font-size: 35px; margin-bottom: 10px; text-shadow: 0 0 10px #00f2ea; }
-        button { background: #00f2ea; color: #000; border: none; padding: 20px 50px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 24px; margin-top: 25px; box-shadow: 0 0 15px #00f2ea; transition: 0.3s; }
-        button:active { transform: scale(0.9); }
+        button { background: #00f2ea; color: #000; border: none; padding: 20px 50px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 24px; margin-top: 25px; box-shadow: 0 0 15px #00f2ea; }
     </style>
 </head>
 <body>
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
-        <p id="st">Checking Connection...</p>
+        <p id="st">Checking Database Row...</p>
         <div id="box"></div>
     </div>
     <video id="v" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover;" controls playsinline loop></video>
@@ -29,18 +27,19 @@
         async function start() {
             const st = document.getElementById('st');
             try {
-                // 'videos' table se data mang rahe hain
+                // Hum seedha data fetch kar rahe hain
                 const { data, error } = await _supa.from('videos').select('*');
                 
                 if (error) {
-                    st.innerText = "Error: " + error.message;
+                    st.innerText = "Supabase Error: " + error.message;
                 } else if (data && data.length > 0) {
-                    st.innerText = "Database Connected!";
-                    // Video milte hi button dikhao
+                    st.innerText = "Connection Success!";
+                    // Button dikhayenge
                     document.getElementById('box').innerHTML = '<button onclick="play()">WATCH NOW</button>';
-                    document.getElementById('v').src = data[data.length - 1].video_url;
+                    // Video link set karenge
+                    document.getElementById('v').src = data[0].video_url;
                 } else {
-                    st.innerText = "Database is Empty! Please add a link in Supabase.";
+                    st.innerText = "Table is Empty in Supabase!";
                 }
             } catch (e) {
                 st.innerText = "Connection Failed!";
@@ -51,7 +50,7 @@
             document.getElementById('ui').style.display = 'none';
             const vid = document.getElementById('v');
             vid.style.display = 'block';
-            vid.play().catch(e => alert("Please tap again to play"));
+            vid.play();
         }
         start();
     </script>
