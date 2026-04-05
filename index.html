@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIVIBE LIVE</title>
+    <title>INDIVIBE SUCCESS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: #00f2ea; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; overflow: hidden; }
@@ -16,7 +16,7 @@
     <div id="ui" class="card">
         <h1>INDIVIBE</h1>
         <p id="st">READY!</p>
-        <button onclick="playNow()">WATCH NOW</button>
+        <button id="mainBtn" onclick="fetchAndPlay()">WATCH NOW</button>
     </div>
     <video id="v" controls playsinline loop></video>
 
@@ -25,24 +25,30 @@
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        async function playNow() {
-            const vid = document.getElementById('v');
+        async function fetchAndPlay() {
+            const btn = document.getElementById('mainBtn');
+            const status = document.getElementById('st');
+            btn.innerText = "Loading...";
+
             try {
-                // Seedha row 3 wala data mang rahe hain
+                // Bina kisi filter ke seedha pura data mang rahe hain
                 const { data, error } = await _supa.from('videos').select('video_url');
                 
                 if (data && data.length > 0) {
-                    // Sabse naya link (Row 3)
-                    const link = data[data.length - 1].video_url;
-                    vid.src = link;
+                    const latestVideo = data[data.length - 1].video_url;
+                    const vid = document.getElementById('v');
+                    vid.src = latestVideo;
+                    
                     document.getElementById('ui').style.display = 'none';
                     vid.style.display = 'block';
                     vid.play();
                 } else {
-                    alert("Supabase mein data nahi mila!");
+                    alert("Supabase table mein link nahi mila!");
+                    btn.innerText = "WATCH NOW";
                 }
             } catch (e) {
-                alert("Internet connection check karein!");
+                alert("Technical Error! Refresh karke dobara check karein.");
+                btn.innerText = "WATCH NOW";
             }
         }
     </script>
