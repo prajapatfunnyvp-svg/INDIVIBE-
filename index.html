@@ -2,91 +2,69 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe 3D Pro</title>
+    <title>IndiVibe - Instagram Style</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* 3D App Styling */
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .feed::-webkit-scrollbar { display: none; }
-        .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
+        
+        /* Home Feed Header (Instagram Look) */
+        .home-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header-logo { width: 40px; }
+        .header-name { font-size: 26px; font-weight: bold; color: #00f2ea; margin-left: 10px; }
+
+        /* Reels Container (Starts after header) */
+        .feed { height: calc(100vh - 60px); margin-top: 60px; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .v-card { height: calc(100vh - 60px); width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 3D Glass Header */
-        .header-3d {
-            position: absolute; top: 15px; left: 15px; z-index: 100;
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(255, 255, 255, 0.1); padding: 8px 15px;
-            border-radius: 15px; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .logo-img { width: 30px; height: 30px; border-radius: 5px; }
-        .brand-3d {
-            font-size: 20px; font-weight: 900; color: #00f2ea;
-            text-shadow: 2px 2px 0px #005f5c, 3px 3px 10px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
-        }
-
         /* Social Icons */
-        .side-icons { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 25px; z-index: 50; }
-        .icon-box { text-align: center; font-size: 28px; cursor: pointer; filter: drop-shadow(2px 2px 5px #000); }
-        .icon-box span { font-size: 11px; display: block; margin-top: 2px; }
+        .side-icons { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 50; }
+        .icon-btn { text-align: center; font-size: 26px; filter: drop-shadow(2px 2px 5px #000); cursor: pointer; }
+        .icon-btn span { font-size: 10px; display: block; }
 
-        /* Start Screen */
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .logo-large { width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 20px #00f2ea); }
-        .enter-btn { background: #00f2ea; color: #000; border: none; padding: 18px 50px; border-radius: 50px; font-weight: bold; font-size: 22px; cursor: pointer; }
+        /* Splash Screen */
+        #splash { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
-    <div id="start-overlay">
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-large">
-        <div class="brand-3d" style="font-size: 45px;">IndiVibe</div>
-        <p style="margin: 20px 0; color: #00f2ea; opacity: 0.7;">Vibe Like Never Before</p>
-        <button class="enter-btn" onclick="launch()">ENTER APP</button>
+    <div class="home-header">
+        <img src="[LINK TO YOUR LOGO]" class="header-logo">
+        <div class="header-name">IndiVibe</div>
     </div>
 
     <div id="main-feed" class="feed"></div>
 
-    <script>
-        // Backup Videos (Agar database nahi chala toh ye dikhenge)
-        const myData = [
-            {v: "https://vjs.zencdn.net/v/oceans.mp4", u: "@Dshrat_Nayak"},
-            {v: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", u: "@IndiVibe_Music"}
-        ];
+    <div id="splash">
+        <img src="[LINK TO YOUR LOGO]" style="width:100px; filter: drop-shadow(0 0 15px #00f2ea);">
+        <h1 style="color:#00f2ea; letter-spacing:3px;">IndiVibe</h1>
+        <button onclick="startApp()" style="background:#00f2ea; border:none; padding:15px 40px; border-radius:30px; font-weight:bold; margin-top:20px;">VIBE NOW</button>
+    </div>
 
-        function launch() {
-            document.getElementById('start-overlay').style.display = 'none';
+    <script>
+        function startApp() {
+            document.getElementById('splash').style.display = 'none';
             const feed = document.getElementById('main-feed');
             
-            feed.innerHTML = myData.map(v => `
+            // Backup Videos (Jaise pichli baar the)
+            const myVideos = [{v: 'https://vjs.zencdn.net/v/oceans.mp4', u: '@Dshrat_Nayak'}];
+            
+            feed.innerHTML = myVideos.map(v => `
                 <div class="v-card">
-                    <div class="header-3d">
-                        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-img">
-                        <div class="brand-3d">IndiVibe</div>
-                    </div>
-                    
                     <video src="${v.v}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
-                    
                     <div class="side-icons">
-                        <div class="icon-box" onclick="alert('Like Done!')">❤️<span>12k</span></div>
-                        <div class="icon-box" onclick="openChat()">💬<span>45</span></div>
-                        <div class="icon-box" onclick="navigator.share({title:'IndiVibe', url:window.location.href})">🚀<span>Share</span></div>
-                    </div>
-
-                    <div style="position:absolute; bottom:40px; left:15px; text-shadow: 2px 2px 5px #000;">
-                        <h4 style="margin:0;">${v.u}</h4>
-                        <p style="font-size:14px; margin:5px 0;">Relaxing Flute Music 🎵</p>
+                        <div class="icon-btn">❤️<span>15k</span></div>
+                        <div class="icon-btn" onclick="alert('Chat box coming in next update!')">💬<span>80</span></div>
+                        <div class="icon-btn" onclick="navigator.share({url:window.location.href})">🚀<span>Share</span></div>
                     </div>
                 </div>
             `).join('');
-            
             document.querySelector('video').play();
-        }
-
-        function openChat() {
-            let msg = prompt("Doston ko message bhejein:");
-            if(msg) alert("Message Sent: " + msg);
         }
     </script>
 </body>
