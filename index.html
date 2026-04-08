@@ -1,84 +1,64 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Mobile Edition</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>INDIVIBE PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
-        .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .video-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #00f2ea; font-family: sans-serif; overflow: hidden; }
+        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Level 2 & 3: Icons & Branding */
-        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 25px; z-index: 10; }
-        .icon { font-size: 30px; text-align: center; }
-        .icon span { font-size: 12px; display: block; }
-        .info { position: absolute; bottom: 30px; left: 15px; z-index: 10; }
-
-        #status-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .btn { background: #00f2ea; color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 20px; display: none; margin-top: 20px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .go-btn { background: #00f2ea; color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="status-screen">
-        <h1 style="color:#00f2ea">INDIVIBE</h1>
-        <p id="msg">Checking Database...</p>
-        <button id="startBtn" class="btn" onclick="startApp()">START WATCHING</button>
+    <div id="loader">
+        <h1>INDIVIBE</h1>
+        <p id="msg">Connecting to Server...</p>
+        <button id="btn" class="go-btn" onclick="startApp()">START VIBING</button>
     </div>
 
-    <div id="feed" class="reels-container"></div>
+    <div id="feed" class="feed"></div>
 
     <script>
-        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const S_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
-        const supa = supabase.createClient(S_URL, S_KEY);
+        // In dono ko dhyan se dekhein, inme galti nahi honi chahiye
+        const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
+        
+        const _supa = supabase.createClient(URL, KEY);
 
-        async function loadData() {
+        async function init() {
             try {
-                const { data, error } = await supa.from('videos').select('*');
-                
+                const { data, error } = await _supa.from('videos').select('*');
                 if (error) {
-                    document.getElementById('msg').innerText = "Error: " + error.message;
-                    return;
-                }
-
-                if (data && data.length > 0) {
-                    window.myVideos = data;
-                    document.getElementById('msg').innerText = "Connected! (" + data.length + " Videos Found)";
-                    document.getElementById('startBtn').style.display = "block";
+                    document.getElementById('msg').innerText = "Key Error: Check API Key settings.";
+                } else if (data && data.length > 0) {
+                    window.vList = data;
+                    document.getElementById('msg').innerText = "Connected! ✅";
+                    document.getElementById('btn').style.display = "block";
                 } else {
-                    document.getElementById('msg').innerText = "Database is Empty! Check your Supabase rows.";
+                    document.getElementById('msg').innerText = "Table is Empty in Supabase!";
                 }
             } catch (e) {
-                document.getElementById('msg').innerText = "Connection Failed! Check Internet.";
+                document.getElementById('msg').innerText = "Network Error!";
             }
         }
-        loadData();
+        init();
 
         function startApp() {
-            document.getElementById('status-screen').style.display = 'none';
-            const feed = document.getElementById('feed');
-            
-            feed.innerHTML = window.myVideos.map((v, i) => `
-                <div class="video-card">
-                    <video src="${v.video_url}" loop playsinline muted onclick="this.muted=!this.muted; this.play();"></video>
-                    <div class="side-bar">
-                        <div class="icon">❤️<span>Like</span></div>
-                        <div class="icon">💬<span>Chat</span></div>
-                        <div class="icon">🚀<span>Share</span></div>
-                    </div>
-                    <div class="info">
-                        <h4>@IndiVibe_Music</h4>
-                        <p>Instrumental Melody</p>
-                    </div>
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('feed').innerHTML = window.vList.map(v => `
+                <div class="v-card">
+                    <video src="${v.video_url}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
+                    <div style="position:absolute; bottom:30px; left:15px;"><h4>@IndiVibe_Music</h4></div>
                 </div>
             `).join('');
-            
             document.querySelector('video').play();
         }
     </script>
 </body>
 </html>
+
