@@ -2,60 +2,79 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE PRO</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>IndiVibe 3D</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Arial Black', sans-serif; overflow: hidden; }
         .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Logo Watermark */
-        .watermark { position: absolute; top: 20px; right: 20px; width: 60px; z-index: 10; opacity: 0.8; }
-        
-        /* Social Buttons */
-        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
-        .btn { text-align: center; font-size: 25px; }
-        .btn span { font-size: 10px; display: block; }
 
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .start-btn { background: #00f2ea; color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; margin-top: 20px; }
+        /* 3D App Name (Instagram Style) */
+        .app-header {
+            position: absolute; top: 20px; left: 15px; z-index: 100;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-small { width: 35px; height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,242,234,0.5); }
+        
+        .brand-name {
+            font-size: 24px;
+            color: #00f2ea;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            /* 3D Effect */
+            text-shadow: 1px 1px 0px #000, 2px 2px 0px #00a8a3, 3px 3px 5px rgba(0,0,0,0.8);
+            background: linear-gradient(to bottom, #fff, #00f2ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons & Controls */
+        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 50; }
+        .btn { text-align: center; font-size: 28px; cursor: pointer; filter: drop-shadow(2px 2px 5px #000); }
+        .btn span { font-size: 11px; display: block; font-family: sans-serif; }
+
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .start-btn { background: linear-gradient(45deg, #00f2ea, #005f5c); color: #000; border: none; padding: 15px 50px; border-radius: 50px; font-weight: bold; font-size: 20px; box-shadow: 0 10px 20px rgba(0,242,234,0.3); }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:120px; margin-bottom:20px;">
-        <h2 style="color:#00f2ea">INDIVIBE</h2>
-        <p id="msg">Aapka App Taiyaar Hai!</p>
-        <button class="start-btn" onclick="startApp()">VIBE START KAREIN</button>
+    <div id="start-screen">
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:100px; margin-bottom:15px;">
+        <div class="brand-name" style="font-size: 40px;">IndiVibe</div>
+        <button class="start-btn" onclick="openApp()">START VIBING</button>
     </div>
 
     <div id="feed" class="feed"></div>
 
     <script>
-        // Seedha video data (Agar database nakhre kare toh bhi chale)
-        const myVideos = [
+        const vData = [
             {url: "https://vjs.zencdn.net/v/oceans.mp4", user: "@Dshrat_Nayak"},
             {url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", user: "@IndiVibe_Music"}
         ];
 
-        function startApp() {
-            document.getElementById('loader').style.display = 'none';
+        function openApp() {
+            document.getElementById('start-screen').style.display = 'none';
             const feed = document.getElementById('feed');
             
-            feed.innerHTML = myVideos.map(v => `
+            feed.innerHTML = vData.map(v => `
                 <div class="v-card">
-                    <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="watermark">
-                    <video src="${v.url}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
-                    <div class="side-bar">
-                        <div class="btn">❤️<span>Like</span></div>
-                        <div class="btn">💬<span>Chat</span></div>
-                        <div class="btn">🚀<span>Share</span></div>
+                    <div class="app-header">
+                        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-small">
+                        <div class="brand-name">IndiVibe</div>
                     </div>
-                    <div style="position:absolute; bottom:30px; left:15px;">
-                        <h4>${v.user}</h4>
-                        <p>Relaxing Instrumental Flute 🎵</p>
+                    
+                    <video src="${v.url}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
+                    
+                    <div class="side-bar">
+                        <div class="btn" onclick="alert('Liked!')">❤️<span>12.4k</span></div>
+                        <div class="btn" onclick="alert('Chat box coming soon!')">💬<span>500</span></div>
+                        <div class="btn" onclick="alert('Link Copied!')">🚀<span>Share</span></div>
+                    </div>
+                    
+                    <div style="position:absolute; bottom:40px; left:15px; font-family:sans-serif;">
+                        <h4 style="margin:0;">${v.user}</h4>
+                        <p style="font-size:14px; margin:5px 0;">🎵 Flute Instrumental Beats</p>
                     </div>
                 </div>
             `).join('');
@@ -64,4 +83,3 @@
     </script>
 </body>
 </html>
-
