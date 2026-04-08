@@ -2,84 +2,93 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe 3D</title>
+    <title>IndiVibe 3D Pro</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Arial Black', sans-serif; overflow: hidden; }
-        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        /* 3D App Styling */
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .feed::-webkit-scrollbar { display: none; }
         .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 3D App Name (Instagram Style) */
-        .app-header {
-            position: absolute; top: 20px; left: 15px; z-index: 100;
+        /* 3D Glass Header */
+        .header-3d {
+            position: absolute; top: 15px; left: 15px; z-index: 100;
             display: flex; align-items: center; gap: 10px;
+            background: rgba(255, 255, 255, 0.1); padding: 8px 15px;
+            border-radius: 15px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .logo-small { width: 35px; height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,242,234,0.5); }
-        
-        .brand-name {
-            font-size: 24px;
-            color: #00f2ea;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            /* 3D Effect */
-            text-shadow: 1px 1px 0px #000, 2px 2px 0px #00a8a3, 3px 3px 5px rgba(0,0,0,0.8);
-            background: linear-gradient(to bottom, #fff, #00f2ea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .logo-img { width: 30px; height: 30px; border-radius: 5px; }
+        .brand-3d {
+            font-size: 20px; font-weight: 900; color: #00f2ea;
+            text-shadow: 2px 2px 0px #005f5c, 3px 3px 10px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
         }
 
-        /* Buttons & Controls */
-        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 50; }
-        .btn { text-align: center; font-size: 28px; cursor: pointer; filter: drop-shadow(2px 2px 5px #000); }
-        .btn span { font-size: 11px; display: block; font-family: sans-serif; }
+        /* Social Icons */
+        .side-icons { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 25px; z-index: 50; }
+        .icon-box { text-align: center; font-size: 28px; cursor: pointer; filter: drop-shadow(2px 2px 5px #000); }
+        .icon-box span { font-size: 11px; display: block; margin-top: 2px; }
 
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .start-btn { background: linear-gradient(45deg, #00f2ea, #005f5c); color: #000; border: none; padding: 15px 50px; border-radius: 50px; font-weight: bold; font-size: 20px; box-shadow: 0 10px 20px rgba(0,242,234,0.3); }
+        /* Start Screen */
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo-large { width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 20px #00f2ea); }
+        .enter-btn { background: #00f2ea; color: #000; border: none; padding: 18px 50px; border-radius: 50px; font-weight: bold; font-size: 22px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:100px; margin-bottom:15px;">
-        <div class="brand-name" style="font-size: 40px;">IndiVibe</div>
-        <button class="start-btn" onclick="openApp()">START VIBING</button>
+    <div id="start-overlay">
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-large">
+        <div class="brand-3d" style="font-size: 45px;">IndiVibe</div>
+        <p style="margin: 20px 0; color: #00f2ea; opacity: 0.7;">Vibe Like Never Before</p>
+        <button class="enter-btn" onclick="launch()">ENTER APP</button>
     </div>
 
-    <div id="feed" class="feed"></div>
+    <div id="main-feed" class="feed"></div>
 
     <script>
-        const vData = [
-            {url: "https://vjs.zencdn.net/v/oceans.mp4", user: "@Dshrat_Nayak"},
-            {url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", user: "@IndiVibe_Music"}
+        // Backup Videos (Agar database nahi chala toh ye dikhenge)
+        const myData = [
+            {v: "https://vjs.zencdn.net/v/oceans.mp4", u: "@Dshrat_Nayak"},
+            {v: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", u: "@IndiVibe_Music"}
         ];
 
-        function openApp() {
-            document.getElementById('start-screen').style.display = 'none';
-            const feed = document.getElementById('feed');
+        function launch() {
+            document.getElementById('start-overlay').style.display = 'none';
+            const feed = document.getElementById('main-feed');
             
-            feed.innerHTML = vData.map(v => `
+            feed.innerHTML = myData.map(v => `
                 <div class="v-card">
-                    <div class="app-header">
-                        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-small">
-                        <div class="brand-name">IndiVibe</div>
+                    <div class="header-3d">
+                        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="logo-img">
+                        <div class="brand-3d">IndiVibe</div>
                     </div>
                     
-                    <video src="${v.url}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
+                    <video src="${v.v}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
                     
-                    <div class="side-bar">
-                        <div class="btn" onclick="alert('Liked!')">❤️<span>12.4k</span></div>
-                        <div class="btn" onclick="alert('Chat box coming soon!')">💬<span>500</span></div>
-                        <div class="btn" onclick="alert('Link Copied!')">🚀<span>Share</span></div>
+                    <div class="side-icons">
+                        <div class="icon-box" onclick="alert('Like Done!')">❤️<span>12k</span></div>
+                        <div class="icon-box" onclick="openChat()">💬<span>45</span></div>
+                        <div class="icon-box" onclick="navigator.share({title:'IndiVibe', url:window.location.href})">🚀<span>Share</span></div>
                     </div>
-                    
-                    <div style="position:absolute; bottom:40px; left:15px; font-family:sans-serif;">
-                        <h4 style="margin:0;">${v.user}</h4>
-                        <p style="font-size:14px; margin:5px 0;">🎵 Flute Instrumental Beats</p>
+
+                    <div style="position:absolute; bottom:40px; left:15px; text-shadow: 2px 2px 5px #000;">
+                        <h4 style="margin:0;">${v.u}</h4>
+                        <p style="font-size:14px; margin:5px 0;">Relaxing Flute Music 🎵</p>
                     </div>
                 </div>
             `).join('');
+            
             document.querySelector('video').play();
+        }
+
+        function openChat() {
+            let msg = prompt("Doston ko message bhejein:");
+            if(msg) alert("Message Sent: " + msg);
         }
     </script>
 </body>
 </html>
+
