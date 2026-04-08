@@ -2,93 +2,91 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe - Real Instagram Style</title>
+    <title>IndiVibe Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
         
         /* HEADER */
-        .app-header {
-            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; box-sizing: border-box;
-            background: #000; z-index: 100;
-        }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .header-logo { width: 32px; height: 32px; border-radius: 8px; }
-        .header-name { font-size: 22px; font-weight: bold; letter-spacing: -1px; }
+        .header { position: fixed; top: 0; width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; z-index: 100; background: #000; border-bottom: 0.5px solid #222; }
+        .logo { font-size: 24px; font-weight: bold; font-style: italic; color: #00f2ea; }
 
-        /* REELS FEED */
-        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .feed::-webkit-scrollbar { display: none; }
-        .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
+        /* PAGES */
+        .page { display: none; height: calc(100vh - 60px); overflow-y: auto; padding-top: 60px; padding-bottom: 60px; }
+        .page.active { display: block; }
+        #vibe-page { height: 100vh; padding: 0; overflow-y: scroll; scroll-snap-type: y mandatory; }
+
+        /* STORIES (24h Concept) */
+        .stories-bar { display: flex; gap: 12px; padding: 15px; overflow-x: auto; border-bottom: 0.5px solid #222; scrollbar-width: none; }
+        .story-item { min-width: 65px; height: 65px; border-radius: 50%; border: 2px solid #00f2ea; padding: 2px; position: relative; }
+        .story-item img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .story-add { position: absolute; bottom: 0; right: 0; background: #0095f6; border-radius: 50%; border: 2px solid #000; font-size: 14px; }
+
+        /* VIBE CARD (Full Reels Style) */
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
+        .vibe-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 22px; z-index: 50; }
+        .vibe-actions span { text-align: center; cursor: pointer; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
-        /* SIDEBAR ICONS (Real Instagram Style) */
-        .side-icons { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; z-index: 50; align-items: center; }
-        .icon-btn { text-align: center; cursor: pointer; color: white; }
-        .icon-btn .material-icons-outlined { font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
-        .icon-btn span { font-size: 12px; display: block; margin-top: 2px; font-weight: 500; }
+        /* UPLOAD & FILTER MODAL */
+        .modal { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #121212; z-index: 500; transition: 0.4s; padding: 20px; box-sizing: border-box; }
+        .modal.active { top: 0; }
+        .filter-preview { width: 100%; height: 300px; background: #222; border-radius: 15px; margin-bottom: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .filter-btn { padding: 8px 15px; background: #333; border: none; color: white; border-radius: 5px; margin-right: 5px; }
 
-        /* PANELS (SEARCH & SHARE) */
-        .panel {
-            position: fixed; top: 100%; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 200; transition: 0.3s ease-out;
-            display: flex; flex-direction: column;
-        }
-        .panel.active { top: 0; }
-        .panel-header { display: flex; align-items: center; padding: 15px; border-bottom: 0.5px solid #222; }
-        .search-input { flex: 1; background: #262626; border: none; padding: 10px 15px; border-radius: 10px; color: white; font-size: 16px; outline: none; }
-
-        /* SHARE MODAL (Niche se aane wala) */
-        .share-modal {
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%;
-            background: #262626; border-radius: 15px 15px 0 0; z-index: 300;
-            transition: 0.3s; padding: 20px; box-sizing: border-box;
-        }
-        .share-modal.active { bottom: 0; }
-        .friend-list { margin-top: 20px; }
-        .friend-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .send-btn { background: #0095f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; }
-
-        #splash { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        /* BOTTOM NAV */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; align-items: center; justify-content: space-around; border-top: 0.5px solid #222; z-index: 400; }
+        .vibe-btn { border: 2px solid #00f2ea; border-radius: 8px; padding: 2px 8px; color: #00f2ea; font-weight: bold; }
+        .nav-icon { font-size: 28px !important; color: #8e8e8e; }
+        .nav-icon.active { color: white; }
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <div class="header-left">
-            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="header-logo">
-            <div class="header-name">IndiVibe</div>
+    <div class="header" id="main-header">
+        <div class="logo">IndiVibe</div>
+        <div style="display: flex; gap: 15px;">
+            <span class="material-icons-outlined">favorite_border</span>
+            <span class="material-icons-outlined" onclick="alert('Messages opening...')">chat_bubble_outline</span>
         </div>
-        <span class="material-icons-outlined" onclick="openPanel('search-panel')">search</span>
     </div>
 
-    <div id="main-feed" class="feed"></div>
-
-    <div id="search-panel" class="panel">
-        <div class="panel-header">
-            <span class="material-icons-outlined" onclick="closePanel('search-panel')" style="margin-right:15px">arrow_back</span>
-            <input type="text" class="search-input" placeholder="Search">
+    <div id="home-page" class="page active">
+        <div class="stories-bar">
+            <div class="story-item"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"><div class="story-add">+</div></div>
+            <div class="story-item"><img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=100"></div>
         </div>
-        <div style="padding: 20px; color: #8e8e8e; text-align: center;">Explore videos, creators, and vibes.</div>
+        <div style="padding: 20px; color: gray;">
+            <h3>Dost ki Vibe yahan dikhegi...</h3>
+            <div style="height: 300px; background: #111; border-radius: 10px; display:flex; align-items:center; justify-content:center;">New Post Coming Soon</div>
+        </div>
     </div>
 
-    <div id="share-modal" class="share-modal">
-        <div style="width: 40px; height: 4px; background: #333; border-radius: 2px; margin: 0 auto 15px;"></div>
-        <h3 style="margin:0">Send</h3>
-        <div class="friend-list">
-            <div class="friend-row"><span>@Dshrat_Nayak</span><button class="send-btn" onclick="sendTo('@Dshrat_Nayak')">Send</button></div>
-            <div class="friend-row"><span>@Vishnu_Indi</span><button class="send-btn" onclick="sendTo('@Vishnu_Indi')">Send</button></div>
+    <div id="vibe-page" class="page"></div>
+
+    <div id="upload-modal" class="modal">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <span onclick="toggleModal('upload-modal')">Cancel</span>
+            <b>New Vibe</b>
+            <span style="color: #00f2ea;" onclick="alert('Uploading...')">Share</span>
         </div>
-        <button onclick="closeShare()" style="width:100%; background:none; color:#ed4956; border:none; margin-top:20px; font-weight:bold;">Cancel</button>
+        <div class="filter-preview" id="preview-box">Yahan Video Filter hoga</div>
+        <input type="file" accept="video/*" onchange="previewFile(event)">
+        <div style="margin-top: 20px;">
+            <p>Select Filter:</p>
+            <button class="filter-btn" onclick="applyFilter('none')">Normal</button>
+            <button class="filter-btn" onclick="applyFilter('sepia(1)')">Retro</button>
+            <button class="filter-btn" onclick="applyFilter('grayscale(1)')">B&W</button>
+        </div>
     </div>
 
-    <div id="splash">
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:80px;">
-        <h2 style="margin-top:20px">IndiVibe</h2>
-        <button onclick="initApp()" style="background:#0095f6; border:none; padding:12px 40px; border-radius:8px; color:white; font-weight:bold; margin-top:30px;">Enter App</button>
+    <div class="nav-bar">
+        <span class="material-icons-outlined nav-icon active" onclick="showPage('home-page', this)">home</span>
+        <span class="material-icons-outlined nav-icon" onclick="alert('Search...')">search</span>
+        <span class="material-icons-outlined nav-icon" onclick="toggleModal('upload-modal')">add_box</span>
+        <span class="vibe-btn" onclick="showPage('vibe-page', this)">VIBE</span>
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width: 25px; height: 25px; border-radius: 50%;">
     </div>
 
     <script>
@@ -96,29 +94,45 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initApp() {
-            document.getElementById('splash').style.display = 'none';
+        function showPage(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) el.classList.add('active');
+            
+            document.getElementById('main-header').style.display = (id === 'vibe-page') ? 'none' : 'flex';
+            if(id === 'vibe-page') loadVibes();
+        }
+
+        async function loadVibes() {
             const { data } = await supa.from('videos').select('*').eq('is_safe', true);
             if (data) {
-                document.getElementById('main-feed').innerHTML = data.map(v => `
-                    <div class="v-card">
+                document.getElementById('vibe-page').innerHTML = data.map(v => `
+                    <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline muted onclick="this.muted=!this.muted;this.play()"></video>
-                        <div class="side-icons">
-                            <div class="icon-btn"><span class="material-icons-outlined">favorite_border</span><span>12k</span></div>
-                            <div class="icon-btn"><span class="material-icons-outlined">chat_bubble_outline</span><span>45</span></div>
-                            <div class="icon-btn" onclick="openShare()"><span class="material-icons-outlined">send</span><span>Share</span></div>
+                        <div class="vibe-actions">
+                            <span class="material-icons-outlined" style="font-size:35px">favorite_border</span>
+                            <span class="material-icons-outlined" style="font-size:35px" onclick="prompt('Write a comment:')">chat_bubble_outline</span>
+                            <span class="material-icons-outlined" style="font-size:35px" onclick="navigator.share({url:window.location.href})">send</span>
+                            <span class="material-icons-outlined" style="font-size:35px">more_vert</span>
                         </div>
                     </div>
                 `).join('');
-                document.querySelector('video').play();
+                document.querySelector('#vibe-page video').play();
             }
         }
 
-        function openPanel(id) { document.getElementById(id).classList.add('active'); }
-        function closePanel(id) { document.getElementById(id).classList.remove('active'); }
-        function openShare() { document.getElementById('share-modal').classList.add('active'); }
-        function closeShare() { document.getElementById('share-modal').classList.remove('active'); }
-        function sendTo(id) { alert("Sent to " + id); closeShare(); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
+
+        function previewFile(event) {
+            const box = document.getElementById('preview-box');
+            box.innerHTML = `<video src="${URL.createObjectURL(event.target.files[0])}" autoplay muted loop style="width:100%"></video>`;
+        }
+
+        function applyFilter(f) {
+            document.querySelector('#preview-box video').style.filter = f;
+        }
     </script>
 </body>
 </html>
+
