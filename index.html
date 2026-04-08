@@ -2,70 +2,85 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE REELS FIXED</title>
+    <title>INDIVIBE PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; font-family: sans-serif; }
-        .feed-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; color: white; font-family: sans-serif; }
+        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .video-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        #start-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#00f2ea; text-align: center; }
-        button { background:#00f2ea; color:#000; border:none; padding:20px 50px; border-radius:50px; font-weight:bold; font-size:22px; cursor:pointer; box-shadow: 0 0 20px #00f2ea; }
-        .info { position: absolute; bottom: 80px; left: 15px; color: white; text-shadow: 1px 1px 5px #000; z-index: 10; }
+        
+        /* Side Buttons (Like, Comment, Share) */
+        .side-bar { position: absolute; right: 15px; bottom: 120px; display: flex; flex-direction: column; gap: 25px; z-index: 20; text-align: center; }
+        .btn { font-size: 28px; cursor: pointer; text-shadow: 0 0 10px #000; }
+        .btn span { font-size: 12px; display: block; margin-top: 2px; }
+
+        /* UI Overlay */
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .start-btn { background: #00f2ea; color: #000; border: none; padding: 18px 45px; border-radius: 50px; font-weight: bold; font-size: 22px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <h1>INDIVIBE</h1>
-        <p>Database Connecting...</p>
-        <button id="sBtn" onclick="startNow()" style="display:none;">START WATCHING</button>
+    <div id="start-overlay">
+        <h1 style="color:#00f2ea; margin-bottom:10px;">INDIVIBE</h1>
+        <p id="status">Connecting...</p>
+        <button class="start-btn" id="sBtn" onclick="launchApp()" style="display:none;">ENTER APP</button>
     </div>
 
-    <div id="feed" class="feed-container"></div>
+    <div id="main-feed" class="feed"></div>
 
     <script>
         const URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const _supa = supabase.createClient(URL, KEY);
 
-        // Pehle check karte hain ki database connect ho raha hai ya nahi
-        async function checkConn() {
-            const { data, error } = await _supa.from('videos').select('*');
-            if (error) {
-                document.querySelector('p').innerText = "Error: " + error.message;
-            } else {
-                document.querySelector('p').innerText = "Connected! Click below:";
-                document.getElementById('sBtn').style.display = 'block';
-                window.videoData = data;
+        async function connectDB() {
+            try {
+                const { data, error } = await _supa.from('videos').select('*');
+                if (data && data.length > 0) {
+                    window.allVideos = data;
+                    document.getElementById('status').innerText = "Ready to Vibe!";
+                    document.getElementById('sBtn').style.display = 'block';
+                } else {
+                    document.getElementById('status').innerText = "Empty Database. Add rows in Supabase!";
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = "Connection Failed. Refresh!";
             }
         }
-        checkConn();
+        connectDB();
 
-        function startNow() {
-            document.getElementById('start-screen').style.display = 'none';
-            const feed = document.getElementById('feed');
+        function launchApp() {
+            document.getElementById('start-overlay').style.display = 'none';
+            const feed = document.getElementById('main-feed');
             
-            feed.innerHTML = window.videoData.map((item, index) => `
+            feed.innerHTML = window.allVideos.map((v, i) => `
                 <div class="video-card">
-                    <video id="vid-${index}" src="${item.video_url}" loop playsinline muted onclick="this.muted = !this.muted; this.play();"></video>
-                    <div class="info">
-                        <h3>@IndiVibe_Music</h3>
-                        <p>Instrumental Audio</p>
+                    <video src="${v.video_url}" id="v-${i}" loop playsinline muted onclick="this.muted=!this.muted; this.play();"></video>
+                    <div class="side-bar">
+                        <div class="btn" onclick="alert('Liked!')">❤️<span>12k</span></div>
+                        <div class="btn" onclick="alert('Comments opening...')">💬<span>450</span></div>
+                        <div class="btn" onclick="alert('Link Copied!')">🚀<span>Share</span></div>
+                    </div>
+                    <div style="position:absolute; bottom:30px; left:15px; z-index:10;">
+                        <h4 style="margin:0;">@IndiVibe_Music</h4>
+                        <p style="margin:5px 0; font-size:14px;">Relaxing Flute Melody</p>
                     </div>
                 </div>
             `).join('');
-
-            const firstVid = document.querySelector('video');
-            if(firstVid) firstVid.play();
+            
+            // First video auto play
+            const fv = document.querySelector('video');
+            if(fv) fv.play();
         }
 
-        document.getElementById('feed').addEventListener('scroll', () => {
-            const vids = document.querySelectorAll('video');
-            vids.forEach(v => {
-                const r = v.getBoundingClientRect();
-                if(r.top >= 0 && r.top < window.innerHeight / 2) v.play();
-                else v.pause();
+        // Scroll logic for playing next video
+        document.getElementById('main-feed').addEventListener('scroll', () => {
+            document.querySelectorAll('video').forEach(vid => {
+                const pos = vid.getBoundingClientRect();
+                if(pos.top >= 0 && pos.top < window.innerHeight / 2) vid.play();
+                else vid.pause();
             });
         });
     </script>
