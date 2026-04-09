@@ -9,27 +9,27 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* FULL SCREEN VIBE - No Top Tabs */
+        /* FULL REELS FEED - Pure Instagram Style */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* RIGHT ACTIONS STACK (Instagram Perfect) */
-        .vibe-actions { position: absolute; right: 12px; bottom: 110px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 100; }
+        /* RIGHT ACTIONS (Sirf 4 Icons: Like, Comment, Share, Save) */
+        .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9)); }
         .action-label { font-size: 12px; margin-top: 4px; font-weight: 600; text-shadow: 0 1px 3px #000; }
 
-        /* USER INFO (Bottom Left Overlay) */
-        .vibe-info { position: absolute; left: 15px; bottom: 105px; width: 75%; z-index: 100; pointer-events: none; }
-        .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; pointer-events: auto; }
+        /* USER INFO (Bottom Left) */
+        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 100; pointer-events: none; }
+        .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
         .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid white; }
         .follow-tag { border: 1px solid white; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; font-weight: 400; }
+        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; }
 
-        /* INSTAGRAM STYLE BOTTOM NAV */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.2px solid #262626; z-index: 1000; }
+        /* BOTTOM NAV BAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid #262626; z-index: 1000; }
         .nav-btn { font-size: 28px !important; color: white; opacity: 0.6; }
         .nav-btn.active { opacity: 1; }
         .profile-btn { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #555; }
@@ -38,13 +38,13 @@
 <body>
 
     <div id="vibe-feed">
-        <div style="padding: 100px 20px; text-align: center;">Loading Vibe...</div>
+        <div style="padding: 100px 20px; text-align: center;">Vibes Loading...</div>
     </div>
 
     <div class="nav-bar">
         <span class="material-icons-outlined nav-btn" onclick="location.reload()">home</span>
         <span class="material-icons-outlined nav-btn">search</span>
-        <span class="material-icons-outlined nav-btn" onclick="alert('Video Uploading...')">add_box</span>
+        <span class="material-icons-outlined nav-btn" onclick="alert('Upload coming soon')">add_box</span>
         <span class="material-icons-outlined nav-btn active">play_circle</span>
         <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-btn">
     </div>
@@ -57,19 +57,17 @@
         async function getVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('vibe-feed').innerHTML = data.map((v, i) => `
+                document.getElementById('vibe-feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        
                         <div class="vibe-info">
                             <div class="user-meta">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
                                 <span style="font-weight:700;">@vishnu_vibes</span>
                                 <span class="follow-tag">Follow</span>
                             </div>
-                            <div class="vibe-desc">${v.caption || 'IndiVibe Pro - Quality Content 🇮🇳'}</div>
+                            <div class="vibe-desc">${v.caption || 'IndiVibe Pro Quality Content 🇮🇳'}</div>
                         </div>
-
                         <div class="vibe-actions">
                             <div class="action-item" onclick="like(this)">
                                 <span class="material-icons-outlined vibe-icon">favorite_border</span>
@@ -85,28 +83,14 @@
                             <div class="action-item" onclick="save(this)">
                                 <span class="material-icons-outlined vibe-icon">bookmark_border</span>
                             </div>
-                            <div class="action-item" onclick="downloadVibe('${v.video_url}')">
-                                <span class="material-icons-outlined vibe-icon">more_horiz</span>
-                            </div>
                         </div>
                     </div>
                 `).join('');
-                setTimeout(() => document.querySelector('video').play(), 500);
             }
         }
 
         function shareVibe(url) {
             navigator.share ? navigator.share({url}) : alert("Link: " + url);
-        }
-
-        function downloadVibe(url) {
-            // PROMOTION: Filename mein IndiVibe aur Username add kar diya
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `IndiVibe_@vishnu_vibes_${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
         }
 
         function like(el) {
@@ -124,4 +108,3 @@
     </script>
 </body>
 </html>
-
