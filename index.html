@@ -3,108 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro</title>
+    <title>IndiVibe Pro - Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         :root { --neon: #00f2ea; --bg: #000; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* FULL SCREEN VIBE FEED */
+        /* REELS FEED */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
 
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* RIGHT ACTIONS (Instagram Style) */
+        /* RIGHT ACTIONS (As per 1000037231.jpg) */
         .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 100; }
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .vibe-icon { font-size: 34px !important; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .action-count { font-size: 13px; margin-top: 2px; font-weight: 500; text-shadow: 0 2px 5px #000; }
+        .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .action-count { font-size: 12px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px #000; }
 
-        /* BOTTOM INFO OVERLAY */
-        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 70%; z-index: 100; pointer-events: none; }
-        .user-block { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; pointer-events: auto; }
-        .user-avatar { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
-        .username { font-weight: 700; font-size: 15px; text-shadow: 1px 1px 5px #000; }
-        .follow-tag { border: 1px solid white; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
-        .caption { font-size: 14px; line-height: 1.4; text-shadow: 1px 1px 5px #000; }
+        /* BOTTOM OVERLAY (As per 1000037123.jpg) */
+        .vibe-info { position: absolute; left: 12px; bottom: 95px; width: 75%; z-index: 100; }
+        .user-section { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
+        .name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; }
+        .follow-badge { border: 1px solid white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        .vibe-caption { font-size: 14px; line-height: 1.3; text-shadow: 0 1px 3px #000; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* BOTTOM NAV (Premium Look) */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 65px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.2px solid #333; z-index: 1000; }
-        .nav-icon { font-size: 28px !important; color: white; opacity: 0.6; }
-        .nav-icon.active { opacity: 1; color: white; }
-        .profile-small { width: 26px; height: 26px; border-radius: 50%; border: 1px solid gray; }
-
-        /* UPLOAD MODAL */
-        .upload-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; padding: 20px; box-sizing: border-box; }
+        /* GLASS NAV BAR (As per 1000037217.jpg) */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid #222; z-index: 1000; }
+        .nav-btn { font-size: 26px !important; color: white; opacity: 0.6; }
+        .active-btn { opacity: 1; border-bottom: 2px solid white; padding-bottom: 2px; }
+        .user-thumb { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #555; }
     </style>
 </head>
 <body>
 
     <div id="vibe-feed">
-        <div style="padding: 100px 20px; text-align: center;">Vibes Load ho rahi hain...</div>
+        <div style="padding: 100px 20px; text-align: center; color: gray;">Vibes load ho rahi hain...</div>
     </div>
 
     <div class="nav-bar">
-        <span class="material-icons nav-icon" onclick="location.reload()">home</span>
-        <span class="material-icons nav-icon">search</span>
-        <span class="material-icons nav-icon" onclick="document.getElementById('file-in').click()">add_box</span>
-        <span class="material-icons nav-icon active">play_circle_outline</span>
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-small">
+        <span class="material-icons-outlined nav-btn" onclick="location.reload()">home</span>
+        <span class="material-icons-outlined nav-btn">search</span>
+        <span class="material-icons-outlined nav-btn" onclick="document.getElementById('upload-input').click()">add_box</span>
+        <span class="material-icons-outlined nav-btn active-btn">play_circle_filled</span>
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-thumb">
     </div>
 
-    <input type="file" id="file-in" accept="video/*" style="display:none" onchange="startUpload(this)">
+    <input type="file" id="upload-input" accept="video/*" style="display:none" onchange="handleNewUpload(this)">
 
     <script>
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function fetchVibes() {
+        async function loadVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('vibe-feed').innerHTML = data.map((v, idx) => `
+                document.getElementById('vibe-feed').innerHTML = data.map((v, i) => `
                     <div class="vibe-card">
-                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
+                        <video src="${v.video_url}" loop playsinline onclick="toggleVideo(this)"></video>
                         
                         <div class="vibe-info">
-                            <div class="user-block">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-avatar">
-                                <span class="username">vishnu_vibes</span>
-                                <span class="follow-tag">Follow</span>
+                            <div class="user-section">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="avatar">
+                                <span class="name">vishnu_vibes</span>
+                                <span class="follow-badge">Follow</span>
                             </div>
-                            <div class="caption">${v.caption || 'IndiVibe Pro pe swagat hai! 🚀'}</div>
+                            <div class="vibe-caption">${v.caption || 'IndiVibe Pro - India ka apna vibe! 🇮🇳 #Viral'}</div>
                         </div>
 
                         <div class="vibe-actions">
-                            <div class="action-item" onclick="likeIt(this)">
-                                <span class="material-icons vibe-icon">favorite_border</span>
-                                <span class="action-count">14.5k</span>
+                            <div class="action-item" onclick="heartEffect(this)">
+                                <span class="material-icons-outlined vibe-icon">favorite_border</span>
+                                <span class="action-count">1.2M</span>
                             </div>
                             <div class="action-item">
-                                <span class="material-icons vibe-icon">chat_bubble_outline</span>
-                                <span class="action-count">320</span>
+                                <span class="material-icons-outlined vibe-icon">chat_bubble_outline</span>
+                                <span class="action-count">45K</span>
                             </div>
                             <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})">
-                                <span class="material-icons vibe-icon">send</span>
+                                <span class="material-icons-outlined vibe-icon">send</span>
                             </div>
                             <div class="action-item">
-                                <span class="material-icons vibe-icon">more_vert</span>
+                                <span class="material-icons-outlined vibe-icon">more_vert</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
                 
-                // Auto-play first video
-                setTimeout(() => document.querySelector('video').play(), 1000);
+                // First video auto-play logic
+                const firstVideo = document.querySelector('video');
+                if(firstVideo) firstVideo.play();
             }
         }
 
-        function likeIt(el) {
+        function toggleVideo(vid) { vid.paused ? vid.play() : vid.pause(); }
+
+        function heartEffect(el) {
             const icon = el.querySelector('.vibe-icon');
-            if (icon.innerText === 'favorite_border') {
+            if(icon.innerText === 'favorite_border') {
                 icon.innerText = 'favorite';
                 icon.style.color = 'red';
             } else {
@@ -113,7 +113,8 @@
             }
         }
 
-        fetchVibes();
+        loadVibes();
     </script>
 </body>
 </html>
+
