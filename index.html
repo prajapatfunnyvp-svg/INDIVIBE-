@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro 2.0</title>
+    <title>IndiVibe Pro - Professional UI</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ea; --bg: #000; --border: #262626; }
+        :root { --bg: #000; --border: #262626; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* VIBE FEED - Standard Reels Feel */
+        /* REELS FEED - Simple & Smooth Scrolling */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ACTION STACK (Right Side) - 1000037230.jpg */
+        /* ACTION STACK (Right Side) - Matches image_1.png style */
         .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .vibe-icon { font-size: 34px !important; cursor: pointer; text-shadow: 0 2px 8px #000; }
-        .icon-count { font-size: 13px; margin-top: 2px; text-shadow: 0 1px 4px #000; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .vibe-icon { font-size: 34px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .icon-count { font-size: 13px; margin-top: 2px; text-shadow: 0 1px 4px #000; font-weight: 500; }
 
-        /* USER INFO & STORIES */
-        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 10; }
-        .stories-bar { position: absolute; top: 10px; width: 100%; display: flex; gap: 10px; padding: 10px 15px; overflow-x: auto; z-index: 100; scrollbar-width: none; }
-        .story-avatar { width: 65px; height: 65px; border-radius: 50%; border: 2.5px solid var(--neon); padding: 3px; background: black; }
+        /* USER INFO (Bottom Left) - Matches image_1.png style */
+        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 10; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
+        .caption { font-size: 14px; line-height: 1.4; margin: 0; }
 
-        /* Simple DM Modal */
-        .dm-modal { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #111; z-index: 2000; transition: 0.4s; padding: 20px; box-sizing: border-box; }
-        .dm-modal.active { top: 0; }
-
-        /* NAV BAR */
+        /* PREMIUM BOTTOM NAV (Transparent Glass) */
         .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid var(--border); z-index: 100; }
+        .nav-btn { font-size: 28px !important; opacity: 0.7; cursor: pointer; color: white; }
+        .active-btn { opacity: 1; border-bottom: 2px solid white; padding-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -40,30 +40,21 @@
         <div style="padding: 100px 20px; text-align: center; color: gray;">Vibes Load ho rahi hain...</div>
     </div>
 
-    <div id="dm-modal" class="dm-modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <span class="material-icons-outlined" onclick="toggleDM()">close</span>
-            <b style="font-size:18px;">Direct Messages</b>
-            <span class="material-icons-outlined">search</span>
-        </div>
-        <input type="text" placeholder="Dost ka naam dhoondein..." style="width:100%; background:#222; color:white; border:none; padding:15px; border-radius:10px;">
-        <div style="margin-top:20px; color:gray; text-align:center;">Doston ko video bhejane ka feature enable ho gaya hai!</div>
-    </div>
-
     <div class="nav-bar">
-        <span class="material-icons-outlined nav-btn active-btn" onclick="location.reload()">home</span>
+        <span class="material-icons-outlined nav-btn" onclick="location.reload()">home</span>
         <span class="material-icons-outlined nav-btn">search</span>
         <span class="material-icons-outlined nav-btn" onclick="alert('Upload functionality here')">add_box</span>
-        <span class="material-icons-outlined nav-btn">play_circle</span>
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width: 26px; height: 26px; border-radius: 50%;">
+        <span class="material-icons-outlined nav-btn active-btn">play_circle</span>
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid white;">
     </div>
 
     <script>
+        // Supabase setup (Use your existing credentials)
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        // 1. VIDEOS LOAD KARNA
+        // 1. VIDEOS LOAD KARNA (Professional Layout)
         async function loadVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data && data.length > 0) {
@@ -72,19 +63,30 @@
                         <video src="${v.video_url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
                         
                         <div class="vibe-info">
-                            <b style="display:block; margin-bottom:5px;">@vishnu_vibes</b>
-                            <p style="font-size: 14px; margin:0;">${v.caption || 'IndiVibe Pro pe swagat hai! 🚀'}</p>
-                            <span style="font-size:12px; color:gray;">${(v.views || 0)} views</span>
+                            <div class="user-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
+                                <b style="font-size:15px;">@vishnu_vibes</b>
+                                <button style="background:transparent; border:1px solid white; color:white; border-radius:5px; padding:2px 10px; font-size:12px; font-weight:bold;">Follow</button>
+                            </div>
+                            <p class="caption">${v.caption || 'Best beautiful video 🇮🇳 #Viral'}</p>
+                            <span style="font-size:12px; color:rgba(255,255,255,0.7);">${(v.views || 0)} views</span>
                         </div>
 
                         <div class="vibe-actions">
-                            <div style="display:flex; flex-direction:column; align-items:center;">
-                                <span class="material-icons-outlined vibe-icon" onclick="likeIt(this)">favorite_border</span>
-                                <span class="icon-count">1.5k</span>
+                            <div class="action-item" onclick="likeIt(this)">
+                                <span class="material-icons-outlined vibe-icon">favorite_border</span>
+                                <span class="icon-count">${(v.likes || '1.5k')}</span>
                             </div>
-                            <span class="material-icons-outlined vibe-icon" onclick="toggleDM()">chat_bubble_outline</span>
-                            <span class="material-icons-outlined vibe-icon" onclick="shareVibe('${v.video_url}')">send</span>
-                            <span class="material-icons-outlined vibe-icon" onclick="bookmarkIt(this)">bookmark_border</span>
+                            <div class="action-item">
+                                <span class="material-icons-outlined vibe-icon" onclick="alert('Comments coming soon')">chat_bubble_outline</span>
+                                <span class="icon-count">320</span>
+                            </div>
+                            <div class="action-item" onclick="shareVibe('${v.video_url}')">
+                                <span class="material-icons-outlined vibe-icon">send</span>
+                            </div>
+                            <div class="action-item">
+                                <span class="material-icons-outlined vibe-icon" onclick="bookmarkIt(this)">bookmark_border</span>
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -92,15 +94,19 @@
             }
         }
 
-        function toggleDM() { document.getElementById('dm-modal').classList.toggle('active'); }
-
+        // Functions (Interactive part)
         function shareVibe(url) {
             if (navigator.share) {
                 navigator.share({ title: 'IndiVibe Video', text: 'Ye vibe dekho!', url: url });
             } else { alert("Link copy ho gaya: " + url); }
         }
 
-        function likeIt(el) { el.innerText = (el.innerText === 'favorite_border' ? 'favorite' : 'favorite_border'); el.style.color = (el.innerText === 'favorite' ? 'red' : 'white'); }
+        function likeIt(el) {
+            const icon = el.querySelector('.vibe-icon');
+            icon.innerText = (icon.innerText === 'favorite_border' ? 'favorite' : 'favorite_border');
+            icon.style.color = (icon.innerText === 'favorite' ? 'red' : 'white');
+        }
+
         function bookmarkIt(el) { el.innerText = (el.innerText === 'bookmark_border' ? 'bookmark' : 'bookmark_border'); }
 
         loadVibes();
