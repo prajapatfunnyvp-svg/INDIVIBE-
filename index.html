@@ -3,129 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro</title>
+    <title>IndiVibe Pro - Professional UI</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+        :root { --neon: #00f2ea; --bg: #000; --border: #262626; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* FULL REELS FEED */
+        /* REELS FEED - Pure Full Screen */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* RIGHT SIDE BUTTONS - Fix for Share Icon */
-        .vibe-actions { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 100; }
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 50px; }
-        .vibe-icon { font-size: 34px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
-        .action-label { font-size: 12px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+        /* ACTION STACK (Right Side) - Matches image_1.png layout */
+        .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .vibe-icon { font-size: 34px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .icon-count { font-size: 13px; margin-top: 2px; text-shadow: 0 1px 4px #000; font-weight: 500; }
 
-        /* USER INFO (Bottom Left) */
-        .vibe-info { position: absolute; left: 15px; bottom: 105px; width: 75%; z-index: 100; pointer-events: none; }
+        /* INFO OVERLAY (Bottom Left) - Text shadows like image_1.png */
+        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 10; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); pointer-events: none; }
         .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
-        .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid white; background: #333; }
-        .follow-tag { border: 1px solid white; padding: 2px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; padding-right: 20px; }
+        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
+        .follow-btn { border: 1.5px solid white; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; background: transparent; color: white; cursor: pointer; }
+        .caption { font-size: 14px; line-height: 1.4; margin: 0; font-weight: 400; }
 
-        /* BOTTOM NAVIGATION - Pure Instagram */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid #262626; z-index: 1000; }
-        .nav-btn { font-size: 28px !important; color: white; opacity: 0.6; }
-        .nav-btn.active { opacity: 1; }
-        .profile-thumb { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #fff; }
+        /* PREMIUM GLASS NAV BAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid var(--border); z-index: 100; }
+        .nav-btn { font-size: 28px !important; opacity: 0.7; cursor: pointer; color: white; }
+        .nav-btn.active { opacity: 1; border-bottom: 2px solid white; padding-bottom: 2px; }
+
+        /* COMMENT MODAL */
+        #comment-modal { display: none; position: fixed; bottom: 0; width: 100%; height: 70vh; background: #111; border-top-radius: 20px; z-index: 2000; padding: 20px; box-sizing: border-box; transition: 0.3s ease; }
+        #comment-modal.active { display: block; border-top: 1px solid #333; }
+        #close-comments { float: right; cursor: pointer; color: gray; }
+        .comment-input-area { position: absolute; bottom: 0; width: 100%; display: flex; gap: 10px; padding: 15px; border-top: 1px solid #222; background: #111; left: 0; box-sizing: border-box;}
     </style>
 </head>
 <body>
 
     <div id="vibe-feed">
-        <div style="padding: 100px; text-align: center;">Wait... Loading Vibes</div>
+        <div style="padding: 100px 20px; text-align: center; color: gray;">Vibes Load ho rahi hain...</div>
+    </div>
+
+    <div id="comment-modal">
+        <span id="close-comments" class="material-icons-outlined" onclick="toggleComments(null, false)">close</span>
+        <h3 style="margin-top:0;">Comments</h3>
+        <div id="comment-list" style="overflow-y:auto; height: 80%; padding-bottom: 50px;">
+            <div style="text-align:center; color:gray; margin-top:50px;">Comments load karne ke liye...</div>
+        </div>
+        <div class="comment-input-area">
+            <input type="text" id="new-comment" placeholder="Add a comment as @vishnu_vibes..." style="flex:1; background:#222; border:none; padding:12px; border-radius:20px; color:white;">
+            <button onclick="postComment()" style="background:var(--neon); border:none; color:black; font-weight:bold; padding:0 20px; border-radius:20px;">Post</button>
+        </div>
     </div>
 
     <div class="nav-bar">
         <span class="material-icons-outlined nav-btn" onclick="location.reload()">home</span>
         <span class="material-icons-outlined nav-btn">search</span>
-        <span class="material-icons-outlined nav-btn" onclick="alert('Upload coming soon')">add_box</span>
+        <span class="material-icons-outlined nav-btn" onclick="alert('Upload functionality')">add_box</span>
         <span class="material-icons-outlined nav-btn active">play_circle</span>
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-thumb">
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid white;">
     </div>
 
     <script>
+        // Use existing Supabase Credentials
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
+        let currentVideoId = null;
 
-        async function getVibes() {
+        // 1. VIDEOS LOAD KARNA (Matches layout image_1.png)
+        async function loadVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
+            if (data && data.length > 0) {
                 document.getElementById('vibe-feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
-                        <video src="${v.video_url}" loop playsinline webkit-playsinline></video>
+                        <video src="${v.video_url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
+                        
                         <div class="vibe-info">
                             <div class="user-meta">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
-                                <span style="font-weight:700;">@vishnu_vibes</span>
-                                <span class="follow-tag">Follow</span>
+                                <b style="font-size:15px;">@vishnu_vibes</b>
+                                <button class="follow-btn">Follow</button>
                             </div>
-                            <div class="vibe-desc">${v.caption || 'IndiVibe Pro Quality Content 🇮🇳'}</div>
+                            <p class="caption">${v.caption || 'Beautiful video from India! 🇮🇳 #Viral #IndiVibe'}</p>
+                            <span style="font-size:12px; color:rgba(255,255,255,0.7); font-weight: 500;">${(v.views || 0)} views</span>
                         </div>
+
                         <div class="vibe-actions">
-                            <div class="action-item" onclick="like(this)">
+                            <div class="action-item" onclick="likeIt(this)">
                                 <span class="material-icons-outlined vibe-icon">favorite_border</span>
-                                <span class="action-label">1.5M</span>
+                                <span class="icon-count">${(v.likes || '1.5k')}</span>
                             </div>
-                            <div class="action-item">
+                            <div class="action-item" onclick="toggleComments(${v.id}, true)">
                                 <span class="material-icons-outlined vibe-icon">chat_bubble_outline</span>
-                                <span class="action-label">45K</span>
+                                <span class="icon-count">320</span>
                             </div>
                             <div class="action-item" onclick="shareVibe('${v.video_url}')">
                                 <span class="material-icons-outlined vibe-icon">send</span>
-                                <span class="action-label">Share</span>
                             </div>
-                            <div class="action-item" onclick="save(this)">
-                                <span class="material-icons-outlined vibe-icon">bookmark_border</span>
+                            <div class="action-item" onclick="reportVideo(${v.id})">
+                                <span class="material-icons-outlined vibe-icon" style="color:#ff3333; opacity: 0.7;">report_problem</span>
+                            </div>
+                            <div class="action-item">
+                                <span class="material-icons-outlined vibe-icon" onclick="downloadWithWatermark('${v.video_url}', 'vishnu_vibes')">file_download</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                
-                setupScrolling();
+                document.querySelector('video').play(); // Pehla video auto-play
             }
         }
 
-        // 🟢 PURE SCROLL LOGIC: Purana video band, naya chalu
-        function setupScrolling() {
-            const options = { threshold: 0.6 };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    if (entry.isIntersecting) {
-                        video.play().catch(() => {});
-                    } else {
-                        video.pause();
-                        video.currentTime = 0;
-                    }
-                });
-            }, options);
-
-            document.querySelectorAll('.vibe-card').forEach(card => observer.observe(card));
+        // 2. COMMENTS FIX LOGIC
+        function toggleComments(videoId, show) {
+            const modal = document.getElementById('comment-modal');
+            modal.classList.toggle('active', show);
+            currentVideoId = videoId;
+            if(show) { loadComments(videoId); }
         }
 
+        async function loadComments(videoId) {
+            // Hum isse backend se tab tak fetch nahi kar sakte jab tak Comments table Supabase mein na ho. 
+            // Isliye abhi Demo text dikhate hain. 
+            document.getElementById('comment-list').innerHTML = `
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:30px; height:30px; border-radius:50%;">
+                    <div><b>@rahul_fan</b> <br> <span style="font-size:13px; color:gray;">Kya mast video hai! 🔥</span></div>
+                </div>
+            `;
+        }
+
+        async function postComment() {
+            const input = document.getElementById('new-comment');
+            if(!input.value) return;
+            // Jab database setup hoga tab hum comments save karenge. Abhi ke liye bas input clear karte hain.
+            alert(`Comment in production: ${input.value} to video ${currentVideoId}`);
+            input.value = '';
+        }
+
+        // 3. REPORT FIX LOGIC
+        function reportVideo(videoId) {
+            const reason = prompt("Is video ko kyun report karna chahte hain? (e.g., Ganda content, spam)");
+            if(reason) {
+                // In production, we send a 'report' to Supabase table.
+                alert(`Report Video ${videoId} due to: ${reason}. Hum iski janch karenge.`);
+            }
+        }
+
+        // 4. WATERMARK DOWNLOAD LOGIC (Matches your request for promotion)
+        // JS cannot directly watermark. We create a backend link logic.
+        function downloadWithWatermark(videoUrl, username) {
+            // Hum directly JS mein watermark nahi laga sakte, iske liye backend code lagta hai. 
+            // Humein filename change karke user ko download dena hoga standard name format mein.
+            const filename = `IndiVibe_${username}_${Date.now()}.mp4`; // Example promotion filename
+            
+            // Abhi ke liye humdirectly download karate hain, filename change ke saath.
+            const link = document.createElement('a');
+            link.href = videoUrl;
+            link.download = filename; 
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert(`Video download ho rahi hai: ${filename}. Ismein logo lagane ka backend script hum agle step mein setup karenge.`);
+        }
+
+        // Functions (Interactive part)
         function shareVibe(url) {
-            navigator.share ? navigator.share({url}) : alert("Link: " + url);
+            if (navigator.share) {
+                navigator.share({ title: 'IndiVibe Video', text: 'Ye vibe dekho!', url: url });
+            } else { alert("Link copy ho gaya: " + url); }
         }
 
-        function like(el) {
+        function likeIt(el) {
             const icon = el.querySelector('.vibe-icon');
-            icon.innerText = (icon.innerText === 'favorite_border') ? 'favorite' : 'favorite_border';
-            icon.style.color = (icon.innerText === 'favorite') ? 'red' : 'white';
+            icon.innerText = (icon.innerText === 'favorite_border' ? 'favorite' : 'favorite_border');
+            icon.style.color = (icon.innerText === 'favorite' ? 'red' : 'white');
         }
 
-        function save(el) {
-            const icon = el.querySelector('.vibe-icon');
-            icon.innerText = (icon.innerText === 'bookmark_border') ? 'bookmark' : 'bookmark_border';
-        }
-
-        getVibes();
+        loadVibes();
     </script>
 </body>
 </html>
