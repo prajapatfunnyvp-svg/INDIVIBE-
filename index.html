@@ -3,151 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro - Instagram Style</title>
+    <title>IndiVibe - Home</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ea; --bg: #000; --gray: #8e8e8e; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+        :root { --bg: #000; --border: #262626; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; }
+
+        /* TOP HEADER */
+        .top-nav { position: fixed; top: 0; width: 100%; height: 50px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; z-index: 1000; }
+        .logo { font-size: 24px; font-weight: bold; font-family: 'Brush Script MT', cursive; }
+
+        /* STORIES BAR (Asli Instagram Style) */
+        .stories-container { display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto; border-bottom: 0.5px solid var(--border); margin-top: 50px; scrollbar-width: none; }
+        .story-circle { flex-shrink: 0; text-align: center; width: 75px; }
+        .img-ring { width: 68px; height: 68px; border-radius: 50%; padding: 2px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); display: flex; align-items: center; justify-content: center; }
+        .img-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid black; object-fit: cover; }
+        .story-name { font-size: 11px; margin-top: 5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* POST FEED */
+        .post-card { width: 100%; margin-bottom: 20px; border-bottom: 0.5px solid var(--border); }
+        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 10px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info img { width: 32px; height: 32px; border-radius: 50%; }
+        .post-img { width: 100%; max-height: 500px; object-fit: cover; background: #111; }
         
-        /* HEADER */
-        .top-header { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-sizing: border-box; z-index: 1000; }
-        .logo { font-size: 28px; font-family: 'Brush Script MT', cursive; color: white; }
+        /* POST ACTIONS */
+        .post-actions { padding: 10px; display: flex; justify-content: space-between; }
+        .action-left { display: flex; gap: 15px; }
+        .action-icon { font-size: 28px !important; cursor: pointer; }
 
-        /* PAGES */
-        .page { display: none; height: 100vh; overflow-y: auto; }
-        .page.active { display: block; }
-        #vibe-feed { height: 100vh; padding: 0; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-
-        /* REELS STYLE CARD */
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* RIGHT ACTIONS */
-        .vibe-actions { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .vibe-icon-group { display: flex; flex-direction: column; align-items: center; }
-        .vibe-icon { font-size: 35px; color: white; cursor: pointer; }
-        .icon-text { font-size: 12px; margin-top: 4px; }
-
-        /* BOTTOM INFO (USER PROFILE) */
-        .vibe-info { position: absolute; left: 15px; bottom: 90px; width: 70%; z-index: 100; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .user-img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; }
-        .follow-btn { border: 1px solid white; padding: 2px 10px; border-radius: 5px; font-size: 13px; font-weight: bold; }
-
-        /* SPINNING MUSIC DISK */
-        .music-disk { position: absolute; right: 15px; bottom: 30px; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle, #444, #000); border: 5px solid #333; animation: spin 3s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* NAV BAR */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; align-items: center; justify-content: space-around; border-top: 0.5px solid #222; z-index: 500; }
-        .nav-btn { font-size: 30px !important; color: white; opacity: 0.6; }
-        .nav-btn.active { opacity: 1; }
-
-        /* MODAL */
-        .overlay { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; transition: 0.4s; }
-        .overlay.active { top: 0; }
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 50px; background: #000; border-top: 0.5px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
     </style>
 </head>
 <body>
 
-    <div class="top-header" id="header">
+    <div class="top-nav">
         <div class="logo">IndiVibe</div>
-        <div style="display: flex; gap: 20px;"><span class="material-icons-outlined">favorite_border</span><span class="material-icons-outlined">chat_bubble_outline</span></div>
-    </div>
-
-    <div id="home-page" class="page active" style="padding-top:60px;">
-        <div style="text-align: center; margin-top: 50px;">
-            <h3>Home Feed</h3>
-            <p style="color:gray;">Yahan aapke doston ki posts dikhengi.</p>
+        <div style="display: flex; gap: 20px;">
+            <span class="material-icons-outlined">favorite_border</span>
+            <span class="material-icons-outlined">chat_bubble_outline</span>
         </div>
     </div>
 
-    <div id="vibe-feed" class="page"></div>
+    <div class="stories-container">
+        <div class="story-circle">
+            <div class="img-ring" style="background: none; position: relative;">
+                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
+                <div style="position: absolute; bottom: 0; right: 0; background: #0095f6; border-radius: 50%; border: 2px solid black; font-size: 14px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">+</div>
+            </div>
+            <div class="story-name">Your story</div>
+        </div>
+        <div class="story-circle"><div class="img-ring"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=100"></div><div class="story-name">oy_aarav...</div></div>
+        <div class="story-circle"><div class="img-ring"><img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"></div><div class="story-name">_prakash_</div></div>
+        <div class="story-circle"><div class="img-ring"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100"></div><div class="story-name">chotu_salvi</div></div>
+    </div>
 
-    <div id="up-modal" class="overlay">
-        <div style="padding: 20px; text-align: center; margin-top: 100px;">
-            <h2>Nayi Vibe Banayein</h2>
-            <p id="up-status" style="color:var(--neon)"></p>
-            <input type="file" id="video-file" accept="video/*" style="display:none" onchange="startUpload(event)">
-            <button onclick="document.getElementById('video-file').click()" style="width:100%; padding:15px; background:var(--neon); border:none; border-radius:10px; font-weight:bold;">Gallery se Video chunein</button>
-            <br><br>
-            <button onclick="toggleM('up-modal')" style="color:gray; background:none; border:none;">Cancel</button>
+    <div id="home-feed" style="margin-bottom: 60px;">
+        <div class="post-card">
+            <div class="post-header">
+                <div class="user-info">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100">
+                    <span style="font-weight: bold; font-size: 14px;">ur_smartmaker <span style="color:#0095f6; font-size: 12px;">✔</span></span>
+                </div>
+                <span class="material-icons-outlined">more_vert</span>
+            </div>
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600" class="post-img">
+            <div class="post-actions">
+                <div class="action-left">
+                    <span class="material-icons-outlined action-icon">favorite_border</span>
+                    <span class="material-icons-outlined action-icon">chat_bubble_outline</span>
+                    <span class="material-icons-outlined action-icon">send</span>
+                </div>
+                <span class="material-icons-outlined action-icon">bookmark_border</span>
+            </div>
+            <div style="padding: 0 10px 15px;">
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">1,245 likes</div>
+                <div style="font-size: 14px;"><span style="font-weight: bold;">ur_smartmaker</span> Aaj ka mausam kamaal hai! ☁️</div>
+            </div>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <span class="material-icons-outlined nav-btn active" onclick="showP('home-page')">home</span>
-        <span class="material-icons-outlined nav-btn">search</span>
-        <span class="material-icons-outlined nav-btn" onclick="toggleM('up-modal')">add_box</span>
-        <span class="material-icons-outlined nav-btn" onclick="showP('vibe-feed')">play_circle</span>
-        <span class="material-icons-outlined nav-btn">person_outline</span>
+    <div class="bottom-nav">
+        <span class="material-icons-outlined" style="font-size: 30px;">home</span>
+        <span class="material-icons-outlined" style="font-size: 30px; opacity: 0.6;">search</span>
+        <span class="material-icons-outlined" style="font-size: 30px; opacity: 0.6;">add_box</span>
+        <span class="material-icons-outlined" style="font-size: 30px; opacity: 0.6;" onclick="alert('Going to Reels')">play_circle</span>
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width: 26px; height: 26px; border-radius: 50%;">
     </div>
 
-    <script>
-        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
-        const supa = supabase.createClient(S_URL, S_KEY);
-
-        function showP(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('header').style.display = (id === 'vibe-feed') ? 'none' : 'flex';
-            if(id === 'vibe-feed') loadVibes();
-        }
-
-        async function loadVibes() {
-            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
-                document.getElementById('vibe-feed').innerHTML = data.map(v => `
-                    <div class="vibe-card">
-                        <video src="${v.video_url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
-                        
-                        <div class="vibe-info">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-img">
-                                <span class="font-bold">@vishnu_vibes</span>
-                                <div class="follow-btn">Follow</div>
-                            </div>
-                            <p>IndiVibe Pro pe swagat hai! 🚀 #Viral #India</p>
-                        </div>
-
-                        <div class="vibe-actions">
-                            <div class="vibe-icon-group"><span class="material-icons-outlined vibe-icon">favorite_border</span><span class="icon-text">15k</span></div>
-                            <div class="vibe-icon-group"><span class="material-icons-outlined vibe-icon">chat_bubble_outline</span><span class="icon-text">450</span></div>
-                            <div class="vibe-icon-group"><span class="material-icons-outlined vibe-icon">send</span></div>
-                            <div class="vibe-icon-group"><span class="material-icons-outlined vibe-icon">bookmark_border</span></div>
-                        </div>
-
-                        <div class="music-disk"></div>
-                    </div>
-                `).join('');
-                
-                // Pehle video ko auto-play karein
-                const firstVideo = document.querySelector('#vibe-feed video');
-                if(firstVideo) firstVideo.play();
-            }
-        }
-
-        async function startUpload(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const status = document.getElementById('up-status');
-            status.innerText = "🚀 Uploading...";
-            const fileName = `${Date.now()}_vibe.mp4`;
-            
-            const { data, error } = await supa.storage.from('vibe-videos').upload(fileName, file);
-            if (error) { alert("Error: " + error.message); return; }
-
-            const { data: urlData } = supa.storage.from('vibe-videos').getPublicUrl(fileName);
-            await supa.from('videos').insert([{ video_url: urlData.publicUrl, is_safe: true }]);
-            
-            status.innerText = "✅ Done!";
-            setTimeout(() => location.reload(), 1500);
-        }
-
-        function toggleM(id) { document.getElementById(id).classList.toggle('active'); }
-    </script>
 </body>
 </html>
-
