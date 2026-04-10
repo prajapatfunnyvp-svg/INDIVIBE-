@@ -3,109 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Classic FB</title>
+    <title>IndiVibe Facebook Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+        body, html { height: 100%; background: #000; color: white; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; overflow: hidden; }
 
-        .v-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .v-feed::-webkit-scrollbar { display: none; }
-        .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
+        .reel-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .reel-container::-webkit-scrollbar { display: none; }
+        .reel-page { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FB TOP HEADER (Small & Elegant) */
-        .fb-header { position: absolute; top: 0; width: 100%; height: 48px; display: flex; align-items: center; padding: 0 12px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 20; }
-        .fb-header .material-symbols-outlined { font-size: 22px; margin-right: 12px; color: #fff; }
-        .fb-header b { font-size: 17px; flex: 1; font-weight: 500; }
+        /* FB TOP HEADER */
+        .fb-head { position: absolute; top: 0; width: 100%; height: 55px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 30; }
+        .fb-head i { font-size: 26px; color: #fff; margin-right: 15px; }
+        .fb-head span { font-size: 20px; font-weight: 500; flex: 1; }
 
-        /* FB RIGHT SIDE BUTTONS (Small size - image_1000037508 style) */
-        .fb-actions { position: absolute; right: 8px; bottom: 80px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 20; width: 45px; }
-        .act-box { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        /* FB SIDE BUTTONS (EXACT DESIGN) */
+        .fb-side-bar { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 30; }
+        .fb-btn-group { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         
-        /* ❤️ INSTAGRAM STYLE HEART (Small & Thin) */
-        .heart-icon { font-size: 22px !important; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)); }
-        
-        /* FB MINI ICONS (Thin Outline) */
-        .fb-mini { font-size: 20px !important; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)); }
-        .count-val { font-size: 10px; margin-top: 1px; font-weight: 600; text-shadow: 0 1px 2px #000; }
+        /* THE BLUE LIKE BUTTON & OTHERS */
+        .fb-btn-group i { font-size: 28px; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        .fb-btn-group.active i { color: #1877F2; } /* FB BLUE COLOR */
+        .fb-count { font-size: 12px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px #000; }
 
-        /* FB BOTTOM INFO */
-        .fb-info { position: absolute; left: 12px; bottom: 85px; width: 72%; z-index: 20; }
-        .u-profile { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .u-img { width: 30px; height: 30px; border-radius: 50%; border: 0.8px solid #fff; }
-        .u-name { font-weight: 700; font-size: 13px; text-shadow: 0 1px 2px #000; }
-        .f-btn { border: 1px solid #fff; padding: 1px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        .caption { font-size: 13px; line-height: 1.2; text-shadow: 0 1px 2px #000; opacity: 0.95; }
+        /* FB BOTTOM USER INFO */
+        .fb-user-box { position: absolute; left: 15px; bottom: 90px; width: 75%; z-index: 30; }
+        .fb-user-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .fb-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
+        .fb-name { font-weight: 700; font-size: 15px; text-shadow: 0 1px 4px #000; }
+        .fb-follow { background: transparent; border: 1px solid #fff; color: #fff; padding: 3px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+        .fb-caption { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; margin-top: 5px; }
+
+        /* BOTTOM NAV BAR (Like Image) */
+        .fb-nav { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid rgba(255,255,255,0.2); }
+        .fb-nav i { color: #fff; font-size: 24px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
-    <div class="v-feed" id="v-container"></div>
+    <div class="reel-container" id="fb-reels"></div>
 
     <script>
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function getVibes() {
+        async function fetchFeed() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('v-container').innerHTML = data.map(v => `
-                    <div class="v-card">
-                        <div class="fb-header">
-                            <span class="material-symbols-outlined">arrow_back</span>
-                            <b>Vibes</b>
-                            <span class="material-symbols-outlined" style="margin-left:auto">search</span>
-                            <span class="material-symbols-outlined">account_circle</span>
+                document.getElementById('fb-reels').innerHTML = data.map(v => `
+                    <div class="reel-page">
+                        <div class="fb-head">
+                            <i class="material-icons">arrow_back</i>
+                            <span>Reels</span>
+                            <i class="material-icons" style="margin-left:auto">search</i>
+                            <i class="material-icons">more_vert</i>
                         </div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="fb-info">
-                            <div class="u-profile">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
-                                <span class="u-name">@vishnu_vibes</span>
-                                <div class="f-btn">Follow</div>
+                        <div class="fb-user-box">
+                            <div class="fb-user-top">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="fb-avatar">
+                                <span class="fb-name">Vishnupur Fifthoot</span>
+                                <button class="fb-follow">Follow</button>
                             </div>
-                            <div class="caption">${v.caption || ''}</div>
+                            <div class="fb-caption">${v.caption || 'Best romantic ❤️ love story vibe'}</div>
                         </div>
-                        <div class="fb-actions">
-                            <div class="act-box" onclick="like(this)">
-                                <span class="material-symbols-outlined heart-icon">favorite</span>
-                                <span class="count-val">1.5M</span>
+                        <div class="fb-side-bar">
+                            <div class="fb-btn-group" onclick="this.classList.toggle('active')">
+                                <i class="material-icons">thumb_up</i>
+                                <span class="fb-count">1.5M</span>
                             </div>
-                            <div class="act-box">
-                                <span class="material-symbols-outlined fb-mini">chat_bubble</span>
-                                <span class="count-val">45K</span>
+                            <div class="fb-btn-group">
+                                <i class="material-icons">chat_bubble</i>
+                                <span class="fb-count">45K</span>
                             </div>
-                            <div class="act-box" onclick="navigator.share({url:'${v.video_url}'})">
-                                <span class="material-symbols-outlined fb-mini">share</span>
-                                <span class="count-val">Share</span>
+                            <div class="fb-btn-group" onclick="navigator.share({url:'${v.video_url}'})">
+                                <i class="material-icons">reply</i>
+                                <span class="fb-count">Share</span>
                             </div>
-                            <div class="act-box">
-                                <span class="material-symbols-outlined fb-mini">more_horiz</span>
-                                <span class="count-val">More</span>
+                            <div class="fb-btn-group">
+                                <i class="material-symbols-outlined">more_horiz</i>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                
-                const obs = new IntersectionObserver((es) => {
-                    es.forEach(e => {
-                        const v = e.target.querySelector('video');
-                        if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
-                    });
-                }, { threshold: 0.8 });
-                document.querySelectorAll('.v-card').forEach(c => obs.observe(c));
+                initObserver();
             }
         }
 
-        function like(el) {
-            const i = el.querySelector('.heart-icon');
-            i.style.color = (i.style.color === 'rgb(255, 48, 64)') ? 'white' : '#ff3040';
+        function initObserver() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.reel-page').forEach(r => obs.observe(r));
         }
 
-        getVibes();
+        fetchFeed();
     </script>
 </body>
 </html>
