@@ -8,36 +8,34 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
-
-        /* REELS FEED SCROLLING */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* RIGHT ACTIONS (As per Instagram Screenshot) */
-        .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        /* RIGHT ACTIONS - EXACT INSTAGRAM STYLE */
+        .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 100; }
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9)); }
-        .action-label { font-size: 12px; margin-top: 4px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+        .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+        .action-label { font-size: 13px; margin-top: 2px; font-weight: 500; text-shadow: 0 1px 3px #000; }
 
-        /* USER INFO (Bottom Left) */
+        /* LEFT INFO - MATCHES SCREENSHOT 1000037231.jpg */
         .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 100; pointer-events: none; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; pointer-events: auto; }
         .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid white; }
-        .follow-btn { border: 1.2px solid white; padding: 2px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; }
+        .follow-btn { border: 1.2px solid white; padding: 3px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.1); }
+        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; font-weight: 400; }
 
-        /* INSTAGRAM BOTTOM MENU TRAY */
-        #more-options-tray { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 2000; transition: 0.3s; padding: 20px 0; }
-        #more-options-tray.open { bottom: 0; }
-        .tray-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.2px solid #333; cursor: pointer; }
+        /* INSTAGRAM TRAY (Bottom Sheet) */
+        #option-tray { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding-bottom: 30px; }
+        #option-tray.open { bottom: 0; }
+        .tray-header { width: 40px; height: 4px; background: #555; border-radius: 10px; margin: 15px auto; }
+        .tray-item { padding: 16px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.1px solid #333; cursor: pointer; font-size: 16px; font-weight: 500; }
         .tray-item:last-child { border: none; }
-        .tray-handle { width: 40px; height: 4px; background: #555; border-radius: 2px; margin: 0 auto 15px; }
 
         /* NAV BAR */
         .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid #262626; z-index: 1000; }
-        .nav-btn { font-size: 28px !important; color: white; opacity: 0.6; }
+        .nav-btn { font-size: 30px !important; color: white; opacity: 0.7; }
         .nav-btn.active { opacity: 1; }
     </style>
 </head>
@@ -45,15 +43,15 @@
 
     <div id="vibe-feed"></div>
 
-    <div id="more-options-tray">
-        <div class="tray-handle" onclick="closeTray()"></div>
-        <div class="tray-item" id="download-trigger" style="color: white;">
-            <span class="material-icons-outlined">file_download</span> <b>Download Video</b>
+    <div id="option-tray">
+        <div class="tray-header" onclick="closeTray()"></div>
+        <div class="tray-item" id="dl-btn" style="color: white;">
+            <span class="material-icons-outlined">file_download</span> Video Download Karein
         </div>
-        <div class="tray-item" onclick="alert('Reported to Vishnu!')" style="color: #ff4444;">
-            <span class="material-icons-outlined">report_problem</span> <b>Report Content</b>
+        <div class="tray-item" onclick="alert('IndiVibe Support ko report bhej di gayi!')" style="color: #ff4d4d;">
+            <span class="material-icons-outlined">report_problem</span> Video Report Karein
         </div>
-        <div class="tray-item" onclick="closeTray()" style="color: white;">
+        <div class="tray-item" onclick="closeTray()">
             <span class="material-icons-outlined">close</span> Cancel
         </div>
     </div>
@@ -71,7 +69,7 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function getVibes() {
+        async function fetchVideos() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('vibe-feed').innerHTML = data.map(v => `
@@ -83,14 +81,14 @@
                                 <span style="font-weight:700;">@vishnu_vibes</span>
                                 <span class="follow-btn">Follow</span>
                             </div>
-                            <div class="vibe-desc">${v.caption || 'IndiVibe Reel'}</div>
+                            <div class="vibe-desc">${v.caption || 'Quality Content 🇮🇳'}</div>
                         </div>
                         <div class="vibe-actions">
                             <div class="action-item" onclick="like(this)">
                                 <span class="material-icons-outlined vibe-icon">favorite_border</span>
                                 <span class="action-label">1.5M</span>
                             </div>
-                            <div class="action-item" onclick="alert('Comment box opening...')">
+                            <div class="action-item" onclick="alert('Comments coming soon!')">
                                 <span class="material-icons-outlined vibe-icon">chat_bubble_outline</span>
                                 <span class="action-label">45K</span>
                             </div>
@@ -103,24 +101,24 @@
                         </div>
                     </div>
                 `).join('');
-                setupScrolling();
+                startObserver();
             }
         }
 
-        function setupScrolling() {
+        function startObserver() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if (e.isIntersecting) { v.play(); } else { v.pause(); v.currentTime = 0; }
+                    const video = e.target.querySelector('video');
+                    if (e.isIntersecting) { video.play().catch(p => {}); } 
+                    else { video.pause(); video.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
             document.querySelectorAll('.vibe-card').forEach(c => observer.observe(c));
         }
 
         function openTray(url) {
-            const tray = document.getElementById('more-options-tray');
-            tray.classList.add('open');
-            document.getElementById('download-trigger').onclick = () => {
+            document.getElementById('option-tray').classList.add('open');
+            document.getElementById('dl-btn').onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `IndiVibe_@vishnu_vibes.mp4`;
@@ -129,15 +127,15 @@
             };
         }
 
-        function closeTray() { document.getElementById('more-options-tray').classList.remove('open'); }
+        function closeTray() { document.getElementById('option-tray').classList.remove('open'); }
 
         function like(el) {
-            const i = el.querySelector('.vibe-icon');
-            i.innerText = (i.innerText === 'favorite_border') ? 'favorite' : 'favorite_border';
-            i.style.color = (i.innerText === 'favorite') ? 'red' : 'white';
+            const icon = el.querySelector('.vibe-icon');
+            icon.innerText = (icon.innerText === 'favorite_border') ? 'favorite' : 'favorite_border';
+            icon.style.color = (icon.innerText === 'favorite') ? '#ff3040' : 'white';
         }
 
-        getVibes();
+        fetchVideos();
     </script>
 </body>
 </html>
