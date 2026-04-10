@@ -3,60 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro - Final UI Fix</title>
+    <title>IndiVibe Pro v6</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* VIBE FEED - SNAP SCROLL */
+        /* VIBE FEED */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FACEBOOK TOP BAR (Match Image 1000037502) */
-        .fb-header { position: absolute; top: 0; width: 100%; height: 60px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); z-index: 100; }
-        .fb-header .material-icons-outlined { font-size: 26px; margin-right: 15px; cursor: pointer; }
-        .fb-header b { font-size: 20px; flex: 1; letter-spacing: 0.5px; }
+        /* FB STYLE TOP HEADER (Small & Elegant) */
+        .fb-header { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 12px; background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent); z-index: 100; }
+        .fb-header span { font-size: 24px; margin-right: 12px; }
+        .fb-header b { font-size: 18px; flex: 1; font-weight: 600; }
 
-        /* SIDE ACTIONS (FB Layout Style) */
-        .vibe-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        /* RIGHT ACTIONS (FB Style - Chote Icons like image 1000037508) */
+        .vibe-actions { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; gap: 15px; align-items: center; z-index: 100; }
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         
-        /* ❤️ INSTAGRAM LIKE ICON (AS REQUESTED) */
-        .heart-icon { font-size: 30px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); transition: 0.1s; }
+        /* ❤️ INSTAGRAM STYLE HEART (Small & Clear) */
+        .heart-btn { font-size: 26px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
         
-        /* 💬 FB STYLE COMMENT & SHARE */
-        .fb-icon { font-size: 28px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
-        .action-label { font-size: 12px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+        /* 💬 FB STYLE COMMENT/SHARE (Thin & Small) */
+        .fb-mini-icon { font-size: 24px !important; color: white; opacity: 0.95; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+        .action-label { font-size: 10px; margin-top: 1px; font-weight: 500; text-shadow: 0 1px 2px #000; }
 
-        /* FB STYLE USER INFO (Bottom Left) */
-        .vibe-info { position: absolute; left: 15px; bottom: 90px; width: 78%; z-index: 100; pointer-events: none; }
-        .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
-        .u-pic { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
-        .u-name { font-weight: 700; font-size: 15px; text-shadow: 0 1px 4px #000; }
-        .f-btn { border: 1.2px solid white; padding: 2px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.1); color: white; }
-        .v-caption { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; font-weight: 400; pointer-events: auto; }
+        /* BOTTOM INFO AREA (FB Style) */
+        .vibe-info { position: absolute; left: 12px; bottom: 85px; width: 75%; z-index: 100; }
+        .user-box { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .u-pic { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.8); }
+        .u-name { font-weight: 700; font-size: 13px; text-shadow: 0 1px 3px #000; }
+        .f-badge { border: 1px solid white; padding: 1px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.1); }
+        .v-text { font-size: 13px; text-shadow: 0 1px 3px #000; line-height: 1.2; }
 
-        /* OPTION TRAY (Like FB Screenshot 1000037494) */
-        #tray { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 16px 16px 0 0; z-index: 2000; transition: 0.3s ease; padding-bottom: 35px; }
-        #tray.open { bottom: 0; }
-        .tray-line { width: 35px; height: 4px; background: #555; border-radius: 10px; margin: 12px auto; }
-        .tray-opt { padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.1px solid #333; font-size: 16px; font-weight: 600; color: white; }
+        /* FB MENU TRAY */
+        #fb-tray { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 12px 12px 0 0; z-index: 2000; transition: 0.3s ease; padding-bottom: 30px; }
+        #fb-tray.open { bottom: 0; }
+        .tray-bar { width: 30px; height: 3px; background: #666; border-radius: 5px; margin: 10px auto; }
+        .tray-opt { padding: 15px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 0.1px solid #333; font-size: 15px; font-weight: 500; }
     </style>
 </head>
 <body>
 
     <div id="vibe-feed"></div>
 
-    <div id="tray">
-        <div class="tray-line" onclick="closeTray()"></div>
-        <div class="tray-opt" onclick="alert('Vibe Saved!')"><span class="material-icons-outlined">bookmark_border</span> <b>Save to Vibe Collection</b></div>
-        <div class="tray-opt" id="dl-vibe"><span class="material-icons-outlined">file_download</span> <b>Download Video</b></div>
-        <div class="tray-opt" onclick="alert('Reported!')" style="color:#ff4d4d;"><span class="material-icons-outlined">report</span> <b>Report</b></div>
-        <div class="tray-opt" onclick="closeTray()" style="opacity:0.6;">Cancel</div>
+    <div id="fb-tray">
+        <div class="tray-bar" onclick="closeTray()"></div>
+        <div class="tray-opt" onclick="alert('Saved!')"><span class="material-icons-outlined">bookmark_border</span> Save Vibe</div>
+        <div class="tray-opt" id="dl-vibe"><span class="material-icons-outlined">file_download</span> Download Video</div>
+        <div class="tray-opt" onclick="alert('Reported!')" style="color:#ff4d4d;"><span class="material-icons-outlined">report</span> Report</div>
+        <div class="tray-opt" onclick="closeTray()">Cancel</div>
     </div>
 
     <script>
@@ -64,7 +64,7 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function getVibes() {
+        async function loadApp() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('vibe-feed').innerHTML = data.map(v => `
@@ -76,30 +76,32 @@
                             <span class="material-icons-outlined">account_circle</span>
                         </div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
+                        
                         <div class="vibe-info">
-                            <div class="user-meta">
+                            <div class="user-box">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <span class="user-name">@vishnu_vibes</span>
-                                <div class="f-btn">Follow</div>
+                                <span class="u-name">@vishnu_vibes</span>
+                                <div class="f-badge">Follow</div>
                             </div>
-                            <div class="v-caption">${v.caption || 'New Vibe'}</div>
+                            <div class="v-text">${v.caption || 'New Vibe'}</div>
                         </div>
+
                         <div class="vibe-actions">
-                            <div class="action-item" onclick="hitLike(this)">
-                                <span class="material-icons-outlined heart-icon">favorite_border</span>
+                            <div class="action-item" onclick="toggleLike(this)">
+                                <span class="material-icons-outlined heart-btn">favorite_border</span>
                                 <span class="action-label">1.5M</span>
                             </div>
-                            <div class="action-item"><span class="material-icons-outlined fb-icon">chat_bubble_outline</span><span class="action-label">45K</span></div>
-                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><span class="material-icons-outlined fb-icon">share</span><span class="action-label">Share</span></div>
-                            <div class="action-item" onclick="openTray('${v.video_url}')"><span class="material-icons-outlined fb-icon">more_horiz</span></div>
+                            <div class="action-item"><span class="material-icons-outlined fb-mini-icon">chat_bubble_outline</span><span class="action-label">45K</span></div>
+                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><span class="material-icons-outlined fb-mini-icon">share</span><span class="action-label">Share</span></div>
+                            <div class="action-item" onclick="openTray('${v.video_url}')"><span class="material-icons-outlined fb-mini-icon">more_horiz</span></div>
                         </div>
                     </div>
                 `).join('');
-                startVibing();
+                initObserver();
             }
         }
 
-        function startVibing() {
+        function initObserver() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
@@ -109,22 +111,19 @@
             document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
         }
 
-        function hitLike(el) {
-            const i = el.querySelector('.heart-icon');
-            if(i.innerText === 'favorite_border') {
-                i.innerText = 'favorite'; i.style.color = '#ff3040';
-            } else {
-                i.innerText = 'favorite_border'; i.style.color = 'white';
-            }
+        function toggleLike(el) {
+            const i = el.querySelector('.heart-btn');
+            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; } 
+            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
         }
 
         function openTray(url) {
-            document.getElementById('tray').classList.add('open');
+            document.getElementById('fb-tray').classList.add('open');
             document.getElementById('dl-vibe').onclick = () => { window.open(url); closeTray(); };
         }
-        function closeTray() { document.getElementById('tray').classList.remove('open'); }
+        function closeTray() { document.getElementById('fb-tray').classList.remove('open'); }
 
-        getVibes();
+        loadApp();
     </script>
 </body>
 </html>
