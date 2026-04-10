@@ -3,122 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe FB Style</title>
+    <title>IndiVibe Facebook v16</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body, html { height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
 
-        /* SCROLL SYSTEM */
-        #feed-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed-container::-webkit-scrollbar { display: none; }
-        .v-reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; background: #000; }
+        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #feed::-webkit-scrollbar { display: none; }
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
         /* FB TOPBAR */
-        .fb-top { position: absolute; top: 0; width: 100%; height: 60px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
-        .fb-top i { font-size: 24px; margin-right: 15px; }
-        .fb-top b { font-size: 20px; flex: 1; font-weight: 500; }
+        .top { position: absolute; top: 0; width: 100%; height: 60px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
+        .top i { font-size: 24px; margin-right: 15px; }
+        .top b { font-size: 20px; flex: 1; }
 
-        /* FB SIDE BUTTONS (EXACT PLACEMENT) */
-        .fb-right { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 10; }
-        .btn-act { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        
-        /* ❤️ THE HEART ICON (AS REQUESTED) */
-        .h-icon { font-size: 30px !important; color: white; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8)); }
-        
-        /* FB STYLE ICONS (COMMENT, SHARE, MORE) */
-        .fb-icon { font-size: 28px !important; color: white; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8)); }
-        .count-txt { font-size: 11px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+        /* FB RIGHT ACTIONS */
+        .actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .h-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 3px #000); }
+        .fb-icon { font-size: 28px !important; color: white; filter: drop-shadow(0 2px 3px #000); }
+        .count { font-size: 11px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 2px #000; }
 
-        /* FB BOTTOM TEXT AREA */
-        .fb-bottom { position: absolute; left: 15px; bottom: 100px; width: 75%; z-index: 10; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-avatar { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
-        .u-name { font-weight: 700; font-size: 15px; text-shadow: 0 1px 3px #000; }
-        .f-btn { background: transparent; border: 1px solid #fff; color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; }
-        .v-cap { font-size: 14px; text-shadow: 0 1px 3px #000; line-height: 1.3; }
+        /* FB BOTTOM INFO */
+        .info { position: absolute; left: 15px; bottom: 100px; width: 75%; z-index: 10; }
+        .u-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .u-img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid white; }
+        .u-name { font-weight: 700; font-size: 15px; }
+        .follow { background: transparent; border: 1px solid white; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .cap { font-size: 14px; line-height: 1.3; margin-top: 5px; }
+
+        /* FB ROUND COMMENT BOX TRAY */
+        #comment-tray { position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%; background: #242526; border-radius: 15px 15px 0 0; z-index: 1000; transition: 0.3s; display: flex; flex-direction: column; }
+        #comment-tray.open { bottom: 0; }
+        .tray-head { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; }
+        .comment-list { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; color: #ccc; }
+        
+        /* THE ACTUAL ROUND INPUT BOX */
+        .comment-input-area { padding: 10px 15px 25px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; }
+        .round-input { background: #3a3b3c; border-radius: 20px; padding: 8px 15px; flex: 1; border: none; color: white; outline: none; font-size: 14px; }
+        .send-btn { color: #1877F2; font-weight: bold; font-size: 14px; }
+
+        /* WATERMARK */
+        .watermark { position: absolute; bottom: 120px; right: 20px; opacity: 0.4; font-size: 16px; font-weight: bold; color: #fff; pointer-events: none; z-index: 50; }
     </style>
 </head>
 <body>
 
-    <div id="feed-container"></div>
+    <div id="feed"></div>
+
+    <div id="comment-tray">
+        <div class="tray-head">Comments</div>
+        <div class="comment-list" id="comm-list">No comments yet. Be the first!</div>
+        <div class="comment-input-area">
+            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:30px; border-radius:50%;">
+            <input type="text" class="round-input" placeholder="Write a comment..." id="c-input">
+            <div class="send-btn" onclick="addComment()">Post</div>
+        </div>
+        <div onclick="closeComments()" style="text-align:center; padding: 10px; font-size:12px; color:#888;">Close</div>
+    </div>
 
     <script>
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function loadReels() {
+        async function init() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('feed-container').innerHTML = data.map(v => `
-                    <div class="v-reel">
-                        <div class="fb-top">
-                            <i class="material-icons-outlined">arrow_back</i>
-                            <b>Reels</b>
-                            <i class="material-icons-outlined" style="margin-left:auto">search</i>
-                            <i class="material-icons-outlined">more_vert</i>
-                        </div>
+                document.getElementById('feed').innerHTML = data.map(v => `
+                    <div class="reel" id="v-${v.id}">
+                        <div class="top"><i class="material-icons-outlined">arrow_back</i><b>Reels</b></div>
+                        <div class="watermark">IndiVibe</div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        
-                        <div class="fb-bottom">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
+                        <div class="info">
+                            <div class="u-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
                                 <span class="u-name">Vishnupur Fifthoot</span>
-                                <button class="f-btn">Follow</button>
+                                <button class="follow">Follow</button>
                             </div>
-                            <div class="v-cap">${v.caption || 'Made with IndiVibe ❤️'}</div>
+                            <div class="cap">${v.caption || ''}</div>
                         </div>
-
-                        <div class="fb-right">
-                            <div class="btn-act" onclick="handleLike(this)">
-                                <i class="material-icons-outlined h-icon">favorite_border</i>
-                                <span class="count-txt">1.5M</span>
-                            </div>
-                            <div class="btn-act" onclick="alert('Comments opening...')">
-                                <i class="material-icons-outlined fb-icon">chat_bubble_outline</i>
-                                <span class="count-txt">45K</span>
-                            </div>
-                            <div class="btn-act" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i>
-                                <span class="count-txt">Share</span>
-                            </div>
-                            <div class="btn-act">
-                                <i class="material-icons-outlined fb-icon">more_horiz</i>
-                            </div>
+                        <div class="actions">
+                            <div class="btn" onclick="handleLike(this)"><i class="material-icons-outlined h-icon">favorite_border</i><span class="count">1.5M</span></div>
+                            <div class="btn" onclick="openComments()"><i class="material-icons-outlined fb-icon">chat_bubble_outline</i><span class="count">45K</span></div>
+                            <div class="btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i><span class="count">Share</span></div>
+                            <div class="btn" onclick="alert('Report/Download options coming...')"><i class="material-icons-outlined fb-icon">more_horiz</i></div>
                         </div>
                     </div>
                 `).join('');
-                
-                setupVideoAutoPlay();
+                startVideoLogic();
             }
         }
 
-        function setupVideoAutoPlay() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    const video = e.target.querySelector('video');
-                    if (e.isIntersecting) video.play().catch(err => {}); 
-                    else { video.pause(); video.currentTime = 0; }
+        function startVideoLogic() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.v-reel').forEach(r => observer.observe(r));
+            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
         function handleLike(el) {
-            const icon = el.querySelector('.h-icon');
-            if(icon.innerText === 'favorite_border') {
-                icon.innerText = 'favorite';
-                icon.style.color = '#ff3040';
-            } else {
-                icon.innerText = 'favorite_border';
-                icon.style.color = 'white';
+            const i = el.querySelector('.h-icon');
+            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
+            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
+        }
+
+        function openComments() { document.getElementById('comment-tray').classList.add('open'); }
+        function closeComments() { document.getElementById('comment-tray').classList.remove('open'); }
+
+        function addComment() {
+            const input = document.getElementById('c-input');
+            if(input.value) {
+                const list = document.getElementById('comm-list');
+                if(list.innerText.includes("No comments")) list.innerHTML = "";
+                list.innerHTML += `<div style="margin-bottom:10px;"><b>You:</b> ${input.value}</div>`;
+                input.value = "";
             }
         }
 
-        loadReels();
+        init();
     </script>
 </body>
 </html>
