@@ -1,1 +1,118 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IndiVibe FB Exact</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        /* RESET & BASE */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body, html { height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+
+        /* SCROLL CONTAINER */
+        .fb-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .fb-feed::-webkit-scrollbar { display: none; }
+        .v-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 1. TOP HEADER (Small & Thin Icons) */
+        .header-top { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent); z-index: 50; }
+        .header-top .material-icons-outlined { font-size: 24px; margin-right: 15px; color: #efefef; }
+        .header-top b { font-size: 18px; flex: 1; font-weight: 500; color: #fff; }
+
+        /* 2. SIDE ACTIONS (Exact FB Gaps & Small Size) */
+        .right-actions { position: absolute; right: 10px; bottom: 85px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 50; }
+        .act-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        
+        /* ❤️ HEART ICON (Instagram Style, but FB size) */
+        .heart-icon { font-size: 26px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        
+        /* FB STYLE MINI ICONS (24px Slim) */
+        .fb-icon-mini { font-size: 24px !important; color: white; opacity: 0.95; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        .label-val { font-size: 11px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 2px #000; }
+
+        /* 3. BOTTOM INFO AREA (FB Layout) */
+        .info-bottom { position: absolute; left: 15px; bottom: 85px; width: 75%; z-index: 50; pointer-events: none; }
+        .u-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; pointer-events: auto; }
+        .u-img { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.8); }
+        .u-txt { font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; }
+        .btn-f { border: 1px solid #fff; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1); }
+        .v-cap { font-size: 14px; line-height: 1.3; text-shadow: 0 1px 3px #000; pointer-events: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="fb-feed" id="vibe-container"></div>
+
+    <script>
+        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
+        const supa = supabase.createClient(S_URL, S_KEY);
+
+        async function loadFeed() {
+            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+            if (data) {
+                document.getElementById('vibe-container').innerHTML = data.map(v => `
+                    <div class="v-card">
+                        <div class="header-top">
+                            <span class="material-icons-outlined">arrow_back</span>
+                            <b>Vibes</b>
+                            <span class="material-icons-outlined" style="margin-left:auto">search</span>
+                            <span class="material-icons-outlined">account_circle</span>
+                        </div>
+                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
+                        <div class="info-bottom">
+                            <div class="u-meta">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
+                                <span class="u-txt">@vishnu_vibes</span>
+                                <div class="btn-f">Follow</div>
+                            </div>
+                            <div class="v-cap">${v.caption || ''}</div>
+                        </div>
+                        <div class="right-actions">
+                            <div class="act-item" onclick="likeMe(this)">
+                                <span class="material-icons-outlined heart-icon">favorite_border</span>
+                                <span class="label-val">1.2M</span>
+                            </div>
+                            <div class="act-item">
+                                <span class="material-icons-outlined fb-icon-mini">chat_bubble_outline</span>
+                                <span class="label-val">24K</span>
+                            </div>
+                            <div class="act-item" onclick="navigator.share({url:'${v.video_url}'})">
+                                <span class="material-icons-outlined fb-icon-mini">share</span>
+                                <span class="label-val">Share</span>
+                            </div>
+                            <div class="act-item">
+                                <span class="material-icons-outlined fb-icon-mini">more_horiz</span>
+                                <span class="label-val">More</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                setupScroll();
+            }
+        }
+
+        function setupScroll() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.v-card').forEach(c => obs.observe(c));
+        }
+
+        function likeMe(el) {
+            const i = el.querySelector('.heart-icon');
+            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
+            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
+        }
+
+        loadFeed();
+    </script>
+</body>
+</html>
 
