@@ -3,45 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro - IG Layout</title>
+    <title>IndiVibe Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
-        
-        /* FULL SCREEN REELS FEED */
+
+        /* REELS FEED */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #vibe-feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* RIGHT ACTIONS (As per Screenshot 1000037231.jpg) */
-        .vibe-actions { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        /* RIGHT SIDE ACTIONS (Exact IG Placement) */
+        .vibe-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+        .vibe-icon { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9)); }
         .action-label { font-size: 12px; margin-top: 4px; font-weight: 600; text-shadow: 0 1px 3px #000; }
 
-        /* USER INFO (Bottom Left) */
-        .vibe-info { position: absolute; left: 15px; bottom: 95px; width: 75%; z-index: 100; pointer-events: none; }
+        /* BOTTOM LEFT INFO (User & Follow) */
+        .vibe-info { position: absolute; left: 15px; bottom: 100px; width: 75%; z-index: 100; pointer-events: none; }
         .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
         .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid white; object-fit: cover; }
         .user-name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 4px #000; }
-        .follow-btn { border: 1.2px solid white; padding: 3px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.1); color: white; }
-        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; font-weight: 400; padding-left: 2px; }
+        .follow-btn { border: 1.2px solid white; padding: 2px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.1); color: white; }
+        .vibe-desc { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 4px #000; font-weight: 400; }
 
-        /* IG STYLE BOTTOM SHEET (For Download/Report) */
+        /* INSTAGRAM TRAY (Bottom Sheet for More Options) */
         #ig-tray { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2000; transition: 0.3s ease-out; padding-bottom: 40px; }
-        #ig-tray.open { bottom: 0; }
-        .tray-handle { width: 35px; height: 4px; background: #555; border-radius: 10px; margin: 12px auto; }
-        .tray-option { padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.1px solid #333; cursor: pointer; font-size: 16px; font-weight: 500; }
+        #ig-tray.active { bottom: 0; }
+        .tray-handle { width: 36px; height: 4px; background: #555; border-radius: 10px; margin: 12px auto; }
+        .tray-option { padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.1px solid #333; cursor: pointer; font-size: 16px; font-weight: 600; }
         .tray-option:last-child { border: none; }
 
-        /* BOTTOM NAV BAR */
+        /* NAV BAR */
         .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.1px solid #262626; z-index: 1000; }
         .nav-btn { font-size: 28px !important; color: white; opacity: 0.6; }
         .nav-btn.active { opacity: 1; }
-        .profile-img { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid white; }
     </style>
 </head>
 <body>
@@ -49,14 +48,14 @@
     <div id="vibe-feed"></div>
 
     <div id="ig-tray">
-        <div class="tray-handle" onclick="closeIGTray()"></div>
-        <div class="tray-option" id="download-now" style="color: white;">
+        <div class="tray-handle" onclick="closeTray()"></div>
+        <div class="tray-option" id="dl-action" style="color: white;">
             <span class="material-icons-outlined">file_download</span> Video Download Karein
         </div>
-        <div class="tray-option" onclick="alert('Report bhej di gayi hai!')" style="color: #ff3b3b;">
+        <div class="tray-option" onclick="alert('Report submitted!')" style="color: #ff3b3b;">
             <span class="material-icons-outlined">report_problem</span> Report Karein
         </div>
-        <div class="tray-option" onclick="closeIGTray()" style="color: white; opacity: 0.7;">
+        <div class="tray-option" onclick="closeTray()">
             <span class="material-icons-outlined">close</span> Cancel
         </div>
     </div>
@@ -66,7 +65,7 @@
         <span class="material-icons-outlined nav-btn">search</span>
         <span class="material-icons-outlined nav-btn">add_box</span>
         <span class="material-icons-outlined nav-btn active">play_circle</span>
-        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-img">
+        <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:26px; height:26px; border-radius:50%; border: 1.5px solid white;">
     </div>
 
     <script>
@@ -74,7 +73,7 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function loadReels() {
+        async function fetchVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('vibe-feed').innerHTML = data.map(v => `
@@ -86,21 +85,21 @@
                                 <span class="user-name">@vishnu_vibes</span>
                                 <button class="follow-btn">Follow</button>
                             </div>
-                            <div class="vibe-desc">${v.caption || 'Naya Reel! 🇮🇳'}</div>
+                            <div class="vibe-desc">${v.caption || 'IndiVibe Quality Content 🇮🇳'}</div>
                         </div>
                         <div class="vibe-actions">
                             <div class="action-item" onclick="like(this)">
                                 <span class="material-icons-outlined vibe-icon">favorite_border</span>
                                 <span class="action-label">1.5M</span>
                             </div>
-                            <div class="action-item" onclick="alert('Comments coming soon!')">
+                            <div class="action-item" onclick="alert('Comment box opening...')">
                                 <span class="material-icons-outlined vibe-icon">chat_bubble_outline</span>
                                 <span class="action-label">45K</span>
                             </div>
                             <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})">
                                 <span class="material-icons-outlined vibe-icon">send</span>
                             </div>
-                            <div class="action-item" onclick="openIGTray('${v.video_url}')">
+                            <div class="action-item" onclick="openTray('${v.video_url}')">
                                 <span class="material-icons-outlined vibe-icon">more_horiz</span>
                             </div>
                         </div>
@@ -121,26 +120,26 @@
             document.querySelectorAll('.vibe-card').forEach(c => observer.observe(c));
         }
 
-        function openIGTray(url) {
-            document.getElementById('ig-tray').classList.add('open');
-            document.getElementById('download-now').onclick = () => {
+        function openTray(url) {
+            document.getElementById('ig-tray').classList.add('active');
+            document.getElementById('dl-action').onclick = () => {
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `IndiVibe_@vishnu_vibes.mp4`;
                 a.click();
-                closeIGTray();
+                closeTray();
             };
         }
 
-        function closeIGTray() { document.getElementById('ig-tray').classList.remove('open'); }
+        function closeTray() { document.getElementById('ig-tray').classList.remove('active'); }
 
         function like(el) {
-            const icon = el.querySelector('.vibe-icon');
-            icon.innerText = (icon.innerText === 'favorite_border') ? 'favorite' : 'favorite_border';
-            icon.style.color = (icon.innerText === 'favorite') ? '#ff3040' : 'white';
+            const i = el.querySelector('.vibe-icon');
+            i.innerText = (i.innerText === 'favorite_border') ? 'favorite' : 'favorite_border';
+            i.style.color = (i.innerText === 'favorite') ? '#ff3040' : 'white';
         }
 
-        loadReels();
+        fetchVibes();
     </script>
 </body>
 </html>
