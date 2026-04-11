@@ -3,123 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro Final v17</title>
+    <title>IndiVibe Original</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* NEW CLASS NAMES TO BYPASS CACHE */
-        .vibe-wrapper { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .vibe-wrapper::-webkit-scrollbar { display: none; }
-        .vibe-slide { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+        .app-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .app-container::-webkit-scrollbar { display: none; }
+        
+        .reel-unit { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FACEBOOK TOPBAR */
-        .fb-header { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 16px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 10; }
-        .fb-header i { font-size: 24px; margin-right: 20px; color: #efefef; }
-        .fb-header b { font-size: 19px; flex: 1; font-weight: 600; }
+        /* HEADER - INDIVIBE BRANDING */
+        .indivibe-header { position: absolute; top: 0; width: 100%; height: 55px; display: flex; align-items: center; padding: 0 16px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 20; }
+        .indivibe-header i { font-size: 24px; margin-right: 18px; }
+        .indivibe-header b { font-size: 20px; flex: 1; letter-spacing: 0.5px; }
 
-        /* EXACT FB ICONS LAYOUT & SIZE */
-        .vibe-actions { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .act-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        /* SIDE ACTIONS - CLEAN & BASIC */
+        .side-bar { position: absolute; right: 12px; bottom: 95px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
+        .act { display: flex; flex-direction: column; align-items: center; text-align: center; }
         
-        /* ❤️ ONLY THIS HEART FOR LIKE */
-        .heart { font-size: 30px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        /* ❤️ RED HEART ONLY */
+        .h-btn { font-size: 32px !important; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .f-icon { font-size: 28px !important; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .val { font-size: 11px; margin-top: 2px; font-weight: 600; }
+
+        /* BOTTOM INFO AREA */
+        .bottom-ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 16px 15px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 20; }
+        .profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .p-img { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
+        .p-name { font-weight: 700; font-size: 15px; }
+        .follow-tag { border: 1px solid #fff; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
         
-        /* FB STYLE MINI ICONS */
-        .fb-icon-mini { font-size: 26px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
-        .label-val { font-size: 11px; margin-top: 2px; font-weight: 500; text-shadow: 0 1px 2px #000; }
+        .v-caption { font-size: 14px; margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* FB BOTTOM INFO */
-        .vibe-info { position: absolute; left: 16px; bottom: 100px; width: 75%; z-index: 10; pointer-events: none; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; pointer-events: auto; }
-        .u-pic { width: 34px; height: 34px; border-radius: 50%; border: 1px solid white; }
-        .u-name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; }
-        .f-badge { border: 1px solid white; padding: 1px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        .v-cap { font-size: 14px; text-shadow: 0 1px 3px #000; line-height: 1.3; font-weight: 400; pointer-events: auto; }
-
-        /* FB COMMENT INPUT BOX */
-        .comment-input-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 10; display: flex; align-items: flex-end; padding: 10px 16px; }
-        .comment-box { width: 100%; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #eee; font-size: 14px; margin-bottom: 15px; }
+        /* 💬 FB BASIC STYLE COMMENT BOX */
+        .fb-input { width: 100%; height: 42px; background: rgba(255, 255, 255, 0.2); border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #ddd; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div id="vibes-feed" class="vibe-wrapper"></div>
+    <div id="main-feed" class="app-container"></div>
 
     <script>
         const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function loadReels() {
+        async function loadIndiVibe() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('vibes-feed').innerHTML = data.map(v => `
-                    <div class="vibe-slide">
-                        <div class="fb-header">
+                document.getElementById('main-feed').innerHTML = data.map(v => `
+                    <div class="reel-unit">
+                        <div class="indivibe-header">
                             <i class="material-icons-outlined">arrow_back</i>
-                            <b>Vibes</b>
+                            <b>IndiVibe</b>
                             <i class="material-icons-outlined" style="margin-left:auto">search</i>
-                            <i class="material-icons-outlined">account_circle</i>
+                            <i class="material-icons-outlined">more_vert</i>
                         </div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                         
-                        <div class="vibe-info">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <span class="u-name">Vishnupur Fifthoot</span>
-                                <div class="f-badge">Follow</div>
+                        <div class="side-bar">
+                            <div class="act" onclick="toggleLike(this)">
+                                <i class="material-icons-outlined h-btn">favorite_border</i>
+                                <span class="val">1.2M</span>
                             </div>
-                            <div class="v-cap">${v.caption || ''}</div>
-                        </div>
-
-                        <div class="vibe-actions">
-                            <div class="act-item" onclick="likeMe(this)">
-                                <i class="material-icons-outlined heart">favorite_border</i>
-                                <span class="label-val">1.5M</span>
+                            <div class="act">
+                                <i class="material-icons-outlined f-icon">chat_bubble_outline</i>
+                                <span class="val">30K</span>
                             </div>
-                            <div class="act-item">
-                                <i class="material-icons-outlined fb-icon-mini">chat_bubble_outline</i>
-                                <span class="label-val">45K</span>
+                            <div class="act" onclick="navigator.share({url:'${v.video_url}'})">
+                                <i class="material-icons-outlined f-icon" style="transform: scaleX(-1);">reply</i>
+                                <span class="val">Share</span>
                             </div>
-                            <div class="act-item" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons-outlined fb-icon-mini" style="transform: scaleX(-1);">reply</i>
-                                <span class="label-val">Share</span>
-                            </div>
-                            <div class="act-item">
-                                <i class="material-icons-outlined fb-icon-mini">more_horiz</i>
+                            <div class="act">
+                                <i class="material-icons-outlined f-icon">more_horiz</i>
                             </div>
                         </div>
 
-                        <div class="comment-input-area">
-                            <div class="comment-box">कमेंट जोड़ें...</div>
+                        <div class="bottom-ui">
+                            <div class="profile-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="p-img">
+                                <span class="p-name">Vishnupur Fifthoot</span>
+                                <div class="follow-tag">Follow</div>
+                            </div>
+                            <div class="v-caption">${v.caption || 'IndiVibe Reels'}</div>
+                            <div class="fb-input">कमेंट जोड़ें...</div>
                         </div>
                     </div>
                 `).join('');
-                setupIntersection();
+                startScrollLogic();
             }
         }
 
-        function setupIntersection() {
-            const obs = new IntersectionObserver((es) => {
-                es.forEach(e => {
+        function startScrollLogic() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
                     const video = e.target.querySelector('video');
                     if (e.isIntersecting) video.play(); else { video.pause(); video.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-slide').forEach(s => obs.observe(s));
+            document.querySelectorAll('.reel-unit').forEach(unit => observer.observe(unit));
         }
 
-        function likeMe(el) {
-            const i = el.querySelector('.heart');
-            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
-            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
+        function toggleLike(el) {
+            const icon = el.querySelector('.h-btn');
+            if(icon.innerText === 'favorite_border') {
+                icon.innerText = 'favorite'; icon.style.color = '#ff3040';
+            } else {
+                icon.innerText = 'favorite_border'; icon.style.color = 'white';
+            }
         }
 
-        loadReels();
+        loadIndiVibe();
     </script>
 </body>
 </html>
