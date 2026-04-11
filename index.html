@@ -1,170 +1,267 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Premium</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <style>
-        :root { --fb-blue: #1877F2; --dark-bg: #000; --card-bg: #242526; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark-bg); color: white; font-family: sans-serif; overflow: hidden; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>INDIVIBE Premium</title>
 
-        /* --- 1. STORY BAR (Top) --- */
-        .story-container { display: flex; gap: 12px; padding: 10px; overflow-x: auto; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); position: absolute; top: 50px; width: 100%; z-index: 20; scrollbar-width: none; }
-        .story-container::-webkit-scrollbar { display: none; }
-        .story-circle { min-width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ff3040; padding: 2px; }
-        .story-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
-        /* --- 2. MAIN FEED (Snap Scroll) --- */
-        .main-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .main-feed::-webkit-scrollbar { display: none; }
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
-        video { width: 100%; height: 100%; object-fit: cover; }
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* --- 3. UI OVERLAYS (FB Design) --- */
-        .header { position: absolute; top: 0; width: 100%; height: 55px; display: flex; align-items: center; padding: 0 15px; z-index: 30; }
-        .header b { font-size: 22px; flex: 1; letter-spacing: 1px; color: var(--fb-blue); }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+}
 
-        .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 30; align-items: center; }
-        .btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .btn i { font-size: 32px !important; text-shadow: 0 2px 4px #000; }
-        .btn span { font-size: 11px; margin-top: 4px; font-weight: bold; }
+/* TOP BAR & BRANDING */
+.top-bar {
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index:100;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  padding:10px 15px;
+}
 
-        .bottom-info { position: absolute; bottom: 65px; left: 15px; width: 70%; z-index: 30; }
-        .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .user-meta img { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
-        .user-meta b { font-size: 15px; }
+.brand {
+  font-weight:900;
+  font-size:22px;
+  color: #1877F2;
+  letter-spacing: 1px;
+}
 
-        /* --- 4. NAVIGATION BAR (Bottom) --- */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
-        .nav-bar i { font-size: 28px; color: #fff; }
+/* STORIES BAR (PREMIUM LOOK) */
+.stories {
+  display:flex;
+  overflow-x:auto;
+  gap:12px;
+  padding: 10px 0;
+  scrollbar-width: none;
+}
+.stories::-webkit-scrollbar { display: none; }
 
-        /* --- 5. INTERACTION SHEETS (Comments/DMs) --- */
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; height: 70%; background: #1c1c1e; border-radius: 20px 20px 0 0; z-index: 200; transition: 0.4s; display: flex; flex-direction: column; }
-        .sheet.active { bottom: 0; }
-        .sheet-header { padding: 15px; border-bottom: 1px solid #333; text-align: center; font-weight: bold; }
-        .sheet-body { flex: 1; overflow-y: auto; padding: 15px; }
-        .input-area { padding: 10px 15px 30px; border-top: 1px solid #333; display: flex; gap: 10px; }
-        .input-area input { flex: 1; background: #333; border: none; border-radius: 20px; padding: 10px 15px; color: #fff; outline: none; }
+.story-circle {
+  min-width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-        /* Double Tap Heart */
-        .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #ff3040; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 50; }
-        .big-heart.pop { animation: heartPop 0.7s forwards; }
-        @keyframes heartPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
-    </style>
+.story-circle img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid black;
+  object-fit: cover;
+}
+
+/* FEED SECTION */
+.feed {
+  height:100vh;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  scrollbar-width: none;
+}
+.feed::-webkit-scrollbar { display: none; }
+
+.video-container {
+  height:100vh;
+  position:relative;
+  scroll-snap-align:start;
+  background: #000;
+  display: flex;
+  align-items: center;
+}
+
+video {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* RIGHT ACTION ICONS */
+.actions {
+  position:absolute;
+  right:12px;
+  bottom:100px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  align-items:center;
+  z-index: 50;
+}
+
+.act-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.act-btn span { font-size: 11px; margin-top: 4px; font-weight: bold; }
+
+/* ❤️ DOUBLE TAP HEART */
+.heart-pop {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-size:100px;
+  color:#ff3040;
+  pointer-events:none;
+  z-index: 60;
+  opacity: 0;
+}
+.heart-pop.animate { animation: popHeart 0.8s ease-out; }
+@keyframes popHeart {
+  0% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+}
+
+/* BOTTOM NAV */
+.nav {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#000;
+  display:flex;
+  justify-content:space-around;
+  padding:15px 0;
+  border-top: 0.2px solid #333;
+  z-index: 100;
+}
+
+/* USER INFO (BOTTOM LEFT) */
+.user-info {
+  position: absolute;
+  bottom: 80px;
+  left: 15px;
+  z-index: 50;
+}
+.user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.u-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #fff; }
+
+/* DRAWER (COMMENT) */
+.drawer {
+  position:fixed;
+  bottom:-100%;
+  left:0;
+  width:100%;
+  height:65%;
+  background:#1c1c1e;
+  border-radius:20px 20px 0 0;
+  transition:0.4s cubic-bezier(0, 0, 0.2, 1);
+  z-index: 200;
+  padding: 15px;
+}
+.drawer.active { bottom:0; }
+
+</style>
 </head>
+
 <body>
 
-    <div class="header">
-        <b>INDIVIBE</b>
-        <i class="material-icons-outlined" style="margin-right: 20px;" onclick="openSheet('dm-sheet')">send</i>
-    </div>
+<div class="top-bar">
+  <div class="brand">INDIVIBE</div>
+  <div class="stories">
+    <div class="story-circle"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+    <div class="story-circle"><img src="https://picsum.photos/101"></div>
+    <div class="story-circle"><img src="https://picsum.photos/102"></div>
+    <div class="story-circle"><img src="https://picsum.photos/103"></div>
+    <div class="story-circle"><img src="https://picsum.photos/104"></div>
+  </div>
+</div>
 
-    <div class="story-container">
-        <div class="story-circle"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-        <div class="story-circle"><img src="https://picsum.photos/101"></div>
-        <div class="story-circle"><img src="https://picsum.photos/102"></div>
-        <div class="story-circle"><img src="https://picsum.photos/103"></div>
-        <div class="story-circle"><img src="https://picsum.photos/104"></div>
-    </div>
+<div class="feed" id="feed"></div>
 
-    <div id="feed" class="main-feed"></div>
+<div class="nav">
+  <i data-lucide="home"></i>
+  <i data-lucide="search"></i>
+  <i data-lucide="plus-square"></i>
+  <i data-lucide="user"></i>
+</div>
 
-    <div class="nav-bar">
-        <i class="material-icons-outlined">home</i>
-        <i class="material-icons-outlined">search</i>
-        <i class="material-icons-outlined" style="font-size: 35px;">add_box</i>
-        <i class="material-icons-outlined">person</i>
-    </div>
+<div class="drawer" id="comm-drawer">
+  <div style="display:flex; justify-content: space-between; margin-bottom: 15px;">
+    <b>Comments</b>
+    <i data-lucide="x" onclick="toggleC(false)"></i>
+  </div>
+  <div id="comm-list" style="overflow-y:auto; flex:1;">No comments yet.</div>
+</div>
 
-    <div id="comment-sheet" class="sheet">
-        <div class="sheet-header">Comments <i class="material-icons-outlined" style="float:right" onclick="closeSheet()">close</i></div>
-        <div class="sheet-body" id="comm-list">No comments yet.</div>
-        <div class="input-area">
-            <input type="text" placeholder="Add a comment...">
-            <i class="material-icons-outlined" style="color:var(--fb-blue)">send</i>
+<script>
+const supabase = window.supabase.createClient(
+  "https://jxjbmjburdksqfjyhrxp.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4"
+);
+
+async function loadVibes() {
+  const { data } = await supabase.from("videos").select("*").order('created_at', { ascending: false });
+  if(data) renderFeed(data);
+}
+
+function renderFeed(videos) {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = videos.map(v => `
+    <div class="video-container">
+      <video src="${v.video_url}" loop playsinline onclick="handleSingleTap(this)" ondblclick="handleLike(this)"></video>
+      <div class="heart-pop">❤</div>
+      
+      <div class="actions">
+        <div class="act-btn" onclick="handleLike(this.parentElement.parentElement.querySelector('video'))"><i data-lucide="heart" class="h-icon"></i><span>1.2M</span></div>
+        <div class="act-btn" onclick="toggleC(true)"><i data-lucide="message-circle"></i><span>45K</span></div>
+        <div class="act-btn" onclick="navigator.share({url:'${v.video_url}'})"><i data-lucide="share-2"></i><span>Share</span></div>
+        <div class="act-btn" onclick="window.open('${v.video_url}')"><i data-lucide="download"></i></div>
+      </div>
+
+      <div class="user-info">
+        <div class="user-row">
+          <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
+          <b>Vishnupur Fifthoot</b>
         </div>
+        <p style="font-size:14px;">${v.caption || ''}</p>
+      </div>
     </div>
+  `).join('');
 
-    <div id="dm-sheet" class="sheet">
-        <div class="sheet-header">Direct Messages <i class="material-icons-outlined" style="float:right" onclick="closeSheet()">close</i></div>
-        <div class="sheet-body">
-            <div style="display:flex; gap:10px; margin-bottom:15px">
-                <img src="https://picsum.photos/50" style="border-radius:50%; width:40px; height:40px">
-                <div><b>Rohan:</b> Bhai naya vibe dekha? <br><small style="color:gray">2m ago</small></div>
-            </div>
-        </div>
-        <div class="input-area"><input type="text" placeholder="Message..."></div>
-    </div>
+  lucide.createIcons();
+  setupObserver();
+}
 
-    <script>
-        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
-        const supa = supabase.createClient(S_URL, S_KEY);
+let tapTimer;
+function handleSingleTap(v) {
+  if (tapTimer) return;
+  tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
+}
 
-        async function loadFeed() {
-            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
-                document.getElementById('feed').innerHTML = data.map(v => `
-                    <div class="vibe-card">
-                        <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="handleDoubleTap(this)"></video>
-                        <i class="material-icons-outlined big-heart">favorite</i>
-                        <div class="side-actions">
-                            <div class="btn" onclick="like(this)"><i class="material-icons-outlined">favorite_border</i><span>1.2M</span></div>
-                            <div class="btn" onclick="openSheet('comment-sheet')"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
-                            <div class="btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="btn" onclick="alert('Downloading...')"><i class="material-icons-outlined">download</i></div>
-                        </div>
-                        <div class="bottom-info">
-                            <div class="user-meta">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
-                                <b>Vishnupur Fifthoot</b>
-                            </div>
-                            <div>${v.caption || ''}</div>
-                        </div>
-                    </div>
-                `).join('');
-                setupAutoPlay();
-            }
-        }
+function handleLike(v) {
+  clearTimeout(tapTimer); tapTimer = null;
+  const h = v.parentElement.querySelector(".heart-pop");
+  h.classList.add("animate");
+  setTimeout(() => h.classList.remove("animate"), 800);
+  
+  const hIcon = v.parentElement.querySelector(".h-icon");
+  hIcon.style.fill = "#ff3040"; hIcon.style.stroke = "#ff3040";
+}
 
-        function setupAutoPlay() {
-            const obs = new IntersectionObserver(es => {
-                es.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if (e.isIntersecting) v.play(); else v.pause();
-                });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
-        }
+function setupObserver() {
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      const v = e.target.querySelector("video");
+      if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
+    });
+  }, { threshold: 0.8 });
+  document.querySelectorAll(".video-container").forEach(c => obs.observe(c));
+}
 
-        /* Interaction Functions */
-        let tapTimer;
-        function handleTap(v) {
-            if (tapTimer) return;
-            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
-        }
+function toggleC(open) { document.getElementById("comm-drawer").classList.toggle("active", open); }
 
-        function handleDoubleTap(v) {
-            clearTimeout(tapTimer); tapTimer = null;
-            const h = v.parentElement.querySelector('.big-heart');
-            h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 700);
-            const lh = v.parentElement.querySelector('.btn i');
-            lh.innerText = 'favorite'; lh.style.color = '#ff3040';
-        }
+loadVibes();
+</script>
 
-        function like(el) {
-            const i = el.querySelector('i');
-            i.innerText = i.innerText === 'favorite' ? 'favorite_border' : 'favorite';
-            i.style.color = i.innerText === 'favorite' ? '#ff3040' : 'white';
-        }
-
-        function openSheet(id) { document.getElementById(id).classList.add('active'); }
-        function closeSheet() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active')); }
-
-        loadFeed();
-    </script>
 </body>
 </html>
