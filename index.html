@@ -3,131 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Final</title>
+    <title>IndiVibe</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
 
-        /* SCROLL CONTAINER */
-        #feed-box { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed-box::-webkit-scrollbar { display: none; }
+        /* Reels Container */
+        #reel-viewport { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #reel-viewport::-webkit-scrollbar { display: none; }
         
-        .video-unit { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; }
+        .fb-reel-slide { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FB TOPBAR */
-        .header-fb { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
-        .header-fb b { font-size: 20px; flex: 1; letter-spacing: 0.5px; }
+        /* FB Header */
+        .fb-header-bar { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 5; }
+        .fb-header-bar b { font-size: 20px; flex: 1; }
 
-        /* FB SIDEBAR ICONS */
-        .side-icons { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .icon-group { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .heart-icon { font-size: 32px !important; color: white; }
-        .standard-icon { font-size: 28px !important; color: white; }
-        .stat-text { font-size: 11px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 2px #000; }
+        /* FB Right Side Icons */
+        .fb-right-side { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 5; }
+        .fb-action-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .fb-action-btn i { font-size: 30px !important; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .fb-action-btn span { font-size: 11px; margin-top: 2px; font-weight: 600; }
 
-        /* FB BOTTOM AREA */
-        .bottom-ui-fb { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 15px 15px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 10; }
-        .user-block { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .avatar-fb { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
-        .name-fb { font-weight: 700; font-size: 15px; }
-        .follow-fb { border: 1px solid #fff; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .caption-fb { font-size: 14px; margin-bottom: 12px; line-height: 1.4; }
+        /* FB Bottom Profile & Caption */
+        .fb-bottom-text { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 15px 15px; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 5; }
+        .fb-user-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .fb-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid white; }
+        .fb-name { font-weight: 700; font-size: 15px; }
+        .fb-follow-btn { border: 1px solid white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .fb-caption { font-size: 14px; margin-bottom: 12px; line-height: 1.3; color: #fff; }
 
-        /* 💬 FB CHHOTA COMMENT BAR */
-        .fb-comment-bar { width: 100%; height: 42px; background: rgba(255, 255, 255, 0.2); border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #ddd; font-size: 14px; }
-
-        /* FB COMMENT SHEET - WORKING */
-        #comment-overlay { position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s; display: flex; flex-direction: column; }
-        #comment-overlay.show { bottom: 0; }
-        .sheet-top { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; }
-        .comment-scroll { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; }
-        .sheet-bottom { padding: 10px 15px 20px; border-top: 1px solid #333; display: flex; gap: 10px; }
-        .sheet-input { background: #3a3b3c; border-radius: 20px; padding: 10px 15px; flex: 1; border: none; color: white; }
+        /* 💬 FB BASIC STYLE COMMENT BAR */
+        .fb-comment-bar-input { width: 100%; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #eee; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div id="feed-box"></div>
-
-    <div id="comment-overlay">
-        <div class="sheet-top" onclick="closeComm()">Comments</div>
-        <div class="comment-scroll" id="comm-list">No comments yet.</div>
-        <div class="sheet-bottom">
-            <input type="text" class="sheet-input" id="c-in" placeholder="Write a comment...">
-            <span style="color:#1877F2; font-weight:bold;" onclick="postComm()">Post</span>
-        </div>
-    </div>
+    <div id="reel-viewport"></div>
 
     <script>
-        const S_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
-        const supa = supabase.createClient(S_URL, S_KEY);
+        const SUPA_URL = 'https://jxjbmjburdksqfjyhrxp.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
+        const client = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-        async function startApp() {
-            const { data, error } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+        async function loadApp() {
+            const { data } = await client.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('feed-box').innerHTML = data.map(v => `
-                    <div class="video-unit">
-                        <div class="header-fb">
-                            <i class="material-icons-outlined">arrow_back</i>
+                document.getElementById('reel-viewport').innerHTML = data.map(v => `
+                    <div class="fb-reel-slide">
+                        <div class="fb-header-bar">
+                            <i class="material-icons-outlined" style="margin-right:15px">arrow_back</i>
                             <b>IndiVibe</b>
                             <i class="material-icons-outlined" style="margin-left:auto">search</i>
-                            <i class="material-icons-outlined">more_vert</i>
                         </div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                         
-                        <div class="side-icons">
-                            <div class="icon-group" onclick="like(this)"><i class="material-icons-outlined heart-icon">favorite_border</i><span class="stat-text">1.5M</span></div>
-                            <div class="icon-group" onclick="openComm()"><i class="material-icons-outlined standard-icon">chat_bubble_outline</i><span class="stat-text">45K</span></div>
-                            <div class="icon-group" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined standard-icon" style="transform: scaleX(-1);">reply</i><span class="stat-text">Share</span></div>
-                            <div class="icon-group"><i class="material-icons-outlined standard-icon">more_horiz</i></div>
+                        <div class="fb-right-side">
+                            <div class="fb-action-btn" onclick="like(this)"><i class="material-icons-outlined">favorite_border</i><span>1.2M</span></div>
+                            <div class="fb-action-btn"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
+                            <div class="fb-action-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
+                            <div class="fb-action-btn"><i class="material-icons-outlined">more_horiz</i></div>
                         </div>
 
-                        <div class="bottom-ui-fb">
-                            <div class="user-block">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="avatar-fb">
-                                <span class="name-fb">Vishnupur Fifthoot</span>
-                                <div class="follow-fb">Follow</div>
+                        <div class="fb-bottom-text">
+                            <div class="fb-user-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="fb-avatar">
+                                <span class="fb-name">Vishnupur Fifthoot</span>
+                                <div class="fb-follow-btn">Follow</div>
                             </div>
-                            <div class="caption-fb">${v.caption || ''}</div>
-                            <div class="fb-comment-bar" onclick="openComm()">कमेंट जोड़ें...</div>
+                            <div class="fb-caption">${v.caption || ''}</div>
+                            <div class="fb-comment-bar-input">Add a comment...</div>
                         </div>
                     </div>
                 `).join('');
-                initObserver();
+                initReels();
             }
         }
 
-        function initObserver() {
-            const obs = new IntersectionObserver((es) => {
-                es.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
+        function initReels() {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    const vid = e.target.querySelector('video');
+                    if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.7 });
-            document.querySelectorAll('.video-unit').forEach(u => obs.observe(u));
+            document.querySelectorAll('.fb-reel-slide').forEach(s => obs.observe(s));
         }
 
         function like(el) {
-            const i = el.querySelector('.heart-icon');
+            const i = el.querySelector('i');
             if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
             else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
         }
 
-        function openComm() { document.getElementById('comment-overlay').classList.add('show'); }
-        function closeComm() { document.getElementById('comment-overlay').classList.remove('show'); }
-        function postComm() {
-            const val = document.getElementById('c-in').value;
-            if(val) {
-                document.getElementById('comm-list').innerHTML += `<div style="margin-bottom:10px;"><b>You:</b> ${val}</div>`;
-                document.getElementById('c-in').value = "";
-            }
-        }
-
-        startApp();
+        loadApp();
     </script>
 </body>
 </html>
