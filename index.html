@@ -3,140 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE Final Fix</title>
+    <title>INDIVIBE Final Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
 
-        /* HEADER & STORIES (Fix) */
-        .top-fixed { position: fixed; top: 0; width: 100%; z-index: 1000; background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 10px; }
-        .brand { font-size: 22px; font-weight: 900; color: #1877F2; margin-bottom: 10px; padding-left: 5px; }
-        .stories-row { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
-        .stories-row::-webkit-scrollbar { display: none; }
-        .s-ring { min-width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2px; }
-        .s-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.8); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 900; color: #1877F2; letter-spacing: 1px; }
 
-        /* FULL SCREEN FEED */
-        #feed-main { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed-main::-webkit-scrollbar { display: none; }
-        .v-snap { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
+        /* REELS CONTAINER (INSTAGRAM STYLE SCROLL) */
+        #reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #reels-container::-webkit-scrollbar { display: none; }
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* SIDE ACTIONS */
-        .side-icons { position: absolute; right: 15px; bottom: 110px; display: flex; flex-direction: column; gap: 20px; z-index: 100; align-items: center; }
-        .icon-unit { text-align: center; cursor: pointer; }
-        .icon-unit i { font-size: 32px !important; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .icon-unit span { font-size: 11px; font-weight: bold; display: block; margin-top: 3px; }
+        /* WATERMARK */
+        .watermark { position: absolute; top: 80px; left: 20px; opacity: 0.6; font-weight: bold; font-size: 14px; pointer-events: none; z-index: 10; display: flex; align-items: center; gap: 5px; }
 
-        /* USER OVERLAY */
-        .user-data { position: absolute; bottom: 85px; left: 15px; z-index: 100; max-width: 75%; }
-        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-pic { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
+        /* FACEBOOK STYLE ACTIONS (BOTTOM ROW) */
+        .fb-action-bar { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 100; border-top: 0.1px solid rgba(255,255,255,0.1); }
+        .fb-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #fff; }
+        .fb-btn i { font-size: 24px; }
+        .fb-btn span { font-size: 14px; font-weight: 600; }
 
-        /* HEART POP ANIMATION */
-        .h-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 90px; color: #ff3040; z-index: 500; opacity: 0; pointer-events: none; }
-        .h-pop.active { animation: heartIn 0.7s ease; }
-        @keyframes heartIn { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+        /* SIDE TOOLS (REPORT & DOWNLOAD) */
+        .side-tools { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; }
+        .tool-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .tool-icon i { font-size: 28px; color: #fff; opacity: 0.8; }
+        .tool-icon span { font-size: 10px; }
+
+        /* USER INFO */
+        .user-details { position: absolute; bottom: 140px; left: 15px; z-index: 100; }
+        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .u-pic { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #1877F2; }
 
         /* BOTTOM NAV */
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 1000; }
-        .nav-bottom i { font-size: 28px; color: #fff; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #262626; z-index: 1000; }
+        .nav i { font-size: 28px; color: #fff; }
+
+        /* HEART POP */
+        .h-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #ff3040; opacity: 0; z-index: 500; }
+        .h-pop.active { animation: heartPop 0.8s ease; }
+        @keyframes heartPop { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="top-fixed">
+    <div class="header">
         <div class="brand">INDIVIBE</div>
-        <div class="stories-row">
-            <div class="s-ring"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-            <div class="s-ring"><img src="https://picsum.photos/150"></div>
-            <div class="s-ring"><img src="https://picsum.photos/151"></div>
-            <div class="s-ring"><img src="https://picsum.photos/152"></div>
-        </div>
-    </div>
-
-    <div id="feed-main">
-        <div style="height:100vh; display:flex; align-items:center; justify-content:center;">Loading Vibes...</div>
-    </div>
-
-    <div class="nav-bottom">
-        <i class="material-icons-outlined">home</i>
         <i class="material-icons-outlined">search</i>
-        <i class="material-icons-outlined">add_box</i>
+    </div>
+
+    <div id="reels-container">
+        </div>
+
+    <div class="nav">
+        <i class="material-icons-outlined" style="color:#1877F2">home</i>
+        <i class="material-icons-outlined">explore</i>
+        <i class="material-icons-outlined">add_circle_outline</i>
         <i class="material-icons-outlined">person_outline</i>
     </div>
 
     <script>
-        const SUPA_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
-        const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
-        const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+        const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
+        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
+        const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function fetchVibes() {
-            const { data, error } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
-                const container = document.getElementById('feed-main');
-                container.innerHTML = data.map(v => `
-                    <div class="v-snap">
-                        <video src="${v.video_url}" loop playsinline onclick="playPause(this)" ondblclick="bigLike(this)"></video>
-                        <div class="h-pop">favorite</div>
-                        
-                        <div class="side-icons">
-                            <div class="icon-unit" onclick="bigLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined l-btn">favorite_border</i><span>1.2M</span>
-                            </div>
-                            <div class="icon-unit" onclick="alert('Comments opening...')">
-                                <i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span>
-                            </div>
-                            <div class="icon-unit" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons-outlined">share</i><span>Share</span>
-                            </div>
-                            <div class="icon-unit" onclick="window.open('${v.video_url}')">
-                                <i class="material-icons-outlined">download</i>
-                            </div>
+        async function initApp() {
+            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+            if (!data) return;
+
+            document.getElementById('reels-container').innerHTML = data.map(v => `
+                <div class="reel">
+                    <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="doLike(this)"></video>
+                    <div class="watermark"><i class="material-icons-outlined" style="font-size:16px">verified</i> INDIVIBE</div>
+                    <div class="h-pop material-icons-outlined">favorite</div>
+                    
+                    <div class="side-tools">
+                        <div class="tool-icon" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
+                        <div class="tool-icon" onclick="alert('Video Reported')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
+                    </div>
+
+                    <div class="user-details">
+                        <div class="u-info">
+                            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
+                            <b>rajasthanking007</b>
                         </div>
+                        <p style="font-size:14px; margin-left:50px;">${v.caption}</p>
+                    </div>
 
-                        <div class="user-data">
-                            <div class="u-info">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <b>Vishnupur Fifthoot</b>
-                            </div>
-                            <p>${v.caption || ''}</p>
+                    <div class="fb-action-bar">
+                        <div class="fb-btn" onclick="doLike(this.parentElement.parentElement.querySelector('video'))">
+                            <i class="material-icons-outlined like-icon">thumb_up</i><span>Like</span>
+                        </div>
+                        <div class="fb-btn" onclick="alert('Comment Box coming soon')">
+                            <i class="material-icons-outlined">chat_bubble_outline</i><span>Comment</span>
+                        </div>
+                        <div class="fb-btn" onclick="navigator.share({url:'${v.video_url}'})">
+                            <i class="material-icons-outlined">share</i><span>Share</span>
                         </div>
                     </div>
-                `).join('');
-                attachObserver();
-            }
+                </div>
+            `).join('');
+
+            setupObserver();
         }
 
-        let tapT;
-        function playPause(v) {
-            if (tapT) return;
-            tapT = setTimeout(() => { v.paused ? v.play() : v.pause(); tapT = null; }, 250);
+        let tapTimer;
+        function handleTap(v) {
+            if (tapTimer) return;
+            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
         }
 
-        function bigLike(v) {
-            clearTimeout(tapT); tapT = null;
-            const heart = v.parentElement.querySelector('.h-pop');
-            heart.classList.add('active', 'material-icons-outlined');
-            setTimeout(() => heart.classList.remove('active'), 700);
+        function doLike(v) {
+            clearTimeout(tapTimer); tapTimer = null;
+            const h = v.parentElement.querySelector('.h-pop');
+            h.classList.add('active');
+            setTimeout(() => h.classList.remove('active'), 800);
             
-            const lBtn = v.parentElement.querySelector('.l-btn');
-            lBtn.innerText = 'favorite'; lBtn.style.color = '#ff3040';
+            const lIcon = v.parentElement.querySelector('.like-icon');
+            lIcon.style.color = '#1877F2';
+            lIcon.innerText = 'thumb_up';
         }
 
-        function attachObserver() {
+        function setupObserver() {
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
-            }, { threshold: 0.6 });
-            document.querySelectorAll('.v-snap').forEach(s => obs.observe(s));
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
-        fetchVibes();
+        initApp();
     </script>
 </body>
 </html>
