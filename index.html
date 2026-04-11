@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Social App</title>
+    <title>INDIVIBE - Facebook Style</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
@@ -11,56 +11,56 @@
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
         /* Reels Container */
-        #reels-feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #reels-feed::-webkit-scrollbar { display: none; }
-        .reel-box { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+        #reels-wrapper { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #reels-wrapper::-webkit-scrollbar { display: none; }
+        .reel-frame { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Top Watermark */
-        .brand { position: absolute; top: 25px; left: 20px; z-index: 10; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 5px #000; }
+        /* Brand Watermark */
+        .brand-logo { position: absolute; top: 25px; left: 20px; z-index: 10; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 10px #000; }
 
-        /* Side Bar (Save/Report) */
-        .side-bar { position: absolute; right: 15px; bottom: 180px; display: flex; flex-direction: column; gap: 20px; z-index: 20; }
-        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .side-btn i { font-size: 30px !important; filter: drop-shadow(0 2px 4px #000); }
-        .side-btn span { font-size: 11px; font-weight: bold; margin-top: 4px; }
+        /* Side Toolbar (Save & Report) - Side mein upar rakha hai */
+        .side-toolbar { position: absolute; right: 15px; bottom: 200px; display: flex; flex-direction: column; gap: 20px; z-index: 20; }
+        .side-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .side-item i { font-size: 30px !important; filter: drop-shadow(0 2px 5px #000); }
+        .side-item span { font-size: 11px; font-weight: bold; margin-top: 4px; text-shadow: 1px 1px 2px #000; }
 
-        /* User Info & Caption */
-        .user-section { position: absolute; bottom: 130px; left: 15px; z-index: 20; max-width: 80%; }
-        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-pic { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; }
-        .u-name { font-weight: 800; font-size: 16px; text-shadow: 1px 1px 3px #000; }
+        /* User & Caption Overlay */
+        .user-overlay { position: absolute; bottom: 140px; left: 15px; z-index: 20; max-width: 80%; }
+        .u-data { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .u-pfp { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; }
+        .u-handle { font-weight: 800; font-size: 16px; text-shadow: 1px 1px 5px #000; }
 
-        /* FACEBOOK STYLE ACTION BAR (The Row Fix) */
-        .action-row {
+        /* FACEBOOK STYLE BAR (THE REAL FIX) */
+        .fb-action-bar {
             position: absolute;
-            bottom: 65px;
+            bottom: 70px; /* Footer ke theek upar */
             width: 100%;
             height: 60px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            border-top: 0.5px solid rgba(255,255,255,0.1);
+            border-top: 0.2px solid rgba(255,255,255,0.15);
             z-index: 30;
         }
-        .act-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .act-item i { font-size: 26px !important; }
-        .act-item span { font-size: 14px; font-weight: 700; }
+        .fb-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .fb-btn i { font-size: 26px !important; }
+        .fb-btn span { font-size: 14px; font-weight: 700; }
 
         /* Bottom Tab Nav */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
         .bottom-nav i { font-size: 28px; color: #fff; }
 
         /* Heart Animation */
-        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 110px; color: #ff3040; opacity: 0; pointer-events: none; z-index: 50; }
-        .heart-pop.active { animation: popAnim 0.8s ease-out; }
-        @keyframes popAnim { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        .h-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 110px; color: #ff3040; opacity: 0; pointer-events: none; z-index: 50; }
+        .h-pop.active { animation: popOut 0.8s ease; }
+        @keyframes popOut { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="reels-feed"></div>
+    <div id="reels-wrapper"></div>
 
     <div class="bottom-nav">
         <i class="material-icons-outlined" style="color: #1877F2;">home</i>
@@ -74,73 +74,73 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initApp() {
+        async function initFeed() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('reels-feed').innerHTML = data.map(v => `
-                    <div class="reel-box">
-                        <div class="brand">INDIVIBE</div>
-                        <video src="${v.video_url}" loop playsinline onclick="vClick(this)" ondblclick="vLike(this)"></video>
-                        <div class="heart-pop material-icons-outlined">favorite</div>
+                document.getElementById('reels-wrapper').innerHTML = data.map(v => `
+                    <div class="reel-frame">
+                        <div class="brand-logo">INDIVIBE</div>
+                        <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="handleLike(this)"></video>
+                        <div class="h-pop material-icons-outlined">favorite</div>
                         
-                        <div class="side-bar">
-                            <div class="side-btn" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
-                            <div class="side-btn" onclick="alert('Reported')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
+                        <div class="side-toolbar">
+                            <div class="side-item" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
+                            <div class="side-item" onclick="alert('Reported')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
                         </div>
 
-                        <div class="user-section">
-                            <div class="u-info">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <span class="u-name">Vishnupur Fifthoot</span>
+                        <div class="user-overlay">
+                            <div class="u-data">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pfp">
+                                <span class="u-handle">Vishnupur Fifthoot</span>
                             </div>
-                            <p style="padding-left:55px; font-size:14px;">${v.caption || ''}</p>
+                            <p style="padding-left:55px;">${v.caption || ''}</p>
                         </div>
 
-                        <div class="action-row">
-                            <div class="act-item" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined l-icon">favorite_border</i><span>Like</span>
+                        <div class="fb-action-bar">
+                            <div class="fb-btn" onclick="handleLike(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons-outlined like-icon">favorite_border</i><span>Like</span>
                             </div>
-                            <div class="act-item" onclick="alert('Comment Box opening...')">
+                            <div class="fb-btn" onclick="alert('Comment box opening...')">
                                 <i class="material-icons-outlined">chat_bubble_outline</i><span>Comment</span>
                             </div>
-                            <div class="act-item" onclick="navigator.share({url:'${v.video_url}'})">
+                            <div class="fb-btn" onclick="navigator.share({url:'${v.video_url}'})">
                                 <i class="material-icons-outlined">share</i><span>Share</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                attachObserver();
+                setupObserver();
             }
         }
 
-        let tapT;
-        function vClick(v) {
-            if (tapT) return;
-            tapT = setTimeout(() => { v.paused ? v.play() : v.pause(); tapT = null; }, 250);
+        let tapTimer;
+        function handleTap(v) {
+            if (tapTimer) return;
+            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
         }
 
-        function vLike(v) {
-            clearTimeout(tapT); tapT = null;
-            const h = v.parentElement.querySelector('.heart-pop');
-            h.classList.add('active');
-            setTimeout(() => h.classList.remove('active'), 800);
+        function handleLike(v) {
+            clearTimeout(tapTimer); tapTimer = null;
+            const pop = v.parentElement.querySelector('.h-pop');
+            pop.classList.add('active');
+            setTimeout(() => pop.classList.remove('active'), 800);
             
-            const icon = v.parentElement.querySelector('.l-icon');
+            const icon = v.parentElement.querySelector('.like-icon');
             icon.innerText = 'favorite'; 
             icon.style.color = '#ff3040';
         }
 
-        function attachObserver() {
+        function setupObserver() {
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel-box').forEach(r => obs.observe(r));
+            document.querySelectorAll('.reel-frame').forEach(r => obs.observe(r));
         }
 
-        initApp();
+        initFeed();
     </script>
 </body>
 </html>
