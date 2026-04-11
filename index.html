@@ -3,158 +3,225 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>INDIVIBE Final</title>
+<title>INDIVIBE Premium</title>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-/* CSS: Design and Layout */
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, sans-serif; background:#000; color:#fff; overflow:hidden; }
 
-/* Header & Stories */
-.top-nav { position: fixed; top: 0; width: 100%; z-index: 100; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); padding: 10px 15px; }
-.brand { font-weight: 900; font-size: 24px; color: #1877F2; }
-.stories { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-.stories::-webkit-scrollbar { display: none; }
-.s-circle { min-width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2px; }
-.s-circle img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+body {
+  font-family: -apple-system, sans-serif;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+  height: 100vh;
+  width: 100vw;
+}
 
-/* Feed */
-#feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-#feed::-webkit-scrollbar { display: none; }
-.video-container { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+/* TOP BAR & STORIES (FIXED AT TOP) */
+.header-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+  padding: 10px 15px;
+}
+
+.brand { font-weight: 900; font-size: 24px; color: #1877F2; margin-bottom: 8px; }
+
+.stories-bar {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: none;
+}
+.stories-bar::-webkit-scrollbar { display: none; }
+
+.story-ring {
+  min-width: 62px; height: 62px; border-radius: 50%;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  padding: 2px;
+}
+.story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+
+/* MAIN FEED (FULL SCREEN SNAP) */
+.main-feed {
+  height: 100vh;
+  width: 100vw;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 10;
+}
+.main-feed::-webkit-scrollbar { display: none; }
+
+.video-box {
+  height: 100vh;
+  width: 100vw;
+  scroll-snap-align: start;
+  position: relative;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 video { width: 100%; height: 100%; object-fit: cover; }
 
-/* Actions */
-.actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 50; align-items: center; }
-.act-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px #000; }
-.act-btn span { font-size: 11px; margin-top: 4px; font-weight: bold; }
+/* ACTION BUTTONS */
+.side-buttons {
+  position: absolute;
+  right: 15px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  z-index: 500;
+  align-items: center;
+}
+.btn-ui { text-align: center; cursor: pointer; }
+.btn-ui span { font-size: 11px; display: block; margin-top: 4px; font-weight: bold; }
 
-/* Heart Pop */
-.heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #ff3040; opacity: 0; pointer-events: none; z-index: 60; }
-.heart-pop.animate { animation: popHeart 0.8s forwards; }
-@keyframes popHeart { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 50% { transform: translate(-50%,-50%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
+/* USER INFO */
+.user-overlay {
+  position: absolute;
+  bottom: 100px;
+  left: 15px;
+  z-index: 500;
+  width: 75%;
+}
+.u-tag { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.u-tag img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
 
-/* User Info */
-.user-info { position: absolute; bottom: 80px; left: 15px; z-index: 50; }
-.u-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
+/* BOTTOM NAVIGATION */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 65px;
+  background: #000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 0.5px solid #333;
+  z-index: 1000;
+}
 
-/* Drawer */
-.drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%; background: #1c1c1e; border-radius: 20px 20px 0 0; z-index: 200; transition: 0.3s; padding: 20px; }
-.drawer.active { bottom: 0; }
+/* HEART POP */
+.pop-heart {
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+  font-size: 100px; color: #ff3040; z-index: 600; opacity: 0; pointer-events: none;
+}
+.pop-heart.show { animation: heartAnim 0.8s ease-out; }
+@keyframes heartAnim {
+  0% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+}
 </style>
 </head>
 <body>
 
-<div class="top-nav">
+<div class="header-container">
   <div class="brand">INDIVIBE</div>
-  <div class="stories">
-    <div class="s-circle"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-    <div class="s-circle"><img src="https://picsum.photos/200"></div>
-    <div class="s-circle"><img src="https://picsum.photos/300"></div>
-    <div class="s-circle"><img src="https://picsum.photos/400"></div>
+  <div class="stories-bar">
+    <div class="story-ring"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+    <div class="story-ring"><img src="https://picsum.photos/101"></div>
+    <div class="story-ring"><img src="https://picsum.photos/102"></div>
+    <div class="story-ring"><img src="https://picsum.photos/103"></div>
+    <div class="story-ring"><img src="https://picsum.photos/104"></div>
   </div>
 </div>
 
-<div id="feed"></div>
+<div id="feed" class="main-feed"></div>
 
-<div class="drawer" id="comm-drawer">
-  <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-    <b>Comments</b>
-    <i data-lucide="x" onclick="toggleC(false)"></i>
-  </div>
-  <div id="comm-list" style="overflow-y:auto; height:80%;">Loading...</div>
+<div class="bottom-nav">
+  <i data-lucide="home"></i>
+  <i data-lucide="search"></i>
+  <i data-lucide="plus-square" style="transform: scale(1.2)"></i>
+  <i data-lucide="user"></i>
 </div>
 
 <script>
-/* Yeh wahi Logic hai jo aapne upar bheja tha, bas Supabase Key aur ID fix ki gayi hai */
-const supabase = window.supabase.createClient(
-  "https://jxjbmjburdksqfjyhrxp.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4"
-);
+const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
+const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
+const supabase = window.supabase.createClient(S_URL, S_KEY);
 
-let currentVideoId = null;
-let observer;
-
-async function loadVibes() {
-  const { data } = await supabase.from("videos").select(`id, video_url, caption, created_at`).order('created_at', { ascending: false });
-  if (data) renderFeed(data);
-}
-
-function renderFeed(videos) {
-  const feed = document.getElementById("feed");
-  feed.innerHTML = videos.map(v => `
-    <div class="video-container" data-id="${v.id}">
-      <video src="${v.video_url}" loop playsinline></video>
-      <div class="heart-pop">❤</div>
-      <div class="actions">
-        <div class="act-btn like-btn"><i data-lucide="heart" class="h-icon"></i><span>1.2M</span></div>
-        <div class="act-btn comment-btn"><i data-lucide="message-circle"></i><span>45K</span></div>
-        <div class="act-btn share-btn"><i data-lucide="share-2"></i><span>Share</span></div>
-        <div class="act-btn download-btn"><i data-lucide="download"></i></div>
-      </div>
-      <div class="user-info">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-          <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
-          <b>@vishnu_pur</b>
+async function initIndiVibe() {
+  const { data, error } = await supabase.from("videos").select("*").order('created_at', { ascending: false });
+  
+  if (data) {
+    const feedDiv = document.getElementById("feed");
+    feedDiv.innerHTML = data.map(v => `
+      <div class="video-box">
+        <video src="${v.video_url}" loop playsinline onclick="tapControl(this)" ondblclick="triggerLike(this)"></video>
+        <div class="pop-heart">❤️</div>
+        
+        <div class="side-buttons">
+          <div class="btn-ui" onclick="triggerLike(this.parentElement.parentElement.querySelector('video'))">
+            <i data-lucide="heart" class="l-icon"></i><span>1.2M</span>
+          </div>
+          <div class="btn-ui" onclick="alert('Comments coming soon')">
+            <i data-lucide="message-circle"></i><span>45K</span>
+          </div>
+          <div class="btn-ui" onclick="navigator.share({url:'${v.video_url}'})">
+            <i data-lucide="share-2"></i><span>Share</span>
+          </div>
+          <div class="btn-ui" onclick="window.open('${v.video_url}')">
+            <i data-lucide="download-cloud"></i>
+          </div>
         </div>
-        <p>${v.caption || ''}</p>
+
+        <div class="user-overlay">
+          <div class="u-tag">
+            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
+            <b>Vishnupur Fifthoot</b>
+          </div>
+          <p>${v.caption || ''}</p>
+        </div>
       </div>
-    </div>
-  `).join('');
-  lucide.createIcons();
-  bindEvents();
-  setupObserver();
+    `).join('');
+
+    lucide.createIcons();
+    setupVideoObserver();
+  } else if (error) {
+    console.error("Data error:", error);
+  }
 }
 
-function bindEvents() {
-  document.querySelectorAll(".video-container").forEach(container => {
-    const video = container.querySelector("video");
-    const id = container.dataset.id;
-    let lastTap = 0;
-
-    video.addEventListener("click", () => {
-      const now = Date.now();
-      if (now - lastTap < 300) { likeVideo(id, container); } 
-      else { video.paused ? video.play() : video.pause(); }
-      lastTap = now;
-    });
-
-    container.querySelector(".like-btn").onclick = () => likeVideo(id, container);
-    container.querySelector(".comment-btn").onclick = () => openComments(id);
-    container.querySelector(".share-btn").onclick = () => navigator.share({ url: video.src });
-    container.querySelector(".download-btn").onclick = () => window.open(video.src);
-  });
+let tapTimer;
+function tapControl(v) {
+  if (tapTimer) return;
+  tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
 }
 
-async function likeVideo(id, container) {
-  const heart = container.querySelector(".heart-pop");
-  heart.classList.add("animate");
-  setTimeout(() => heart.classList.remove("animate"), 800);
-  const icon = container.querySelector(".h-icon");
+function triggerLike(v) {
+  clearTimeout(tapTimer); tapTimer = null;
+  const h = v.parentElement.querySelector(".pop-heart");
+  h.classList.add("show");
+  setTimeout(() => h.classList.remove("show"), 800);
+  
+  const icon = v.parentElement.querySelector(".l-icon");
   icon.style.fill = "#ff3040"; icon.style.stroke = "#ff3040";
 }
 
-function openComments(id) {
-  document.getElementById("comm-drawer").classList.add("active");
-  document.getElementById("comm-list").innerHTML = "Real-time comments feature active.";
-}
-
-function setupObserver() {
-  observer = new IntersectionObserver(entries => {
+function setupVideoObserver() {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      const v = e.target.querySelector("video");
-      if (e.isIntersecting) v.play(); else v.pause();
+      const vid = e.target.querySelector("video");
+      if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
     });
-  }, { threshold: 0.7 });
-  document.querySelectorAll(".video-container").forEach(c => observer.observe(c));
+  }, { threshold: 0.6 });
+  document.querySelectorAll(".video-box").forEach(box => observer.observe(box));
 }
 
-function toggleC(open) { document.getElementById("comm-drawer").classList.toggle("active", open); }
-
-loadVibes();
+initIndiVibe();
 </script>
 </body>
 </html>
