@@ -12,37 +12,31 @@
 
         #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
-        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FB TOPBAR */
-        .fb-top { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 10; }
+        /* TOP BAR */
+        .fb-top { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
         .fb-top i { font-size: 24px; margin-right: 15px; }
         .fb-top b { font-size: 19px; flex: 1; font-weight: 500; }
 
-        /* RIGHT ACTIONS - CLEAN FB STYLE */
-        .fb-actions { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 10; }
+        /* RIGHT ACTIONS */
+        .fb-actions { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
         .act-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        
-        /* 🔴 ONLY RED HEART FOR LIKE */
-        .heart { font-size: 32px !important; color: white; transition: 0.1s; }
-        .fb-icon { font-size: 30px !important; color: white; }
+        .heart { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+        .fb-icon { font-size: 30px !important; color: white; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
         .count { font-size: 12px; margin-top: 2px; font-weight: 600; text-shadow: 0 1px 2px #000; }
 
-        /* FB BOTTOM OVERLAY */
-        .fb-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%); z-index: 10; }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid white; }
-        .u-name { font-weight: 700; font-size: 15px; color: white; }
-        .u-dot { font-size: 12px; margin: 0 4px; opacity: 0.8; }
-        .f-btn { font-weight: 700; font-size: 14px; color: white; background: none; border: none; }
-        .caption { font-size: 14px; line-height: 1.3; margin-bottom: 15px; }
+        /* BOTTOM CONTENT - EXACT FB STYLE */
+        .fb-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 12px 15px 15px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 10; }
+        .u-info { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .u-avatar { width: 34px; height: 34px; border-radius: 50%; border: 1px solid white; }
+        .u-name { font-weight: 700; font-size: 15px; }
+        .f-btn { font-weight: 700; font-size: 14px; margin-left: 5px; }
+        .cap { font-size: 14px; line-height: 1.3; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* 💬 FB STYLE CHHOTA COMMENT BOX */
-        .fb-comment-box { width: 100%; height: 42px; background: rgba(255, 255, 255, 0.18); border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: center; padding: 0 15px; color: #eee; font-size: 14px; }
-
-        /* WATERMARK */
-        .wm { position: absolute; top: 60px; right: 15px; opacity: 0.4; font-size: 13px; font-weight: bold; pointer-events: none; z-index: 5; }
+        /* 💬 CHHOTA COMMENT BOX - FB STYLE */
+        .fb-comment-input { width: 100%; height: 40px; background: rgba(255, 255, 255, 0.2); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #ddd; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -54,7 +48,7 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function fetchVideos() {
+        async function init() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
@@ -65,61 +59,46 @@
                             <i class="material-icons-outlined" style="margin-left:auto">search</i>
                             <i class="material-icons-outlined">person_outline</i>
                         </div>
-                        <div class="wm">IndiVibe</div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                         
                         <div class="fb-actions">
-                            <div class="act-btn" onclick="like(this)">
-                                <i class="material-icons-outlined heart">favorite_border</i>
-                                <span class="count">1.5M</span>
-                            </div>
-                            <div class="act-btn">
-                                <i class="material-icons-outlined fb-icon">chat_bubble_outline</i>
-                                <span class="count">45K</span>
-                            </div>
-                            <div class="act-btn" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i>
-                                <span class="count">Share</span>
-                            </div>
-                            <div class="act-btn">
-                                <i class="material-icons-outlined fb-icon">more_horiz</i>
-                            </div>
+                            <div class="act-btn" onclick="lk(this)"><i class="material-icons-outlined heart">favorite_border</i><span class="count">1.5M</span></div>
+                            <div class="act-btn"><i class="material-icons-outlined fb-icon">chat_bubble_outline</i><span class="count">45K</span></div>
+                            <div class="act-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i><span class="count">Share</span></div>
+                            <div class="act-btn"><i class="material-icons-outlined fb-icon">more_horiz</i></div>
                         </div>
 
                         <div class="fb-bottom">
-                            <div class="user-info">
+                            <div class="u-info">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
-                                <span class="u-name">Vishnupur Fifthoot <span class="u-dot">•</span> <span class="f-btn">Follow</span></span>
+                                <span class="u-name">Vishnupur Fifthoot • <span class="f-btn">Follow</span></span>
                             </div>
-                            <div class="caption">${v.caption || 'New Reel on IndiVibe'}</div>
-                            <div class="fb-comment-box">कमेंट जोड़ें...</div>
+                            <div class="cap">${v.caption || ''}</div>
+                            <div class="fb-comment-input">कमेंट जोड़ें...</div>
                         </div>
                     </div>
                 `).join('');
-                playLogic();
+                setupVideo();
             }
         }
 
-        function playLogic() {
-            const obs = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    const video = e.target.querySelector('video');
-                    if (e.isIntersecting) video.play(); else { video.pause(); video.currentTime = 0; }
+        function setupVideo() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
             document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
-        function like(el) {
+        function lk(el) {
             const i = el.querySelector('.heart');
-            if(i.innerText === 'favorite_border') {
-                i.innerText = 'favorite'; i.style.color = '#ff3040';
-            } else {
-                i.innerText = 'favorite_border'; i.style.color = 'white';
-            }
+            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
+            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
         }
 
-        fetchVideos();
+        init();
     </script>
 </body>
 </html>
