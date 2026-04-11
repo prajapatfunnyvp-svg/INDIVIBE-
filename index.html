@@ -3,68 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro Final v27</title>
+    <title>IndiVibe Premium</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
+        :root { --fb-blue: #1877F2; --dark-bg: #000; --card-bg: #242526; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--dark-bg); color: white; font-family: sans-serif; overflow: hidden; }
 
-        /* INSTAGRAM STYLE SMOOTH SCROLL */
-        .reels-scroller { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .reels-scroller::-webkit-scrollbar { display: none; }
-        .reel-frame { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-        
+        /* --- 1. STORY BAR (Top) --- */
+        .story-container { display: flex; gap: 12px; padding: 10px; overflow-x: auto; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); position: absolute; top: 50px; width: 100%; z-index: 20; scrollbar-width: none; }
+        .story-container::-webkit-scrollbar { display: none; }
+        .story-circle { min-width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ff3040; padding: 2px; }
+        .story-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+        /* --- 2. MAIN FEED (Snap Scroll) --- */
+        .main-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .main-feed::-webkit-scrollbar { display: none; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FACEBOOK TOPBAR */
-        .fb-header { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 16px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 10; }
-        .fb-header b { font-size: 19px; flex: 1; font-weight: 600; }
-        .fb-header i { font-size: 24px; color: #efefef; }
+        /* --- 3. UI OVERLAYS (FB Design) --- */
+        .header { position: absolute; top: 0; width: 100%; height: 55px; display: flex; align-items: center; padding: 0 15px; z-index: 30; }
+        .header b { font-size: 22px; flex: 1; letter-spacing: 1px; color: var(--fb-blue); }
 
-        /* INSTAGRAM STYLE SIDE ICONS */
-        .vibe-actions { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .action-item i { font-size: 30px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
-        .label-val { font-size: 11px; margin-top: 2px; font-weight: 500; text-shadow: 0 1px 2px #000; }
+        .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 30; align-items: center; }
+        .btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .btn i { font-size: 32px !important; text-shadow: 0 2px 4px #000; }
+        .btn span { font-size: 11px; margin-top: 4px; font-weight: bold; }
 
-        /* FACEBOOK STYLE BOTTOM INFO Area (Clean - No Comment Box) */
-        .bottom-ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 16px 20px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 10; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        .u-pic { width: 34px; height: 34px; border-radius: 50%; border: 1px solid white; }
-        .u-name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; }
-        .f-badge { border: 1px solid white; padding: 1px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; background: rgba(255,255,255,0.1); }
-        .cap-text { font-size: 14px; line-height: 1.3; text-shadow: 0 1px 3px #000; max-width: 80%; }
+        .bottom-info { position: absolute; bottom: 65px; left: 15px; width: 70%; z-index: 30; }
+        .user-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .user-meta img { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
+        .user-meta b { font-size: 15px; }
 
-        /* 📱 SLIDING COMMENT SHEET (Only Opens on Chat Icon Click) */
-        #comment-overlay { position: fixed; bottom: -100%; left: 0; width: 100%; height: 65%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s cubic-bezier(0, 0, 0.2, 1); display: flex; flex-direction: column; }
-        #comment-overlay.active { bottom: 0; }
-        .overlay-header { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; position: relative; }
-        .overlay-header i { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #aaa; }
-        .comments-list { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; color: #ddd; }
-        
-        /* FACEBOOK DESIGN INPUT BOX INSIDE SHEET */
-        .input-bar { padding: 10px 15px 25px; border-top: 1px solid #333; display: flex; gap: 10px; align-items: center; }
-        .fb-input { background: #3a3b3c; border-radius: 20px; padding: 10px 15px; flex: 1; border: none; color: white; outline: none; font-size: 14px; }
-        .fb-send { color: #1877F2; font-weight: bold; cursor: pointer; }
+        /* --- 4. NAVIGATION BAR (Bottom) --- */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #333; z-index: 100; }
+        .nav-bar i { font-size: 28px; color: #fff; }
 
-        /* INSTAGRAM DOUBLE TAP HEART Animation */
-        .like-animate { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 80px; color: #ff3040; z-index: 9; transition: 0.4s ease-out; pointer-events: none; opacity: 0; }
-        .like-animate.animate { animation: likeAnimate 0.8s ease; }
-        @keyframes likeAnimate { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+        /* --- 5. INTERACTION SHEETS (Comments/DMs) --- */
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; height: 70%; background: #1c1c1e; border-radius: 20px 20px 0 0; z-index: 200; transition: 0.4s; display: flex; flex-direction: column; }
+        .sheet.active { bottom: 0; }
+        .sheet-header { padding: 15px; border-bottom: 1px solid #333; text-align: center; font-weight: bold; }
+        .sheet-body { flex: 1; overflow-y: auto; padding: 15px; }
+        .input-area { padding: 10px 15px 30px; border-top: 1px solid #333; display: flex; gap: 10px; }
+        .input-area input { flex: 1; background: #333; border: none; border-radius: 20px; padding: 10px 15px; color: #fff; outline: none; }
+
+        /* Double Tap Heart */
+        .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #ff3040; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 50; }
+        .big-heart.pop { animation: heartPop 0.7s forwards; }
+        @keyframes heartPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="vibes-feed" class="reels-scroller"></div>
+    <div class="header">
+        <b>INDIVIBE</b>
+        <i class="material-icons-outlined" style="margin-right: 20px;" onclick="openSheet('dm-sheet')">send</i>
+    </div>
 
-    <div id="comment-overlay">
-        <div class="overlay-header">Comments <i class="material-icons-outlined" onclick="toggleComments(false)">close</i></div>
-        <div class="comments-list" id="msg-box">No comments yet.</div>
-        <div class="input-bar">
-            <input type="text" id="msg-input" class="fb-input" placeholder="Comment jodein...">
-            <span class="fb-send" onclick="addMsg()">Post</span>
+    <div class="story-container">
+        <div class="story-circle"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+        <div class="story-circle"><img src="https://picsum.photos/101"></div>
+        <div class="story-circle"><img src="https://picsum.photos/102"></div>
+        <div class="story-circle"><img src="https://picsum.photos/103"></div>
+        <div class="story-circle"><img src="https://picsum.photos/104"></div>
+    </div>
+
+    <div id="feed" class="main-feed"></div>
+
+    <div class="nav-bar">
+        <i class="material-icons-outlined">home</i>
+        <i class="material-icons-outlined">search</i>
+        <i class="material-icons-outlined" style="font-size: 35px;">add_box</i>
+        <i class="material-icons-outlined">person</i>
+    </div>
+
+    <div id="comment-sheet" class="sheet">
+        <div class="sheet-header">Comments <i class="material-icons-outlined" style="float:right" onclick="closeSheet()">close</i></div>
+        <div class="sheet-body" id="comm-list">No comments yet.</div>
+        <div class="input-area">
+            <input type="text" placeholder="Add a comment...">
+            <i class="material-icons-outlined" style="color:var(--fb-blue)">send</i>
         </div>
+    </div>
+
+    <div id="dm-sheet" class="sheet">
+        <div class="sheet-header">Direct Messages <i class="material-icons-outlined" style="float:right" onclick="closeSheet()">close</i></div>
+        <div class="sheet-body">
+            <div style="display:flex; gap:10px; margin-bottom:15px">
+                <img src="https://picsum.photos/50" style="border-radius:50%; width:40px; height:40px">
+                <div><b>Rohan:</b> Bhai naya vibe dekha? <br><small style="color:gray">2m ago</small></div>
+            </div>
+        </div>
+        <div class="input-area"><input type="text" placeholder="Message..."></div>
     </div>
 
     <script>
@@ -72,81 +104,67 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initFeed() {
-            const { data, error } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+        async function loadFeed() {
+            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('vibes-feed').innerHTML = data.map(v => `
-                    <div class="reel-frame">
-                        <div class="fb-header">
-                            <i class="material-icons-outlined">arrow_back</i>
-                            <b>Vibes</b>
-                            <i class="material-icons-outlined" style="margin-left:auto">search</i>
+                document.getElementById('feed').innerHTML = data.map(v => `
+                    <div class="vibe-card">
+                        <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="handleDoubleTap(this)"></video>
+                        <i class="material-icons-outlined big-heart">favorite</i>
+                        <div class="side-actions">
+                            <div class="btn" onclick="like(this)"><i class="material-icons-outlined">favorite_border</i><span>1.2M</span></div>
+                            <div class="btn" onclick="openSheet('comment-sheet')"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
+                            <div class="btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="btn" onclick="alert('Downloading...')"><i class="material-icons-outlined">download</i></div>
                         </div>
-                        <video src="${v.video_url}" loop playsinline onclick="handleSingleTap(this)" ondblclick="handleDoubleTap(this)"></video>
-                        <i class="material-icons-outlined like-animate">favorite</i>
-
-                        <div class="vibe-actions">
-                            <div class="action-item" onclick="like(this)"><i class="material-icons-outlined heart-icon">favorite_border</i><span class="label-val">1.2M</span></div>
-                            <div class="action-item" onclick="toggleComments(true)"><i class="material-icons-outlined fb-icon">chat_bubble_outline</i><span class="label-val">45K</span></div>
-                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i><span class="label-val">Share</span></div>
-                        </div>
-
-                        <div class="bottom-ui">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <span class="u-name">Vishnupur Fifthoot</span>
-                                <div class="f-badge">Follow</div>
+                        <div class="bottom-info">
+                            <div class="user-meta">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
+                                <b>Vishnupur Fifthoot</b>
                             </div>
-                            <div class="cap-text">${v.caption || ''}</div>
+                            <div>${v.caption || ''}</div>
                         </div>
                     </div>
                 `).join('');
-                setupIntersection();
+                setupAutoPlay();
             }
         }
 
-        function setupIntersection() {
-            const obs = new IntersectionObserver((es) => {
+        function setupAutoPlay() {
+            const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
-                    const video = e.target.querySelector('video');
-                    if (e.isIntersecting) video.play(); else { video.pause(); video.currentTime = 0; }
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else v.pause();
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel-frame').forEach(f => obs.observe(f));
+            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
         }
 
-        /* 👆 INSTAGRAM Logic: Double Tap to Like */
-        let singleTapTimeout;
-        function handleSingleTap(video) {
-            if (singleTapTimeout) { clearTimeout(singleTapTimeout); singleTapTimeout = null; return; }
-            singleTapTimeout = setTimeout(() => { video.paused?video.play():video.pause(); singleTapTimeout = null; }, 250);
+        /* Interaction Functions */
+        let tapTimer;
+        function handleTap(v) {
+            if (tapTimer) return;
+            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
         }
 
-        function handleDoubleTap(video) {
-            if (singleTapTimeout) clearTimeout(singleTapTimeout); singleTapTimeout = null;
-            const heart = video.parentElement.querySelector('.like-animate');
-            const sideHeart = video.parentElement.querySelector('.heart-icon');
-            if(sideHeart.innerText === 'favorite_border') { sideHeart.innerText = 'favorite'; sideHeart.style.color = '#ff3040'; }
-            heart.classList.add('animate'); setTimeout(() => { heart.classList.remove('animate'); }, 800);
+        function handleDoubleTap(v) {
+            clearTimeout(tapTimer); tapTimer = null;
+            const h = v.parentElement.querySelector('.big-heart');
+            h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 700);
+            const lh = v.parentElement.querySelector('.btn i');
+            lh.innerText = 'favorite'; lh.style.color = '#ff3040';
         }
 
         function like(el) {
-            const i = el.querySelector('.heart-icon');
-            if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
-            else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
+            const i = el.querySelector('i');
+            i.innerText = i.innerText === 'favorite' ? 'favorite_border' : 'favorite';
+            i.style.color = i.innerText === 'favorite' ? '#ff3040' : 'white';
         }
 
-        function toggleComments(show) { document.getElementById('comment-overlay').classList.toggle('active', show); }
-        function addMsg() {
-            const val = document.getElementById('msg-input').value;
-            if(val) {
-                document.getElementById('msg-box').innerHTML += `<div style="margin-bottom:10px;"><b>Aap:</b> ${val}</div>`;
-                document.getElementById('msg-input').value = "";
-            }
-        }
+        function openSheet(id) { document.getElementById(id).classList.add('active'); }
+        function closeSheet() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active')); }
 
-        initFeed();
+        loadFeed();
     </script>
 </body>
 </html>
-
