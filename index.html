@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Facebook Reels</title>
+    <title>INDIVIBE - Pro Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -11,130 +11,121 @@
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
         /* Full Screen Snap Scroll */
-        #main-feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #main-feed::-webkit-scrollbar { display: none; }
+        #feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #feed::-webkit-scrollbar { display: none; }
 
-        .reel-unit { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Top Bar: Reels Text & Search */
-        .top-ui { position: absolute; top: 15px; width: 100%; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .reels-text { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .top-icons i { font-size: 28px; margin-left: 15px; }
+        /* Top Header (Back & Search) */
+        .top-nav { position: absolute; top: 15px; width: 100%; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .back-text { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
 
-        /* Right Side Interaction Bar (Like, Comment, Share) */
-        .right-actions { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .action-item i { font-size: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .action-item span { font-size: 13px; font-weight: 500; margin-top: 4px; }
-        .fb-blue-icon { color: #1877F2; } /* Facebook Like Blue */
+        /* RIGHT SIDE ACTIONS (Facebook Style Vertical) */
+        .right-ui { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 100; }
+        .action-box { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .action-box i { font-size: 32px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        .action-box span { font-size: 13px; font-weight: 600; margin-top: 2px; }
+        
+        /* Insta Heart Style */
+        .insta-heart { color: #fff; transition: 0.2s; }
+        .liked { color: #ff3040; }
 
-        /* User Info & Caption (Bottom Left) */
-        .bottom-ui { position: absolute; bottom: 85px; left: 15px; z-index: 100; max-width: 70%; }
-        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .u-avatar { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; }
-        .u-name { font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 5px; }
-        .caption { font-size: 14px; margin-bottom: 5px; line-height: 1.3; }
+        /* Bottom Left Info */
+        .bottom-info { position: absolute; bottom: 80px; left: 15px; z-index: 100; max-width: 70%; }
+        .profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; }
+        .name { font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 4px; }
+        .verify-icon { font-size: 16px; color: #1877F2; }
 
-        /* Bottom Comment Box (As per Screenshot) */
-        .comment-box-bar { position: absolute; bottom: 15px; width: 100%; padding: 0 15px; display: flex; align-items: center; gap: 10px; z-index: 100; }
-        .comment-input { flex: 1; background: rgba(255,255,255,0.2); border-radius: 25px; padding: 10px 15px; font-size: 14px; border: 0.5px solid rgba(255,255,255,0.3); color: #fff; }
-        .comment-icons i { font-size: 24px; color: #fff; opacity: 0.8; }
+        /* Facebook Style Bottom Comment Bar */
+        .comment-bar { position: absolute; bottom: 15px; width: 100%; padding: 0 12px; display: flex; align-items: center; gap: 10px; z-index: 100; }
+        .input-box { flex: 1; background: rgba(255,255,255,0.2); border-radius: 30px; padding: 10px 18px; font-size: 15px; border: 0.5px solid rgba(255,255,255,0.3); color: #fff; }
 
-        /* Double Tap Heart */
-        .pop-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #fff; z-index: 200; opacity: 0; pointer-events: none; }
-        .pop-heart.active { animation: fbHeart 0.8s ease; }
-        @keyframes fbHeart { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        /* Double Tap Heart Animation */
+        .pop-h { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 120px; color: #fff; opacity: 0; z-index: 200; pointer-events: none; }
+        .pop-h.active { animation: fbInstaPop 0.8s ease; }
+        @keyframes fbInstaPop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="main-feed">
-        </div>
+    <div id="feed"></div>
 
     <script>
         const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function fetchReels() {
+        async function loadReels() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                const feed = document.getElementById('main-feed');
-                feed.innerHTML = data.map(v => `
-                    <div class="reel-unit">
-                        <div class="top-ui">
-                            <div class="reels-text"><i class="material-icons">arrow_back</i> Reels</div>
-                            <div class="top-icons"><i class="material-icons">search</i><i class="material-icons">account_circle</i></div>
-                        </div>
-                        
-                        <video src="${v.video_url}" loop playsinline onclick="togglePlay(this)" ondblclick="fireLike(this)"></video>
-                        <div class="pop-heart material-icons">thumb_up</div>
-                        
-                        <div class="right-actions">
-                            <div class="action-item" onclick="fireLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons like-btn">thumb_up_off_alt</i><span>1</span>
-                            </div>
-                            <div class="action-item">
-                                <i class="material-icons">chat_bubble_outline</i><span>0</span>
-                            </div>
-                            <div class="action-item">
-                                <i class="material-icons">reply</i><span>Share</span>
-                            </div>
-                            <div class="action-item" onclick="window.open('${v.video_url}')">
-                                <i class="material-icons">download</i>
-                            </div>
-                            <div class="action-item">
-                                <i class="material-icons">more_horiz</i>
-                            </div>
+                document.getElementById('feed').innerHTML = data.map(v => `
+                    <div class="reel">
+                        <div class="top-nav">
+                            <div class="back-text"><i class="material-icons">arrow_back</i> Reels</div>
+                            <div style="display:flex; gap:15px;"><i class="material-icons">search</i><i class="material-icons">account_circle</i></div>
                         </div>
 
-                        <div class="bottom-ui">
-                            <div class="u-info">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
-                                <span class="u-name">Vishnupur Fifthoot <i class="material-icons" style="font-size:16px; color:#1877F2;">check_circle</i></span>
+                        <video src="${v.video_url}" loop playsinline onclick="playToggle(this)" ondblclick="doLike(this)"></video>
+                        <div class="pop-h material-icons">favorite</div>
+
+                        <div class="right-ui">
+                            <div class="action-box" onclick="doLike(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons insta-heart l-icon">favorite_border</i><span>1</span>
+                            </div>
+                            <div class="action-box"><i class="material-icons">chat_bubble_outline</i><span>0</span></div>
+                            <div class="action-box" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons">reply</i><span>Share</span></div>
+                            <div class="action-box" onclick="window.open('${v.video_url}')"><i class="material-icons">download</i></div>
+                            <div class="action-box"><i class="material-icons">more_horiz</i></div>
+                        </div>
+
+                        <div class="bottom-info">
+                            <div class="profile-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="avatar">
+                                <span class="name">Vishnupur Fifthoot <i class="material-icons verify-icon">check_circle</i></span>
                             </div>
                             <p class="caption">${v.caption || ''}</p>
                         </div>
 
-                        <div class="comment-box-bar">
-                            <div class="comment-input">कमेंट जोड़ें...</div>
-                            <div class="comment-icons"><i class="material-icons">sentiment_satisfied</i></div>
+                        <div class="comment-bar">
+                            <div class="input-box">कमेंट जोड़ें...</div>
+                            <i class="material-icons">sentiment_satisfied</i>
                         </div>
                     </div>
                 `).join('');
-                initObserver();
+                startPlayer();
             }
         }
 
-        let clickT;
-        function togglePlay(v) {
-            if (clickT) return;
-            clickT = setTimeout(() => { v.paused ? v.play() : v.pause(); clickT = null; }, 250);
+        let tTimer;
+        function playToggle(v) {
+            if (tTimer) return;
+            tTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tTimer = null; }, 250);
         }
 
-        function fireLike(v) {
-            clearTimeout(clickT); clickT = null;
-            const h = v.parentElement.querySelector('.pop-heart');
-            h.classList.add('active');
-            setTimeout(() => h.classList.remove('active'), 800);
+        function doLike(v) {
+            clearTimeout(tTimer); tTimer = null;
+            const pop = v.parentElement.querySelector('.pop-h');
+            pop.classList.add('active');
+            setTimeout(() => pop.classList.remove('active'), 800);
             
-            const lIcon = v.parentElement.querySelector('.like-btn');
-            lIcon.innerText = 'thumb_up';
-            lIcon.classList.add('fb-blue-icon');
+            const heart = v.parentElement.querySelector('.l-icon');
+            heart.innerText = 'favorite'; 
+            heart.classList.add('liked');
         }
 
-        function initObserver() {
-            const obs = new IntersectionObserver(entries => {
-                entries.forEach(e => {
+        function startPlayer() {
+            const obs = new IntersectionObserver(es => {
+                es.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel-unit').forEach(r => obs.observe(r));
+            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
-        fetchReels();
+        loadReels();
     </script>
 </body>
 </html>
