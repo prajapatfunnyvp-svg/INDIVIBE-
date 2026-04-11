@@ -3,75 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE Pro</title>
+    <title>INDIVIBE - Final Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Smooth Snap Feed */
-        #feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed::-webkit-scrollbar { display: none; }
-        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #vibe-feed::-webkit-scrollbar { display: none; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Top Header */
-        .top-ui { position: absolute; top: 18px; width: 100%; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .logo { font-size: 22px; font-weight: 800; text-shadow: 2px 2px 5px #000; }
+        /* Top App Branding */
+        .header { position: absolute; top: 15px; left: 15px; z-index: 100; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 10px #000; }
 
-        /* Sidebar Spacing - FB Spacing Fixed */
-        .sidebar { position: absolute; right: 12px; bottom: 135px; display: flex; flex-direction: column; gap: 28px; align-items: center; z-index: 100; }
-        .side-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-align: center; }
-        .side-item i { font-size: 34px; text-shadow: 0 2px 8px #000; transition: 0.2s; }
-        .side-item span { font-size: 13px; font-weight: 600; margin-top: 4px; }
-        .liked-red { color: #ff3040 !important; }
+        /* SIDE ACTIONS (Symmetry as per Image) */
+        .sidebar { position: absolute; right: 12px; bottom: 130px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 100; }
+        .btn-act { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .btn-act i { font-size: 32px; text-shadow: 0 2px 10px #000; }
+        .btn-act span { font-size: 13px; font-weight: 600; margin-top: 4px; }
+        .red { color: #ff3040 !important; }
 
-        /* User Info Spacing Fixed */
-        .user-block { position: absolute; bottom: 100px; left: 16px; z-index: 100; max-width: 75%; }
-        .user-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-        .user-pfp { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #fff; }
-        .verify { color: #1877F2; font-size: 18px; margin-left: 2px; }
+        /* USER DATA (Bottom Left) */
+        .user-overlay { position: absolute; bottom: 100px; left: 15px; z-index: 100; max-width: 75%; }
+        .u-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .pfp { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; }
+        .tick { color: #1877F2; font-size: 18px; margin-left: 2px; }
 
-        /* COMPACT COMMENT BOX - EXACTLY LIKE IMAGE */
-        .comment-anchor { position: absolute; bottom: 30px; width: 100%; padding: 0 16px; z-index: 100; display: flex; justify-content: center; }
-        .comment-bar { 
-            width: 100%; max-width: 420px; background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(15px); border-radius: 30px; padding: 12px 20px; 
-            display: flex; align-items: center; justify-content: space-between; 
-            border: 0.5px solid rgba(255,255,255,0.15);
+        /* FB STYLE FLOATING COMMENT BOX (Exact Copy) */
+        .comment-wrap { position: absolute; bottom: 25px; width: 100%; padding: 0 15px; z-index: 100; display: flex; justify-content: center; }
+        .comment-pill { 
+            width: 100%; max-width: 500px; background: rgba(45, 45, 45, 0.7); 
+            backdrop-filter: blur(15px); border-radius: 30px; padding: 12px 18px; 
+            display: flex; align-items: center; justify-content: space-between;
+            border: 0.5px solid rgba(255,255,255,0.2);
         }
-        .comment-bar span { font-size: 15px; color: #aaa; font-weight: 500; }
+        .comment-pill span { color: #ccc; font-size: 15px; }
 
-        /* THREE DOT MENU - Slide up animation */
-        .bottom-menu { 
+        /* THREE DOT MENU (Download & Interest Only) */
+        .vibe-sheet { 
             position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; 
             border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 15px 0 30px 0; 
-            z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000; transition: 0.3s ease;
         }
-        .bottom-menu.active { bottom: 0; }
-        .m-row { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 0.5px solid #333; cursor: pointer; color: #e4e6eb; }
-        .m-row i { font-size: 28px; }
-        .m-row span { font-size: 16px; font-weight: 500; }
+        .vibe-sheet.show { bottom: 0; }
+        .sheet-item { display: flex; align-items: center; gap: 15px; padding: 16px 20px; border-bottom: 0.5px solid #333; cursor: pointer; color: #e4e6eb; }
+        .sheet-item i { font-size: 28px; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 900; }
 
-        /* Double Tap Heart - Insta Style */
-        .pop-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 130px; color: #fff; opacity: 0; z-index: 200; pointer-events: none; }
-        .animate-heart { animation: hPop 0.8s ease-out; }
-        @keyframes hPop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        /* Heart Pop Animation */
+        .pop-h { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 130px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; }
+        .pop-go { animation: hEffect 0.8s ease; }
+        @keyframes hEffect { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="feed"></div>
+    <div id="vibe-feed"></div>
     
-    <div class="overlay" id="overlay" onclick="closeFBMenu()"></div>
-    <div class="bottom-menu" id="menuSheet">
-        <div style="width: 40px; height: 4px; background: #555; margin: 5px auto 15px; border-radius: 2px;"></div>
-        <div class="m-row" onclick="alert('Added to Not Interested'); closeFBMenu()"><i class="material-icons-outlined">visibility_off</i> <span>Not Interested</span></div>
-        <div class="m-row" id="downloadBtn"><i class="material-icons-outlined">download</i> <span>Save Video (Download)</span></div>
-        <div class="m-row" onclick="alert('Reported'); closeFBMenu()"><i class="material-icons-outlined">report_problem</i> <span>Report</span></div>
-        <div class="m-row" onclick="closeFBMenu()" style="border:none; justify-content:center; color:#888;"><span>Cancel</span></div>
+    <div class="overlay" id="overlay" onclick="closeVibeMenu()"></div>
+    <div class="vibe-sheet" id="sheet">
+        <div style="width: 40px; height: 4px; background: #555; margin: 0 auto 10px; border-radius: 2px;"></div>
+        <div class="sheet-item" id="dlNode"><i class="material-icons-outlined">download</i> <span>Download Video</span></div>
+        <div class="sheet-item" onclick="alert('Interested Saved'); closeVibeMenu()"><i class="material-icons-outlined">star_outline</i> <span>Interested</span></div>
+        <div class="sheet-item" onclick="alert('Not Interested Saved'); closeVibeMenu()"><i class="material-icons-outlined">visibility_off</i> <span>Not Interested</span></div>
+        <div class="sheet-item" onclick="closeVibeMenu()" style="border:none; color:#999; justify-content:center;"><span>Cancel</span></div>
     </div>
 
     <script>
@@ -79,89 +76,86 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        let activeVideoUrl = "";
+        let currentVUrl = "";
 
-        async function initApp() {
+        async function loadVibes() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('feed').innerHTML = data.map(v => `
-                    <div class="reel">
-                        <div class="top-ui">
-                            <div class="logo">INDIVIBE</div>
-                            <div style="display:flex; gap:18px;"><i class="material-icons-outlined">search</i><i class="material-icons-outlined">notifications</i></div>
-                        </div>
-
+                document.getElementById('vibe-feed').innerHTML = data.map(v => `
+                    <div class="vibe-card">
+                        <div class="header">INDIVIBE</div>
                         <video src="${v.video_url}" loop playsinline onclick="vTap(this)" ondblclick="vLike(this)"></video>
-                        <div class="pop-heart material-icons-outlined">favorite</div>
+                        <div class="pop-h material-icons-outlined">favorite</div>
 
                         <div class="sidebar">
-                            <div class="side-item" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
+                            <div class="btn-act" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
                                 <i class="material-icons-outlined h-icon">favorite_border</i><span>14K</span>
                             </div>
-                            <div class="side-item"><i class="material-icons-outlined">chat_bubble_outline</i><span>980</span></div>
-                            <div class="side-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="side-item" onclick="openFBMenu('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
+                            <div class="btn-act"><i class="material-icons-outlined">chat_bubble_outline</i><span>980</span></div>
+                            <div class="btn-act" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="btn-act" onclick="alert('Video Saved to Profile')"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
+                            <div class="btn-act" onclick="openVibeMenu('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
                         </div>
 
-                        <div class="user-block">
-                            <div class="user-meta">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pfp">
-                                <span style="font-weight:bold; font-size:16px;">Vishnupur Fifthoot <i class="material-icons verify">check_circle</i></span>
+                        <div class="user-overlay">
+                            <div class="u-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="pfp">
+                                <span style="font-weight:bold; font-size:16px;">Vishnupur Fifthoot <i class="material-icons tick">check_circle</i></span>
                             </div>
                             <p style="padding-left:4px; font-size:14.5px; text-shadow:1px 1px 3px #000;">${v.caption || ''}</p>
                         </div>
 
-                        <div class="comment-anchor">
-                            <div class="comment-bar">
+                        <div class="comment-wrap">
+                            <div class="comment-pill">
                                 <span>Write a comment...</span>
-                                <i class="material-icons-outlined" style="opacity:0.7; font-size:24px;">sentiment_satisfied</i>
+                                <i class="material-icons-outlined" style="opacity:0.7;">sentiment_satisfied</i>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                setupObserver();
+                initObs();
             }
         }
 
-        function openFBMenu(url) {
-            activeVideoUrl = url;
+        function openVibeMenu(url) {
+            currentVUrl = url;
             document.getElementById('overlay').style.display = 'block';
-            document.getElementById('menuSheet').classList.add('active');
+            document.getElementById('sheet').classList.add('show');
         }
 
-        function closeFBMenu() {
+        function closeVibeMenu() {
             document.getElementById('overlay').style.display = 'none';
-            document.getElementById('menuSheet').classList.remove('active');
+            document.getElementById('sheet').classList.remove('show');
         }
 
-        document.getElementById('downloadBtn').onclick = () => { window.open(activeVideoUrl); closeFBMenu(); };
+        document.getElementById('dlNode').onclick = () => { window.open(currentVUrl); closeVibeMenu(); };
 
-        let clickT;
+        let t;
         function vTap(v) {
-            if (clickT) return;
-            clickT = setTimeout(() => { v.paused ? v.play() : v.pause(); clickT = null; }, 250);
+            if (t) return;
+            t = setTimeout(() => { v.paused ? v.play() : v.pause(); t = null; }, 250);
         }
 
         function vLike(v) {
-            clearTimeout(clickT); clickT = null;
-            const h = v.parentElement.querySelector('.pop-heart');
-            h.classList.add('animate-heart');
-            setTimeout(() => h.classList.remove('animate-heart'), 800);
+            clearTimeout(t); t = null;
+            const h = v.parentElement.querySelector('.pop-h');
+            h.classList.add('pop-go');
+            setTimeout(() => h.classList.remove('pop-go'), 800);
             const icon = v.parentElement.querySelector('.h-icon');
-            icon.innerText = 'favorite'; icon.classList.add('liked-red');
+            icon.innerText = 'favorite'; icon.classList.add('red');
         }
 
-        function setupObserver() {
-            const obs = new IntersectionObserver(entries => {
-                entries.forEach(e => {
+        function initObs() {
+            const obs = new IntersectionObserver(es => {
+                es.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
+            document.querySelectorAll('.vibe-card').forEach(r => obs.observe(r));
         }
 
-        initApp();
+        loadVibes();
     </script>
 </body>
 </html>
