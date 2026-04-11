@@ -3,72 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Perfect Vibe</title>
+    <title>INDIVIBE Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #vibe-feed::-webkit-scrollbar { display: none; }
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        /* App Layout */
+        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #feed::-webkit-scrollbar { display: none; }
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        .brand { position: absolute; top: 20px; left: 20px; z-index: 100; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 10px #000; }
+        /* Top Header & Stories */
+        .header-ui { position: absolute; top: 0; width: 100%; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); padding: 15px 16px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo { font-size: 24px; font-weight: 900; color: #fff; }
+        
+        .stories-tray { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .story-node { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #1877F2; padding: 2px; flex-shrink: 0; }
+        .story-node img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .add-story { border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); }
 
-        /* SIDEBAR BUTTONS - EXACT COPY */
-        .vibe-sidebar { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 100; }
-        .action-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .action-node i { font-size: 34px; text-shadow: 0 2px 10px #000; }
-        .action-node span { font-size: 13px; font-weight: 600; margin-top: 4px; text-shadow: 1px 1px 5px #000; }
-        .liked-red { color: #ff3040 !important; }
+        /* Sidebar Buttons (Exact Spacing) */
+        .sidebar { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 25px; align-items: center; z-index: 100; }
+        .s-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .s-btn i { font-size: 32px; text-shadow: 0 2px 10px #000; }
+        .s-btn span { font-size: 12px; font-weight: 600; margin-top: 4px; text-shadow: 1px 1px 3px #000; }
+        .liked { color: #ff3040 !important; }
 
-        /* USER DATA */
-        .vibe-user { position: absolute; bottom: 95px; left: 16px; z-index: 100; max-width: 80%; }
-        .u-line { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-avatar { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #fff; }
-        .u-name { font-weight: 700; font-size: 16px; text-shadow: 1px 1px 5px #000; }
+        /* User Info */
+        .info-overlay { position: absolute; bottom: 90px; left: 16px; z-index: 100; max-width: 75%; }
+        .u-flex { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .u-pfp { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; }
+        .u-name { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 4px; }
 
-        /* FB GOOL (ROUNDED) COMMENT BOX - 100% COPY */
-        .comment-container { position: absolute; bottom: 25px; width: 100%; padding: 0 16px; z-index: 100; display: flex; justify-content: center; }
-        .comment-gool { 
-            width: 100%; max-width: 450px; background: rgba(0, 0, 0, 0.5); 
-            backdrop-filter: blur(20px); border-radius: 40px; padding: 10px 18px; 
-            display: flex; align-items: center; border: 0.8px solid rgba(255,255,255,0.25);
+        /* GOOL (OVAL) FB COMMENT BOX - 100% MATCH */
+        .comment-wrap { position: absolute; bottom: 25px; width: 100%; padding: 0 15px; z-index: 100; display: flex; justify-content: center; }
+        .comment-pill { 
+            width: 100%; max-width: 500px; height: 48px;
+            background: rgba(40, 40, 40, 0.7); 
+            backdrop-filter: blur(20px); 
+            border-radius: 30px; /* Isse bilkul gol (oval) dikhega */
+            padding: 0 18px; 
+            display: flex; align-items: center; 
+            border: 0.5px solid rgba(255,255,255,0.25);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .comment-gool span { flex: 1; color: #ddd; font-size: 15px; margin-left: 5px; }
-        .comment-gool .fb-icons { display: flex; gap: 12px; color: #fff; opacity: 0.9; }
-        .comment-gool .fb-icons i { font-size: 24px; cursor: pointer; }
+        .comment-pill .placeholder { flex: 1; color: rgba(255,255,255,0.7); font-size: 15px; }
+        .pill-icons { display: flex; gap: 14px; color: #fff; }
+        .pill-icons i { font-size: 22px; opacity: 0.9; cursor: pointer; }
 
-        /* BOTTOM SHEET */
-        .vibe-sheet { 
-            position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; 
-            border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 10px 0 30px 0; 
-            z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .vibe-sheet.active { bottom: 0; }
-        .sheet-row { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 0.5px solid #333; color: #e4e6eb; cursor: pointer; }
-        .sheet-row i { font-size: 28px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 900; }
+        /* 3-Dot Bottom Sheet */
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 20px 20px 0 0; z-index: 1000; transition: 0.3s; padding-bottom: 30px; }
+        .sheet.up { bottom: 0; }
+        .sheet-opt { display: flex; align-items: center; gap: 15px; padding: 16px 20px; border-bottom: 0.5px solid #333; color: #eee; }
+        .sheet-opt i { font-size: 26px; }
+        .cover { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 900; }
 
-        /* Heart Pop */
-        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 130px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; }
-        .is-popping { animation: hPop 0.8s ease; }
+        /* Pop Heart */
+        .h-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 120px; color: #fff; opacity: 0; z-index: 200; pointer-events: none; }
+        .h-anim { animation: hPop 0.8s ease; }
         @keyframes hPop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="vibe-feed"></div>
+    <div id="feed"></div>
     
-    <div class="overlay" id="overlay" onclick="closeSheet()"></div>
-    <div class="vibe-sheet" id="vibeSheet">
-        <div style="width: 40px; height: 4px; background: #555; margin: 0 auto 10px; border-radius: 2px;"></div>
-        <div class="sheet-row" id="dlLink"><i class="material-icons-outlined">download</i> <span>Download Video</span></div>
-        <div class="sheet-row" onclick="alert('Interested'); closeSheet()"><i class="material-icons-outlined">thumb_up_off_alt</i> <span>Interested</span></div>
-        <div class="sheet-row" onclick="alert('Not Interested'); closeSheet()"><i class="material-icons-outlined">visibility_off</i> <span>Not Interested</span></div>
-        <div class="sheet-row" onclick="closeSheet()" style="border:none; justify-content:center; color:#888;"><span>Cancel</span></div>
+    <div class="cover" id="cover" onclick="toggleMenu()"></div>
+    <div class="sheet" id="sheet">
+        <div style="width: 40px; height: 4px; background: #555; margin: 10px auto; border-radius: 2px;"></div>
+        <div class="sheet-opt" id="dlAct"><i class="material-icons-outlined">download</i> <span>Download Video</span></div>
+        <div class="sheet-opt" onclick="alert('Interested'); toggleMenu()"><i class="material-icons-outlined">thumb_up_off_alt</i> <span>Interested</span></div>
+        <div class="sheet-opt" onclick="alert('Not Interested'); toggleMenu()"><i class="material-icons-outlined">visibility_off</i> <span>Not Interested</span></div>
+        <div class="sheet-opt" onclick="toggleMenu()" style="border:none; justify-content:center; color:#999;">Cancel</div>
     </div>
 
     <script>
@@ -76,39 +86,50 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        let dlUrl = "";
+        let currentDl = "";
 
-        async function initApp() {
+        async function loadReels() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('vibe-feed').innerHTML = data.map(v => `
-                    <div class="vibe-card">
-                        <div class="brand">INDIVIBE</div>
-                        <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="handleLike(this)"></video>
-                        <div class="heart-pop material-icons-outlined">favorite</div>
-
-                        <div class="vibe-sidebar">
-                            <div class="action-node" onclick="handleLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined h-icon">favorite_border</i><span>14K</span>
+                document.getElementById('feed').innerHTML = data.map(v => `
+                    <div class="reel">
+                        <div class="header-ui">
+                            <div class="top-row">
+                                <span class="logo">INDIVIBE</span>
+                                <div style="display:flex; gap:20px;"><i class="material-icons-outlined">add_box</i><i class="material-icons-outlined">search</i></div>
                             </div>
-                            <div class="action-node"><i class="material-icons-outlined">chat_bubble_outline</i><span>980</span></div>
-                            <div class="action-node" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="action-node" onclick="alert('Vibe Saved!')"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
-                            <div class="action-node" onclick="openSheet('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
+                            <div class="stories-tray">
+                                <div class="story-node add-story"><i class="material-icons-outlined">add</i></div>
+                                <div class="story-node"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+                                <div class="story-node"><img src="https://i.pravatar.cc/100?u=1"></div>
+                            </div>
                         </div>
 
-                        <div class="vibe-user">
-                            <div class="u-line">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
+                        <video src="${v.video_url}" loop playsinline onclick="tapV(this)" ondblclick="likeV(this)"></video>
+                        <div class="h-pop material-icons-outlined">favorite</div>
+
+                        <div class="sidebar">
+                            <div class="s-btn" onclick="likeV(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons-outlined l-icon">favorite_border</i><span>14K</span>
+                            </div>
+                            <div class="s-btn"><i class="material-icons-outlined">chat_bubble_outline</i><span>980</span></div>
+                            <div class="s-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="s-btn" onclick="alert('Vibe Saved')"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
+                            <div class="s-btn" onclick="toggleMenu('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
+                        </div>
+
+                        <div class="info-overlay">
+                            <div class="u-flex">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pfp">
                                 <span class="u-name">Vishnupur Fifthoot <i class="material-icons" style="color:#1877F2; font-size:16px;">check_circle</i></span>
                             </div>
-                            <p style="padding-left:4px; font-size:14.5px; text-shadow:1px 1px 3px #000;">${v.caption || ''}</p>
+                            <p style="padding-left:5px; font-size:14px; text-shadow:1px 1px 3px #000;">${v.caption || 'Enjoy the vibe!'}</p>
                         </div>
 
-                        <div class="comment-container">
-                            <div class="comment-gool">
-                                <span>Write a comment...</span>
-                                <div class="fb-icons">
+                        <div class="comment-wrap">
+                            <div class="comment-pill">
+                                <span class="placeholder">Write a comment...</span>
+                                <div class="pill-icons">
                                     <i class="material-icons-outlined">alternate_email</i>
                                     <i class="material-icons-outlined">sentiment_satisfied</i>
                                     <i class="material-icons-outlined">gif_box</i>
@@ -117,49 +138,46 @@
                         </div>
                     </div>
                 `).join('');
-                startObserver();
+                observeVids();
             }
         }
 
-        function openSheet(url) {
-            dlUrl = url;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('vibeSheet').classList.add('active');
+        function toggleMenu(url) {
+            currentDl = url;
+            const s = document.getElementById('sheet');
+            const c = document.getElementById('cover');
+            if(s.classList.contains('up')) { s.classList.remove('up'); c.style.display='none'; }
+            else { s.classList.add('up'); c.style.display='block'; }
         }
 
-        function closeSheet() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('vibeSheet').classList.remove('active');
+        document.getElementById('dlAct').onclick = () => { window.open(currentDl); toggleMenu(); };
+
+        let t;
+        function tapV(v) {
+            if(t) return;
+            t = setTimeout(() => { v.paused ? v.play() : v.pause(); t=null; }, 250);
         }
 
-        document.getElementById('dlLink').onclick = () => { window.open(dlUrl); closeSheet(); };
-
-        let tapTimer;
-        function handleTap(v) {
-            if (tapTimer) return;
-            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
+        function likeV(v) {
+            clearTimeout(t); t=null;
+            const h = v.parentElement.querySelector('.h-pop');
+            h.classList.add('h-anim');
+            setTimeout(() => h.classList.remove('h-anim'), 800);
+            const i = v.parentElement.querySelector('.l-icon');
+            i.innerText = 'favorite'; i.classList.add('liked');
         }
 
-        function handleLike(v) {
-            clearTimeout(tapTimer); tapTimer = null;
-            const h = v.parentElement.querySelector('.heart-pop');
-            h.classList.add('is-popping');
-            setTimeout(() => h.classList.remove('is-popping'), 800);
-            const icon = v.parentElement.querySelector('.h-icon');
-            icon.innerText = 'favorite'; icon.classList.add('liked-red');
-        }
-
-        function startObserver() {
+        function observeVids() {
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const vid = e.target.querySelector('video');
-                    if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
+                    if(e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(r => obs.observe(r));
+            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
-        initApp();
+        loadReels();
     </script>
 </body>
 </html>
