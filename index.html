@@ -3,133 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE Final</title>
+    <title>INDIVIBE Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* REELS SCROLL CONTAINER */
-        #reels-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #reels-feed::-webkit-scrollbar { display: none; }
-        .reel-frame { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+        /* Full Screen Video Container */
+        #feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #feed::-webkit-scrollbar { display: none; }
+
+        .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* TOP BRANDING & WATERMARK */
-        .top-brand { position: absolute; top: 20px; left: 20px; z-index: 100; font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        /* 1. Top Watermark */
+        .watermark { position: absolute; top: 25px; left: 20px; z-index: 10; font-size: 22px; font-weight: 900; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 
-        /* SIDE ACTIONS (SAVE & REPORT) */
-        .side-bar { position: absolute; right: 15px; top: 45%; display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
-        .side-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-        .side-item i { font-size: 32px !important; color: #fff; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7)); }
-        .side-item span { font-size: 11px; font-weight: bold; }
+        /* 2. Side Buttons (Save & Report) - Fixed Position */
+        .side-btns { position: absolute; right: 15px; bottom: 180px; display: flex; flex-direction: column; gap: 20px; z-index: 20; }
+        .s-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .s-btn i { font-size: 32px !important; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+        .s-btn span { font-size: 11px; font-weight: 700; margin-top: 4px; }
 
-        /* USER OVERLAY */
-        .user-info { position: absolute; bottom: 135px; left: 15px; z-index: 100; }
-        .u-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        /* 3. User Info & Caption */
+        .user-block { position: absolute; bottom: 140px; left: 15px; z-index: 20; max-width: 80%; }
+        .u-flex { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .u-img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #fff; }
-        .u-name { font-weight: 700; font-size: 15px; }
+        .u-name { font-weight: 800; font-size: 16px; }
 
-        /* FACEBOOK STYLE BOTTOM ROW */
-        .action-row { position: absolute; bottom: 75px; width: 100%; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); z-index: 100; border-top: 0.1px solid rgba(255,255,255,0.1); }
-        .act-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .act-btn i { font-size: 28px !important; }
-        .act-btn span { font-size: 14px; font-weight: 700; }
+        /* 4. FACEBOOK STYLE BAR (THE REAL FIX) */
+        .fb-style-bar {
+            position: absolute;
+            bottom: 65px; /* Bottom Nav ke upar */
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            border-top: 0.5px solid rgba(255,255,255,0.1);
+            z-index: 30;
+        }
+        .fb-opt { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .fb-opt i { font-size: 26px !important; }
+        .fb-opt span { font-size: 14px; font-weight: 700; }
 
-        /* BOTTOM NAV BAR */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #262626; z-index: 1000; }
-        .nav-bar i { font-size: 28px; color: #fff; }
+        /* 5. Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
+        .bottom-nav i { font-size: 28px; color: #fff; }
 
-        /* BIG HEART POP */
-        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 110px; color: #ff3040; opacity: 0; z-index: 500; pointer-events: none; }
-        .heart-pop.active { animation: popAnim 0.8s ease; }
-        @keyframes popAnim { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 50% { transform: translate(-50%,-50%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
+        /* Heart Animation */
+        .heart-anim { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #ff3040; z-index: 50; opacity: 0; pointer-events: none; }
+        .active-heart { animation: pop 0.8s ease-out; }
+        @keyframes pop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="reels-feed"></div>
+    <div id="feed"></div>
 
-    <div class="nav-bar">
-        <i class="material-icons-outlined" style="color: #1877F2;">home</i>
+    <div class="bottom-nav">
+        <i class="material-icons-outlined" style="color:#1877F2">home</i>
         <i class="material-icons-outlined">search</i>
         <i class="material-icons-outlined">add_box</i>
         <i class="material-icons-outlined">person_outline</i>
     </div>
 
     <script>
-        const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
-        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
-        const supabaseClient = supabase.createClient(S_URL, S_KEY);
+        const URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
+        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
+        const supa = supabase.createClient(URL, KEY);
 
-        async function loadReels() {
-            const { data } = await supabaseClient.from('videos').select('*').order('created_at', { ascending: false });
+        async function loadApp() {
+            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('reels-feed').innerHTML = data.map(v => `
-                    <div class="reel-frame">
-                        <div class="top-brand">INDIVIBE</div>
-                        <video src="${v.video_url}" loop playsinline onclick="togglePlay(this)" ondblclick="likeVideo(this)"></video>
-                        <div class="heart-pop material-icons-outlined">favorite</div>
+                document.getElementById('feed').innerHTML = data.map(v => `
+                    <div class="reel">
+                        <div class="watermark">INDIVIBE</div>
+                        <video src="${v.video_url}" loop playsinline onclick="playPause(this)" ondblclick="likeIt(this)"></video>
+                        <div class="heart-anim material-icons-outlined">favorite</div>
                         
-                        <div class="side-bar">
-                            <div class="side-item" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
-                            <div class="side-item" onclick="alert('Report Sent')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
+                        <div class="side-btns">
+                            <div class="s-btn" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
+                            <div class="s-btn" onclick="alert('Reported')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
                         </div>
 
-                        <div class="user-info">
-                            <div class="u-head">
+                        <div class="user-block">
+                            <div class="u-flex">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
-                                <span class="u-name">rajasthanking007</span>
+                                <span class="u-name">Vishnupur Fifthoot</span>
                             </div>
                             <p style="padding-left:52px; font-size:14px; opacity:0.9;">${v.caption || ''}</p>
                         </div>
 
-                        <div class="action-row">
-                            <div class="act-btn" onclick="likeVideo(this.parentElement.parentElement.querySelector('video'))">
+                        <div class="fb-style-bar">
+                            <div class="fb-opt" onclick="likeIt(this.parentElement.parentElement.querySelector('video'))">
                                 <i class="material-icons-outlined l-icon">favorite_border</i><span>Like</span>
                             </div>
-                            <div class="act-btn" onclick="alert('Comments opening...')">
+                            <div class="fb-opt" onclick="alert('Comments opening...')">
                                 <i class="material-icons-outlined">chat_bubble_outline</i><span>Comment</span>
                             </div>
-                            <div class="act-btn" onclick="navigator.share({url:'${v.video_url}'})">
+                            <div class="fb-opt" onclick="navigator.share({url:'${v.video_url}'})">
                                 <i class="material-icons-outlined">share</i><span>Share</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
-                attachIntersectionObserver();
+                startVideos();
             }
         }
 
-        let clickTimer;
-        function togglePlay(v) {
-            if (clickTimer) return;
-            clickTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); clickTimer = null; }, 250);
+        let timer;
+        function playPause(v) {
+            if (timer) return;
+            timer = setTimeout(() => { v.paused ? v.play() : v.pause(); timer = null; }, 250);
         }
 
-        function likeVideo(v) {
-            clearTimeout(clickTimer); clickTimer = null;
-            const pop = v.parentElement.querySelector('.heart-pop');
-            pop.classList.add('active');
-            setTimeout(() => pop.classList.remove('active'), 800);
+        function likeIt(v) {
+            clearTimeout(timer); timer = null;
+            const h = v.parentElement.querySelector('.heart-anim');
+            h.classList.add('active-heart');
+            setTimeout(() => h.classList.remove('active-heart'), 800);
             
-            const heartIcon = v.parentElement.querySelector('.l-icon');
-            heartIcon.innerText = 'favorite'; 
-            heartIcon.style.color = '#ff3040';
+            const icon = v.parentElement.querySelector('.l-icon');
+            icon.innerText = 'favorite'; 
+            icon.style.color = '#ff3040';
         }
 
-        function attachIntersectionObserver() {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    if (entry.isIntersecting) video.play(); else { video.pause(); video.currentTime = 0; }
+        function startVideos() {
+            const obs = new IntersectionObserver(es => {
+                es.forEach(e => {
+                    const vid = e.target.querySelector('video');
+                    if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel-frame').forEach(reel => observer.observe(reel));
+            document.querySelectorAll('.reel').forEach(r => obs.observe(r));
         }
 
-        loadReels();
+        loadApp();
     </script>
 </body>
 </html>
