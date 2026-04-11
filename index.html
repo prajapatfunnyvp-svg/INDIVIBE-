@@ -3,65 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe Pro</title>
+    <title>IndiVibe Pro Max</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body, html { height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Smooth Insta-style Scroll */
-        .reels-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .reels-container::-webkit-scrollbar { display: none; }
+        /* Instagram Style Smooth Scroll */
+        #final-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #final-feed::-webkit-scrollbar { display: none; }
         
-        .reel-unit { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+        .fb-slide { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FB Header */
-        .fb-header { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
-        .fb-header b { font-size: 20px; flex: 1; }
+        /* TOP HEADER - FB STYLE */
+        .top-nav { position: absolute; top: 0; width: 100%; height: 55px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 10; }
+        .top-nav b { font-size: 20px; flex: 1; letter-spacing: 0.5px; }
 
-        /* Side Actions */
-        .side-bar { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 10; }
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .action-item i { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        .action-item span { font-size: 11px; margin-top: 3px; font-weight: 600; text-shadow: 0 1px 2px #000; }
+        /* SIDE ACTIONS - ALL BUTTONS */
+        .right-actions { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 10; }
+        .btn-unit { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .btn-unit i { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+        .btn-unit span { font-size: 11px; margin-top: 3px; font-weight: 600; text-shadow: 0 1px 2px #000; }
 
-        /* Profile & Caption (Clean - No Comment Box Here) */
-        .info-section { position: absolute; bottom: 25px; left: 15px; width: 75%; z-index: 10; }
+        /* BOTTOM INFO - PROFILE & CAPTION */
+        .bottom-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 15px 15px; background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%); z-index: 10; }
         .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .p-thumb { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
-        .p-name { font-weight: 700; font-size: 15px; }
-        .f-label { border: 1px solid #fff; padding: 1px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .v-text { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 3px #000; }
+        .avatar { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
+        .username { font-weight: 700; font-size: 15px; }
+        .follow-badge { border: 1px solid #fff; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .v-caption { font-size: 14px; margin-bottom: 12px; line-height: 1.4; max-width: 80%; }
 
-        /* 📱 INSTA-STYLE COMMENT SHEET (Niche click karne par khulega) */
-        #comment-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; height: 65%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s cubic-bezier(0, 0, 0.2, 1); display: flex; flex-direction: column; }
-        #comment-sheet.active { bottom: 0; }
-        .sheet-header { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; position: relative; }
-        .close-btn { position: absolute; right: 15px; top: 15px; color: #aaa; }
-        .comments-list { flex: 1; overflow-y: auto; padding: 15px; }
-        
-        /* Facebook Style Input inside Sheet */
-        .sheet-footer { padding: 10px 15px 25px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; }
-        .fb-input-box { background: #3a3b3c; border-radius: 20px; padding: 10px 15px; flex: 1; border: none; color: white; outline: none; font-size: 14px; }
-        .post-link { color: #1877F2; font-weight: bold; }
+        /* 💬 EXACT FB STYLE COMMENT BOX */
+        .fb-comment-box { width: 100%; height: 42px; background: rgba(255, 255, 255, 0.2); border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 15px; color: #ddd; font-size: 14px; }
+
+        /* MENU SHEET (SAVE, DOWNLOAD, REPORT) */
+        .menu-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s; padding-bottom: 30px; }
+        .menu-sheet.active { bottom: 0; }
+        .menu-item { padding: 18px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #333; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div id="reels-feed" class="reels-container"></div>
+    <div id="final-feed"></div>
 
-    <div id="comment-sheet">
-        <div class="sheet-header">
-            Comments
-            <i class="material-icons-outlined close-btn" onclick="toggleSheet(false)">close</i>
-        </div>
-        <div class="comments-list" id="c-data">No comments yet.</div>
-        <div class="sheet-footer">
-            <input type="text" id="c-input" class="fb-input-box" placeholder="Write a comment...">
-            <span class="post-link" onclick="addComment()">Post</span>
-        </div>
+    <div id="more-sheet" class="menu-sheet">
+        <div class="menu-item" onclick="alert('Video Saved!')"><i class="material-icons-outlined">bookmark_border</i> Save Video</div>
+        <div class="menu-item" onclick="alert('Downloading...')"><i class="material-icons-outlined">download</i> Download</div>
+        <div class="menu-item" style="color: #ff4d4d;" onclick="alert('Reported!')"><i class="material-icons-outlined">report</i> Report</div>
+        <div class="menu-item" onclick="closeMenu()" style="justify-content: center; font-weight: bold; color: #aaa;">Cancel</div>
     </div>
 
     <script>
@@ -69,12 +60,12 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function fetchReels() {
+        async function init() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('reels-feed').innerHTML = data.map(v => `
-                    <div class="reel-unit">
-                        <div class="fb-header">
+                document.getElementById('final-feed').innerHTML = data.map(v => `
+                    <div class="fb-slide">
+                        <div class="top-nav">
                             <i class="material-icons-outlined">arrow_back</i>
                             <b>IndiVibe</b>
                             <i class="material-icons-outlined" style="margin-left:auto">search</i>
@@ -82,57 +73,48 @@
                         </div>
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                         
-                        <div class="side-bar">
-                            <div class="action-item" onclick="handleLike(this)"><i class="material-icons-outlined">favorite_border</i><span>1.2M</span></div>
-                            <div class="action-item" onclick="toggleSheet(true)"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
-                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
-                            <div class="action-item"><i class="material-icons-outlined">more_horiz</i></div>
+                        <div class="right-actions">
+                            <div class="btn-unit" onclick="like(this)"><i class="material-icons-outlined">favorite_border</i><span>1.5M</span></div>
+                            <div class="btn-unit"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
+                            <div class="btn-unit" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
+                            <div class="btn-unit" onclick="openMenu()"><i class="material-icons-outlined">more_horiz</i></div>
                         </div>
 
-                        <div class="info-section">
+                        <div class="bottom-info">
                             <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="p-thumb">
-                                <span class="p-name">Vishnupur Fifthoot</span>
-                                <div class="f-label">Follow</div>
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="avatar">
+                                <span class="username">Vishnupur Fifthoot</span>
+                                <div class="follow-badge">Follow</div>
                             </div>
-                            <div class="v-text">${v.caption || ''}</div>
+                            <div class="v-caption">${v.caption || ''}</div>
+                            <div class="fb-comment-box">Add a comment...</div>
                         </div>
                     </div>
                 `).join('');
-                setupIntersection();
+                setupVideoAutoPlay();
             }
         }
 
-        function setupIntersection() {
+        function setupVideoAutoPlay() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
-                    const vid = e.target.querySelector('video');
-                    if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.6 });
-            document.querySelectorAll('.reel-unit').forEach(u => obs.observe(u));
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.fb-slide').forEach(s => obs.observe(s));
         }
 
-        function handleLike(el) {
+        function like(el) {
             const i = el.querySelector('i');
             if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
             else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
         }
 
-        function toggleSheet(open) {
-            const sheet = document.getElementById('comment-sheet');
-            if(open) sheet.classList.add('active'); else sheet.classList.remove('active');
-        }
+        function openMenu() { document.getElementById('more-sheet').classList.add('active'); }
+        function closeMenu() { document.getElementById('more-sheet').classList.remove('active'); }
 
-        function addComment() {
-            const input = document.getElementById('c-input');
-            if(input.value) {
-                document.getElementById('c-data').innerHTML += `<div style="margin-bottom:10px;"><b>Aap:</b> ${input.value}</div>`;
-                input.value = "";
-            }
-        }
-
-        fetchReels();
+        init();
     </script>
 </body>
 </html>
