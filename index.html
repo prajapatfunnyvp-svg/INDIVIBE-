@@ -3,56 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IndiVibe v2.0</title>
+    <title>IndiVibe Pro Final v27</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Instagram Logic: Vertical Scroll */
+        /* INSTAGRAM STYLE SMOOTH SCROLL */
         .reels-scroller { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .reels-scroller::-webkit-scrollbar { display: none; }
+        .reel-frame { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         
-        .fb-reel-page { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* FB Header Design */
-        .fb-head-nav { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 15px; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%); z-index: 10; }
-        .fb-head-nav b { font-size: 20px; flex: 1; }
+        /* FACEBOOK TOPBAR */
+        .fb-header { position: absolute; top: 0; width: 100%; height: 50px; display: flex; align-items: center; padding: 0 16px; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%); z-index: 10; }
+        .fb-header b { font-size: 19px; flex: 1; font-weight: 600; }
+        .fb-header i { font-size: 24px; color: #efefef; }
 
-        /* Side Icons - Pure FB Design */
-        .fb-side-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
-        .act-group { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .act-group i { font-size: 32px !important; color: white; filter: drop-shadow(0 2px 4px #000); }
-        .act-group span { font-size: 11px; margin-top: 2px; font-weight: bold; }
+        /* INSTAGRAM STYLE SIDE ICONS */
+        .vibe-actions { position: absolute; right: 12px; bottom: 90px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .action-item i { font-size: 30px !important; color: white; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        .label-val { font-size: 11px; margin-top: 2px; font-weight: 500; text-shadow: 0 1px 2px #000; }
 
-        /* Bottom Profile (Clean Screen - No Faltu Input) */
-        .fb-bottom-info { position: absolute; bottom: 25px; left: 15px; width: 80%; z-index: 10; }
-        .fb-user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .fb-p-img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
-        .fb-p-name { font-weight: bold; font-size: 15px; }
-        .fb-cap { font-size: 14px; line-height: 1.4; text-shadow: 0 1px 3px #000; }
+        /* FACEBOOK STYLE BOTTOM INFO Area (Clean - No Comment Box) */
+        .bottom-ui { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 16px 20px; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 10; }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .u-pic { width: 34px; height: 34px; border-radius: 50%; border: 1px solid white; }
+        .u-name { font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; }
+        .f-badge { border: 1px solid white; padding: 1px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; background: rgba(255,255,255,0.1); }
+        .cap-text { font-size: 14px; line-height: 1.3; text-shadow: 0 1px 3px #000; max-width: 80%; }
 
-        /* 📱 Comment Sheet - Only opens on Icon Click */
-        #comment-overlay { position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s ease; display: flex; flex-direction: column; }
+        /* 📱 SLIDING COMMENT SHEET (Only Opens on Chat Icon Click) */
+        #comment-overlay { position: fixed; bottom: -100%; left: 0; width: 100%; height: 65%; background: #242526; border-radius: 15px 15px 0 0; z-index: 100; transition: 0.3s cubic-bezier(0, 0, 0.2, 1); display: flex; flex-direction: column; }
         #comment-overlay.active { bottom: 0; }
-        .overlay-head { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; position: relative; }
-        .overlay-list { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; }
-        .overlay-footer { padding: 10px 15px 30px; border-top: 1px solid #333; display: flex; gap: 10px; }
-        .fb-input-box { background: #3a3b3c; border-radius: 20px; padding: 10px 15px; flex: 1; border: none; color: white; outline: none; }
+        .overlay-header { padding: 15px; text-align: center; border-bottom: 1px solid #333; font-weight: bold; position: relative; }
+        .overlay-header i { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #aaa; }
+        .comments-list { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; color: #ddd; }
+        
+        /* FACEBOOK DESIGN INPUT BOX INSIDE SHEET */
+        .input-bar { padding: 10px 15px 25px; border-top: 1px solid #333; display: flex; gap: 10px; align-items: center; }
+        .fb-input { background: #3a3b3c; border-radius: 20px; padding: 10px 15px; flex: 1; border: none; color: white; outline: none; font-size: 14px; }
+        .fb-send { color: #1877F2; font-weight: bold; cursor: pointer; }
+
+        /* INSTAGRAM DOUBLE TAP HEART Animation */
+        .like-animate { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 80px; color: #ff3040; z-index: 9; transition: 0.4s ease-out; pointer-events: none; opacity: 0; }
+        .like-animate.animate { animation: likeAnimate 0.8s ease; }
+        @keyframes likeAnimate { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="reels-main" class="reels-scroller"></div>
+    <div id="vibes-feed" class="reels-scroller"></div>
 
     <div id="comment-overlay">
-        <div class="overlay-head">Comments <i class="material-icons-outlined" style="position:absolute; right:15px;" onclick="toggleC(false)">close</i></div>
-        <div class="overlay-list" id="msg-list">Abhi koi comment nahi hai.</div>
-        <div class="overlay-footer">
-            <input type="text" id="msg-in" class="fb-input-box" placeholder="Comment likhein...">
-            <span style="color:#1877F2; font-weight:bold; padding-top:10px" onclick="sendC()">Post</span>
+        <div class="overlay-header">Comments <i class="material-icons-outlined" onclick="toggleComments(false)">close</i></div>
+        <div class="comments-list" id="msg-box">No comments yet.</div>
+        <div class="input-bar">
+            <input type="text" id="msg-input" class="fb-input" placeholder="Comment jodein...">
+            <span class="fb-send" onclick="addMsg()">Post</span>
         </div>
     </div>
 
@@ -61,58 +72,80 @@
         const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4';
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function init() {
-            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+        async function initFeed() {
+            const { data, error } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('reels-main').innerHTML = data.map(v => `
-                    <div class="fb-reel-page">
-                        <div class="fb-head-nav"><i class="material-icons-outlined">arrow_back</i><b>IndiVibe</b></div>
-                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="fb-side-actions">
-                            <div class="act-group" onclick="like(this)"><i class="material-icons-outlined">favorite_border</i><span>1.2M</span></div>
-                            <div class="act-group" onclick="toggleC(true)"><i class="material-icons-outlined">chat_bubble_outline</i><span>45K</span></div>
-                            <div class="act-group" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
-                            <div class="act-group" onclick="alert('Options: Save, Download, Report')"><i class="material-icons-outlined">more_horiz</i></div>
+                document.getElementById('vibes-feed').innerHTML = data.map(v => `
+                    <div class="reel-frame">
+                        <div class="fb-header">
+                            <i class="material-icons-outlined">arrow_back</i>
+                            <b>Vibes</b>
+                            <i class="material-icons-outlined" style="margin-left:auto">search</i>
                         </div>
-                        <div class="fb-bottom-info">
-                            <div class="fb-user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="fb-p-img">
-                                <span class="fb-p-name">Vishnupur Fifthoot</span>
+                        <video src="${v.video_url}" loop playsinline onclick="handleSingleTap(this)" ondblclick="handleDoubleTap(this)"></video>
+                        <i class="material-icons-outlined like-animate">favorite</i>
+
+                        <div class="vibe-actions">
+                            <div class="action-item" onclick="like(this)"><i class="material-icons-outlined heart-icon">favorite_border</i><span class="label-val">1.2M</span></div>
+                            <div class="action-item" onclick="toggleComments(true)"><i class="material-icons-outlined fb-icon">chat_bubble_outline</i><span class="label-val">45K</span></div>
+                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined fb-icon" style="transform: scaleX(-1);">reply</i><span class="label-val">Share</span></div>
+                        </div>
+
+                        <div class="bottom-ui">
+                            <div class="user-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
+                                <span class="u-name">Vishnupur Fifthoot</span>
+                                <div class="f-badge">Follow</div>
                             </div>
-                            <div class="fb-cap">${v.caption || ''}</div>
+                            <div class="cap-text">${v.caption || ''}</div>
                         </div>
                     </div>
                 `).join('');
-                startScroll();
+                setupIntersection();
             }
         }
 
-        function startScroll() {
+        function setupIntersection() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if (e.isIntersecting) v.play(); else { v.pause(); v.currentTime = 0; }
+                    const video = e.target.querySelector('video');
+                    if (e.isIntersecting) video.play(); else { video.pause(); video.currentTime = 0; }
                 });
-            }, { threshold: 0.6 });
-            document.querySelectorAll('.fb-reel-page').forEach(r => obs.observe(r));
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.reel-frame').forEach(f => obs.observe(f));
+        }
+
+        /* 👆 INSTAGRAM Logic: Double Tap to Like */
+        let singleTapTimeout;
+        function handleSingleTap(video) {
+            if (singleTapTimeout) { clearTimeout(singleTapTimeout); singleTapTimeout = null; return; }
+            singleTapTimeout = setTimeout(() => { video.paused?video.play():video.pause(); singleTapTimeout = null; }, 250);
+        }
+
+        function handleDoubleTap(video) {
+            if (singleTapTimeout) clearTimeout(singleTapTimeout); singleTapTimeout = null;
+            const heart = video.parentElement.querySelector('.like-animate');
+            const sideHeart = video.parentElement.querySelector('.heart-icon');
+            if(sideHeart.innerText === 'favorite_border') { sideHeart.innerText = 'favorite'; sideHeart.style.color = '#ff3040'; }
+            heart.classList.add('animate'); setTimeout(() => { heart.classList.remove('animate'); }, 800);
         }
 
         function like(el) {
-            const i = el.querySelector('i');
+            const i = el.querySelector('.heart-icon');
             if(i.innerText === 'favorite_border') { i.innerText = 'favorite'; i.style.color = '#ff3040'; }
             else { i.innerText = 'favorite_border'; i.style.color = 'white'; }
         }
 
-        function toggleC(open) { document.getElementById('comment-overlay').classList.toggle('active', open); }
-        function sendC() {
-            const t = document.getElementById('msg-in');
-            if(t.value) {
-                document.getElementById('msg-list').innerHTML += `<div><b>Aap:</b> ${t.value}</div>`;
-                t.value = "";
+        function toggleComments(show) { document.getElementById('comment-overlay').classList.toggle('active', show); }
+        function addMsg() {
+            const val = document.getElementById('msg-input').value;
+            if(val) {
+                document.getElementById('msg-box').innerHTML += `<div style="margin-bottom:10px;"><b>Aap:</b> ${val}</div>`;
+                document.getElementById('msg-input').value = "";
             }
         }
 
-        init();
+        initFeed();
     </script>
 </body>
 </html>
