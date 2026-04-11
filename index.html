@@ -3,144 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Facebook Style</title>
+    <title>INDIVIBE - Facebook Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Reels Container */
-        #reels-wrapper { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #reels-wrapper::-webkit-scrollbar { display: none; }
-        .reel-frame { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; }
+        /* Full Screen Snap Scroll */
+        #main-feed { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #main-feed::-webkit-scrollbar { display: none; }
+
+        .reel-unit { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Brand Watermark */
-        .brand-logo { position: absolute; top: 25px; left: 20px; z-index: 10; font-size: 24px; font-weight: 900; text-shadow: 2px 2px 10px #000; }
+        /* Top Bar: Reels Text & Search */
+        .top-ui { position: absolute; top: 15px; width: 100%; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .reels-text { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .top-icons i { font-size: 28px; margin-left: 15px; }
 
-        /* Side Toolbar (Save & Report) - Side mein upar rakha hai */
-        .side-toolbar { position: absolute; right: 15px; bottom: 200px; display: flex; flex-direction: column; gap: 20px; z-index: 20; }
-        .side-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .side-item i { font-size: 30px !important; filter: drop-shadow(0 2px 5px #000); }
-        .side-item span { font-size: 11px; font-weight: bold; margin-top: 4px; text-shadow: 1px 1px 2px #000; }
+        /* Right Side Interaction Bar (Like, Comment, Share) */
+        .right-actions { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .action-item i { font-size: 32px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .action-item span { font-size: 13px; font-weight: 500; margin-top: 4px; }
+        .fb-blue-icon { color: #1877F2; } /* Facebook Like Blue */
 
-        /* User & Caption Overlay */
-        .user-overlay { position: absolute; bottom: 140px; left: 15px; z-index: 20; max-width: 80%; }
-        .u-data { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-pfp { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; }
-        .u-handle { font-weight: 800; font-size: 16px; text-shadow: 1px 1px 5px #000; }
+        /* User Info & Caption (Bottom Left) */
+        .bottom-ui { position: absolute; bottom: 85px; left: 15px; z-index: 100; max-width: 70%; }
+        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .u-avatar { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; }
+        .u-name { font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 5px; }
+        .caption { font-size: 14px; margin-bottom: 5px; line-height: 1.3; }
 
-        /* FACEBOOK STYLE BAR (THE REAL FIX) */
-        .fb-action-bar {
-            position: absolute;
-            bottom: 70px; /* Footer ke theek upar */
-            width: 100%;
-            height: 60px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            border-top: 0.2px solid rgba(255,255,255,0.15);
-            z-index: 30;
-        }
-        .fb-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .fb-btn i { font-size: 26px !important; }
-        .fb-btn span { font-size: 14px; font-weight: 700; }
+        /* Bottom Comment Box (As per Screenshot) */
+        .comment-box-bar { position: absolute; bottom: 15px; width: 100%; padding: 0 15px; display: flex; align-items: center; gap: 10px; z-index: 100; }
+        .comment-input { flex: 1; background: rgba(255,255,255,0.2); border-radius: 25px; padding: 10px 15px; font-size: 14px; border: 0.5px solid rgba(255,255,255,0.3); color: #fff; }
+        .comment-icons i { font-size: 24px; color: #fff; opacity: 0.8; }
 
-        /* Bottom Tab Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
-        .bottom-nav i { font-size: 28px; color: #fff; }
-
-        /* Heart Animation */
-        .h-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 110px; color: #ff3040; opacity: 0; pointer-events: none; z-index: 50; }
-        .h-pop.active { animation: popOut 0.8s ease; }
-        @keyframes popOut { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        /* Double Tap Heart */
+        .pop-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 100px; color: #fff; z-index: 200; opacity: 0; pointer-events: none; }
+        .pop-heart.active { animation: fbHeart 0.8s ease; }
+        @keyframes fbHeart { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="reels-wrapper"></div>
-
-    <div class="bottom-nav">
-        <i class="material-icons-outlined" style="color: #1877F2;">home</i>
-        <i class="material-icons-outlined">search</i>
-        <i class="material-icons-outlined" style="font-size:35px;">add_box</i>
-        <i class="material-icons-outlined">person_outline</i>
-    </div>
+    <div id="main-feed">
+        </div>
 
     <script>
         const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initFeed() {
+        async function fetchReels() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
-                document.getElementById('reels-wrapper').innerHTML = data.map(v => `
-                    <div class="reel-frame">
-                        <div class="brand-logo">INDIVIBE</div>
-                        <video src="${v.video_url}" loop playsinline onclick="handleTap(this)" ondblclick="handleLike(this)"></video>
-                        <div class="h-pop material-icons-outlined">favorite</div>
+                const feed = document.getElementById('main-feed');
+                feed.innerHTML = data.map(v => `
+                    <div class="reel-unit">
+                        <div class="top-ui">
+                            <div class="reels-text"><i class="material-icons">arrow_back</i> Reels</div>
+                            <div class="top-icons"><i class="material-icons">search</i><i class="material-icons">account_circle</i></div>
+                        </div>
                         
-                        <div class="side-toolbar">
-                            <div class="side-item" onclick="window.open('${v.video_url}')"><i class="material-icons-outlined">download</i><span>Save</span></div>
-                            <div class="side-item" onclick="alert('Reported')"><i class="material-icons-outlined">report_problem</i><span>Report</span></div>
+                        <video src="${v.video_url}" loop playsinline onclick="togglePlay(this)" ondblclick="fireLike(this)"></video>
+                        <div class="pop-heart material-icons">thumb_up</div>
+                        
+                        <div class="right-actions">
+                            <div class="action-item" onclick="fireLike(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons like-btn">thumb_up_off_alt</i><span>1</span>
+                            </div>
+                            <div class="action-item">
+                                <i class="material-icons">chat_bubble_outline</i><span>0</span>
+                            </div>
+                            <div class="action-item">
+                                <i class="material-icons">reply</i><span>Share</span>
+                            </div>
+                            <div class="action-item" onclick="window.open('${v.video_url}')">
+                                <i class="material-icons">download</i>
+                            </div>
+                            <div class="action-item">
+                                <i class="material-icons">more_horiz</i>
+                            </div>
                         </div>
 
-                        <div class="user-overlay">
-                            <div class="u-data">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pfp">
-                                <span class="u-handle">Vishnupur Fifthoot</span>
+                        <div class="bottom-ui">
+                            <div class="u-info">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-avatar">
+                                <span class="u-name">Vishnupur Fifthoot <i class="material-icons" style="font-size:16px; color:#1877F2;">check_circle</i></span>
                             </div>
-                            <p style="padding-left:55px;">${v.caption || ''}</p>
+                            <p class="caption">${v.caption || ''}</p>
                         </div>
 
-                        <div class="fb-action-bar">
-                            <div class="fb-btn" onclick="handleLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined like-icon">favorite_border</i><span>Like</span>
-                            </div>
-                            <div class="fb-btn" onclick="alert('Comment box opening...')">
-                                <i class="material-icons-outlined">chat_bubble_outline</i><span>Comment</span>
-                            </div>
-                            <div class="fb-btn" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons-outlined">share</i><span>Share</span>
-                            </div>
+                        <div class="comment-box-bar">
+                            <div class="comment-input">कमेंट जोड़ें...</div>
+                            <div class="comment-icons"><i class="material-icons">sentiment_satisfied</i></div>
                         </div>
                     </div>
                 `).join('');
-                setupObserver();
+                initObserver();
             }
         }
 
-        let tapTimer;
-        function handleTap(v) {
-            if (tapTimer) return;
-            tapTimer = setTimeout(() => { v.paused ? v.play() : v.pause(); tapTimer = null; }, 250);
+        let clickT;
+        function togglePlay(v) {
+            if (clickT) return;
+            clickT = setTimeout(() => { v.paused ? v.play() : v.pause(); clickT = null; }, 250);
         }
 
-        function handleLike(v) {
-            clearTimeout(tapTimer); tapTimer = null;
-            const pop = v.parentElement.querySelector('.h-pop');
-            pop.classList.add('active');
-            setTimeout(() => pop.classList.remove('active'), 800);
+        function fireLike(v) {
+            clearTimeout(clickT); clickT = null;
+            const h = v.parentElement.querySelector('.pop-heart');
+            h.classList.add('active');
+            setTimeout(() => h.classList.remove('active'), 800);
             
-            const icon = v.parentElement.querySelector('.like-icon');
-            icon.innerText = 'favorite'; 
-            icon.style.color = '#ff3040';
+            const lIcon = v.parentElement.querySelector('.like-btn');
+            lIcon.innerText = 'thumb_up';
+            lIcon.classList.add('fb-blue-icon');
         }
 
-        function setupObserver() {
-            const obs = new IntersectionObserver(es => {
-                es.forEach(e => {
+        function initObserver() {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if (e.isIntersecting) vid.play(); else { vid.pause(); vid.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.reel-frame').forEach(r => obs.observe(r));
+            document.querySelectorAll('.reel-unit').forEach(r => obs.observe(r));
         }
 
-        initFeed();
+        fetchReels();
     </script>
 </body>
 </html>
