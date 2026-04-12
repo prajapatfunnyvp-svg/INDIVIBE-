@@ -6,6 +6,7 @@
     <title>INDIVIBE - FB Style</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
@@ -15,57 +16,53 @@
         .reel { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Header & Stories */
-        .top-nav { position: absolute; top: 0; width: 100%; z-index: 100; padding: 15px; background: linear-gradient(rgba(0,0,0,0.6), transparent); }
+        /* Header */
+        .top-nav { position: absolute; top: 0; width: 100%; z-index: 100; padding: 15px; background: linear-gradient(rgba(0,0,0,0.7), transparent); }
         .top-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .logo { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+        .logo { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
         
-        .story-bar { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
-        .story-item { width: 54px; height: 54px; border-radius: 50%; border: 2px solid #1877F2; padding: 2px; flex-shrink: 0; }
-        .story-item img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .add-st { border: 2px dashed #aaa; display: flex; align-items: center; justify-content: center; }
-
         /* Sidebar Actions */
-        .side-actions { position: absolute; right: 12px; bottom: 125px; display: flex; flex-direction: column; gap: 24px; align-items: center; z-index: 100; }
-        .btn-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .btn-node i { font-size: 34px; text-shadow: 0 2px 8px #000; }
-        .btn-node span { font-size: 12px; font-weight: 600; margin-top: 4px; }
-        .liked { color: #ff3040 !important; }
+        .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .btn-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .btn-node i { font-size: 32px; }
+        .btn-node span { font-size: 13px; font-weight: 500; margin-top: 4px; }
+        .liked { color: #ff3040 !important; animation: heartBeat 0.3s ease-in-out; }
+        @keyframes heartBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-        /* FIXED FB PILL (GOL MATOL) COMMENT BOX */
-        .comment-zone { position: absolute; bottom: 25px; width: 100%; padding: 0 16px; z-index: 100; display: flex; justify-content: center; }
+        /* User Info */
+        .user-data { position: absolute; bottom: 85px; left: 16px; z-index: 100; width: 80%; }
+        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .u-img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; object-fit: cover; }
+        .u-txt { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 4px; }
+        .caption { font-size: 14px; margin-top: 6px; line-height: 1.4; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+
+        /* COMMENT BOX - FB PILL STYLE */
+        .comment-zone { position: fixed; bottom: 20px; width: 100%; padding: 0 12px; z-index: 200; }
         .fb-comment-pill { 
-            width: 100%; max-width: 440px; 
-            height: 46px; /* Height fix ki */
-            background: rgba(50, 50, 50, 0.6); 
-            backdrop-filter: blur(25px); 
-            border-radius: 100px; /* FULL GOL SHAPE */
-            padding: 0 20px; 
+            width: 100%; 
+            height: 48px; 
+            background: rgba(40, 40, 40, 0.7); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 25px; 
+            padding: 0 15px; 
             display: flex; align-items: center; 
-            border: 0.8px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 0.5px solid rgba(255,255,255,0.15);
         }
-        .fb-comment-pill span { flex: 1; color: rgba(255,255,255,0.8); font-size: 15px; }
-        .fb-comment-pill .fb-icons { display: flex; gap: 14px; align-items: center; }
-        .fb-comment-pill i { font-size: 24px; opacity: 0.9; cursor: pointer; }
+        .fb-comment-pill span { flex: 1; color: rgba(255,255,255,0.7); font-size: 15px; }
+        .fb-icons { display: flex; gap: 15px; align-items: center; color: rgba(255,255,255,0.9); }
+        .fb-icons i { font-size: 22px; }
 
-        /* User Block */
-        .user-data { position: absolute; bottom: 90px; left: 16px; z-index: 100; max-width: 70%; }
-        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-img { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #fff; }
-        .u-txt { font-weight: 700; font-size: 15px; text-shadow: 1px 1px 3px #000; }
+        /* Big Heart Animation */
+        .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 120px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; transition: 0.3s; }
+        .pop { animation: popAnim 0.8s ease-out; }
+        @keyframes popAnim { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
 
-        /* Bottom Menu */
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 20px 20px 0 0; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 10px 0 30px 0; }
+        /* Menu Sheet */
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 15px 15px 0 0; z-index: 1000; transition: 0.4s; padding-bottom: 30px; }
         .sheet.active { bottom: 0; }
-        .row-item { display: flex; align-items: center; gap: 15px; padding: 16px 20px; border-bottom: 0.5px solid #333; color: #e4e6eb; }
-        .row-item i { font-size: 28px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 900; }
-
-        /* Double Tap Heart */
-        .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 140px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; }
-        .pop { animation: popAnim 0.8s ease; }
-        @keyframes popAnim { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        .row-item { display: flex; align-items: center; gap: 15px; padding: 18px 20px; color: #fff; font-size: 16px; border-bottom: 0.5px solid #333; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 900; }
     </style>
 </head>
 <body>
@@ -74,11 +71,10 @@
     
     <div class="overlay" id="overlay" onclick="hideMenu()"></div>
     <div class="sheet" id="sheet">
-        <div style="width: 40px; height: 4px; background: #555; margin: 0 auto 15px; border-radius: 2px;"></div>
-        <div class="row-item" id="dlVib"><i class="material-icons-outlined">download</i> <span>Download Vibe</span></div>
-        <div class="row-item" onclick="alert('Interested'); hideMenu()"><i class="material-icons-outlined">star_border</i> <span>Interested</span></div>
-        <div class="row-item" onclick="alert('Not Interested'); hideMenu()"><i class="material-icons-outlined">visibility_off</i> <span>Not Interested</span></div>
-        <div class="row-item" onclick="hideMenu()" style="border:none; justify-content:center; color:#888;">Cancel</div>
+        <div style="width: 40px; height: 5px; background: #555; margin: 12px auto; border-radius: 10px;"></div>
+        <div class="row-item" id="dlVib"><i class="material-icons-outlined">download</i> <span>Download Video</span></div>
+        <div class="row-item" onclick="hideMenu()"><i class="material-icons-outlined">report</i> <span>Report</span></div>
+        <div class="row-item" onclick="hideMenu()" style="border:none; color:#ff4444; justify-content:center; font-weight:bold;">Cancel</div>
     </div>
 
     <script>
@@ -94,26 +90,20 @@
                     <div class="reel">
                         <div class="top-nav">
                             <div class="top-flex">
-                                <span class="logo">INDIVIBE</span>
-                                <div style="display:flex; gap:20px;"><i class="material-icons-outlined">add_box</i><i class="material-icons-outlined">search</i></div>
-                            </div>
-                            <div class="story-bar">
-                                <div class="story-item add-st"><i class="material-icons">add</i></div>
-                                <div class="story-item"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-                                <div class="story-item"><img src="https://i.pravatar.cc/100?u=4"></div>
+                                <div class="logo"><i class="material-icons">arrow_back</i> Reels</div>
+                                <div style="display:flex; gap:20px;"><i class="material-icons">search</i><i class="material-icons">photo_camera</i></div>
                             </div>
                         </div>
 
-                        <video src="${v.video_url}" loop playsinline onclick="vPlay(this)" ondblclick="vLike(this)"></video>
-                        <div class="big-heart material-icons-outlined">favorite</div>
+                        <video src="${v.video_url}" loop playsinline onclick="togglePlay(this)" ondblclick="handleLike(this)"></video>
+                        <div class="big-heart material-icons">favorite</div>
 
                         <div class="side-actions">
-                            <div class="btn-node" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined h-icon">favorite_border</i><span>1.2M</span>
+                            <div class="btn-node" onclick="handleLike(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons-outlined heart-icon">favorite_border</i><span>Like</span>
                             </div>
                             <div class="btn-node"><i class="material-icons-outlined">chat_bubble_outline</i><span>5K</span></div>
                             <div class="btn-node" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="btn-node" onclick="alert('Saved')"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
                             <div class="btn-node" onclick="showMenu('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
                         </div>
 
@@ -122,7 +112,7 @@
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
                                 <span class="u-txt">Vishnupur Fifthoot <i class="material-icons" style="color:#1877F2; font-size:16px;">check_circle</i></span>
                             </div>
-                            <p style="padding-left:5px; font-size:14px; text-shadow:1px 1px 3px #000;">${v.caption || ''}</p>
+                            <div class="caption">${v.caption || 'Best romantic ❤️ love story vibe #love'}</div>
                         </div>
 
                         <div class="comment-zone">
@@ -141,18 +131,25 @@
             }
         }
 
+        // Logic functions
         function showMenu(url) { activeVideo = url; document.getElementById('sheet').classList.add('active'); document.getElementById('overlay').style.display='block'; }
         function hideMenu() { document.getElementById('sheet').classList.remove('active'); document.getElementById('overlay').style.display='none'; }
         document.getElementById('dlVib').onclick = () => { window.open(activeVideo); hideMenu(); };
 
-        let timer;
-        function vPlay(v) { if(timer) return; timer = setTimeout(() => { v.paused ? v.play() : v.pause(); timer = null; }, 250); }
-        function vLike(v) {
-            clearTimeout(timer); timer = null;
-            const h = v.parentElement.querySelector('.big-heart');
-            h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 800);
-            const icon = v.parentElement.querySelector('.h-icon');
-            icon.innerText = 'favorite'; icon.classList.add('liked');
+        function togglePlay(v) { v.paused ? v.play() : v.pause(); }
+
+        function handleLike(v) {
+            const container = v.parentElement;
+            const bigHeart = container.querySelector('.big-heart');
+            const sideHeart = container.querySelector('.heart-icon');
+            
+            // Big Heart Animation
+            bigHeart.classList.add('pop');
+            setTimeout(() => bigHeart.classList.remove('pop'), 800);
+
+            // Side Heart Color Change
+            sideHeart.innerText = 'favorite';
+            sideHeart.classList.add('liked');
         }
 
         function setupObserver() {
@@ -169,3 +166,4 @@
     </script>
 </body>
 </html>
+
