@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INDIVIBE - Instagram Style Comments</title>
+    <title>INDIVIBE - FB Style Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -17,65 +17,84 @@
         video { width: 100%; height: 100%; object-fit: cover; }
 
         /* Sidebar Actions */
-        .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 100; }
+        .side-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .btn-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         .btn-node i { font-size: 32px; color: #fff; }
         .btn-node span { font-size: 12px; font-weight: 600; margin-top: 4px; }
         .liked { color: #ff3040 !important; }
 
-        /* User Info */
-        .user-data { position: absolute; bottom: 30px; left: 16px; z-index: 100; width: 75%; }
+        /* User Info & Caption */
+        .user-data { position: absolute; bottom: 35px; left: 16px; z-index: 100; width: 75%; pointer-events: none; }
         .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .u-img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
-        .u-txt { font-weight: 700; font-size: 15px; text-shadow: 1px 1px 3px #000; }
-        .cap { font-size: 14px; text-shadow: 1px 1px 2px #000; }
+        .u-img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #fff; object-fit: cover; }
+        .u-txt { font-weight: 700; font-size: 16px; text-shadow: 1px 1px 3px #000; display: flex; align-items: center; gap: 4px; }
+        .caption { font-size: 14px; text-shadow: 1px 1px 2px #000; line-height: 1.4; }
 
-        /* INSTAGRAM STYLE COMMENT SHEET */
-        .comment-sheet { 
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60vh; 
+        /* FIXED FB STYLE GOL COMMENT BOX (BOTTOM SHEET MEIN) */
+        .b-sheet { 
+            position: fixed; bottom: -100%; left: 0; width: 100%; 
             background: #242526; border-radius: 20px 20px 0 0; z-index: 2000; 
-            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            display: flex; flex-direction: column;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .comment-sheet.open { bottom: 0; }
-        .sheet-header { padding: 15px; text-align: center; border-bottom: 0.5px solid #333; position: relative; }
-        .handle { width: 40px; height: 4px; background: #555; border-radius: 10px; margin: 0 auto 10px; }
-        .comments-list { flex: 1; overflow-y: auto; padding: 15px; color: #ccc; font-size: 14px; text-align: center; }
+        .b-sheet.open { bottom: 0; }
+        .s-header { padding: 12px; text-align: center; border-bottom: 0.5px solid #333; position: relative; }
+        .handle { width: 35px; height: 4px; background: #555; border-radius: 10px; margin: 0 auto 8px; }
+        
+        /* Menu Items */
+        .menu-item { display: flex; align-items: center; gap: 15px; padding: 16px 20px; color: #eee; font-size: 16px; border-bottom: 0.1px solid #333; cursor: pointer; }
+        .menu-item i { font-size: 24px; }
 
-        /* GOL MATOL (PILL) INPUT INSIDE SHEET */
-        .comment-input-area { 
-            padding: 12px 16px 25px; border-top: 0.5px solid #333; background: #242526;
+        /* Comment List & Gol Input Box */
+        .comment-content { height: 50vh; display: flex; flex-direction: column; }
+        .comment-list { flex: 1; overflow-y: auto; padding: 20px; text-align: center; color: #888; font-size: 14px; }
+        
+        .input-area { padding: 10px 16px 25px; border-top: 0.5px solid #333; background: #242526; }
+        .fb-pill-box { 
+            background: #3a3b3c; 
+            border-radius: 50px; /* FULL GOL */
+            padding: 10px 18px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .pill-box { 
-            background: #3a3b3c; border-radius: 30px; padding: 10px 18px; 
-            display: flex; align-items: center; gap: 12px; border: 0.5px solid #444;
-        }
-        .pill-box input { 
+        .fb-pill-box input { 
             flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 15px; 
         }
-        .pill-box i { color: #1877F2; font-size: 24px; cursor: pointer; }
+        .fb-pill-box i { color: #1877F2; font-size: 24px; cursor: pointer; }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1500; }
+        
+        /* Double Tap Heart */
         .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 120px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; }
         .pop { animation: popAnim 0.7s ease; }
-        @keyframes popAnim { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        @keyframes popAnim { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="feed"></div>
 
-    <div class="overlay" id="overlay" onclick="closeComments()"></div>
-    <div class="comment-sheet" id="commentSheet">
-        <div class="sheet-header">
-            <div class="handle"></div>
-            <span style="font-weight:bold;">Comments</span>
-        </div>
-        <div class="comments-list">No comments yet. Be the first to vibe!</div>
-        <div class="comment-input-area">
-            <div class="pill-box">
-                <input type="text" placeholder="Add a comment...">
-                <i class="material-icons">send</i>
+    <div class="overlay" id="overlay" onclick="closeSheets()"></div>
+
+    <div class="b-sheet" id="menuSheet">
+        <div class="s-header"><div class="handle"></div></div>
+        <div class="menu-item" id="btnDownload"><i class="material-icons">download</i> <span>Download Video</span></div>
+        <div class="menu-item" onclick="closeSheets(); alert('Added to Interested')"><i class="material-icons">star_border</i> <span>Interested</span></div>
+        <div class="menu-item" onclick="closeSheets(); alert('Marked as Not Interested')"><i class="material-icons">visibility_off</i> <span>Not Interested</span></div>
+        <div class="menu-item" onclick="closeSheets(); alert('Reported')" style="color:#ff4d4d;"><i class="material-icons">report_problem</i> <span>Report</span></div>
+        <div class="menu-item" onclick="closeSheets()" style="justify-content:center; color:#999; border:none;">Cancel</div>
+    </div>
+
+    <div class="b-sheet" id="commentSheet">
+        <div class="s-header"><div class="handle"></div><span style="font-weight:bold; font-size:15px;">Comments</span></div>
+        <div class="comment-content">
+            <div class="comment-list">Abhi koi comment nahi hai. Shuruaat karein!</div>
+            <div class="input-area">
+                <div class="fb-pill-box">
+                    <input type="text" placeholder="Write a comment...">
+                    <i class="material-icons">send</i>
+                </div>
             </div>
         </div>
     </div>
@@ -84,6 +103,7 @@
         const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
+        let currentVideoUrl = "";
 
         async function initFeed() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
@@ -92,16 +112,16 @@
                     <div class="reel">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()" ondblclick="vLike(this)"></video>
                         <div class="big-heart material-icons">favorite</div>
-
+                        
                         <div class="side-actions">
                             <div class="btn-node" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
                                 <i class="material-icons-outlined h-icon">favorite_border</i><span>1.2M</span>
                             </div>
-                            <div class="btn-node" onclick="openComments()">
+                            <div class="btn-node" onclick="openSheet('commentSheet')">
                                 <i class="material-icons-outlined">chat_bubble_outline</i><span>5K</span>
                             </div>
                             <div class="btn-node"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="btn-node"><i class="material-icons-outlined">more_horiz</i></div>
+                            <div class="btn-node" onclick="openMenu('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
                         </div>
 
                         <div class="user-data">
@@ -109,7 +129,7 @@
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-img">
                                 <span class="u-txt">Vishnupur Fifthoot <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
                             </div>
-                            <div class="cap">${v.caption || 'Best romantic ❤️ love story vibe'}</div>
+                            <div class="caption">${v.caption || 'Best romantic ❤️ love story vibe #love'}</div>
                         </div>
                     </div>
                 `).join('');
@@ -117,15 +137,25 @@
             }
         }
 
-        function openComments() {
-            document.getElementById('commentSheet').classList.add('open');
+        function openSheet(id) {
+            document.getElementById(id).classList.add('open');
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function closeComments() {
-            document.getElementById('commentSheet').classList.remove('open');
+        function openMenu(url) {
+            currentVideoUrl = url;
+            openSheet('menuSheet');
+        }
+
+        function closeSheets() {
+            document.querySelectorAll('.b-sheet').forEach(s => s.classList.remove('open'));
             document.getElementById('overlay').style.display = 'none';
         }
+
+        document.getElementById('btnDownload').onclick = () => {
+            window.open(currentVideoUrl);
+            closeSheets();
+        };
 
         function vLike(v) {
             const h = v.parentElement.querySelector('.big-heart');
@@ -148,3 +178,4 @@
     </script>
 </body>
 </html>
+
