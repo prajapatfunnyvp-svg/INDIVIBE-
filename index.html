@@ -3,95 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe - Feel the Vibe</title>
+    <title>Indivibe - Pure Vibe Design</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        /* CSS Reset for Pure Design */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Feed Container */
+        /* Main Vibe Feed Container */
         #feed { height: calc(100vh - 65px); overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
-        .vibe-container { height: calc(100vh - 65px); width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        .vibe-wrapper { height: calc(100vh - 65px); width: 100vw; scroll-snap-align: start; position: relative; background: #000; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Sidebar Actions (Updated with Save) */
-        .vibe-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 100; }
-        .action-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
-        .action-btn i { font-size: 30px; color: #fff; }
-        .action-btn span { font-size: 11px; font-weight: 600; margin-top: 2px; }
-        .liked { color: #ff3040 !important; }
-        .saved { color: #ffd700 !important; } /* Gold color for saved vibes */
-
-        /* User Info & Music */
-        .vibe-info { position: absolute; bottom: 20px; left: 16px; z-index: 100; width: 70%; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .user-pic { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
-        .username { font-weight: 700; font-size: 15px; text-shadow: 1px 1px 3px #000; display: flex; align-items: center; gap: 4px; }
-        .music-scroll { display: flex; align-items: center; gap: 8px; margin-top: 8px; width: 100%; overflow: hidden; }
-        .scrolling-txt { white-space: nowrap; animation: scrollText 7s linear infinite; font-size: 12px; opacity: 0.9; }
-        @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-        /* Rotating Disk */
-        .music-disk { position: absolute; bottom: 20px; right: 12px; width: 35px; height: 35px; border-radius: 50%; background: radial-gradient(#444, #000); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; animation: rotate 3s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1000; }
-        .nav-link { color: #fff; opacity: 0.6; cursor: pointer; }
-        .nav-link.active { opacity: 1; }
-
-        /* PILL COMMENT SHEET (Fixed Design) */
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #242526; border-radius: 20px 20px 0 0; z-index: 2000; transition: 0.3s ease; }
-        .sheet.open { bottom: 0; }
-        .sheet-header { padding: 15px; text-align: center; border-bottom: 0.5px solid #333; }
-        .handle { width: 40px; height: 4px; background: #555; border-radius: 10px; margin: 0 auto 5px; }
+        /* Sidebar Elements Placement (Strict Copy of Vibe) */
+        .vibe-sidebar { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .sidebar-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .sidebar-node i { font-size: 32px; color: #fff; }
+        .sidebar-node span { font-size: 11px; font-weight: 600; margin-top: 2px; color: #fff; }
+        .liked { color: #ff3040 !important; animation: popHeart 0.3s ease; }
+        @keyframes popHeart { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         
-        .pill-container { padding: 12px 16px 35px; border-top: 0.5px solid #333; background: #242526; }
-        .pill-box { 
-            background: #3a3b3c; border-radius: 50px; padding: 10px 18px; 
-            display: flex; align-items: center; gap: 12px; border: 1px solid #444; 
-        }
-        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 15px; }
+        /* User Info (Redesigned for Pure Vibe Style) */
+        .vibe-user-info { position: absolute; bottom: 15px; left: 16px; z-index: 100; width: 80%; pointer-events: none; }
+        .user-header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; pointer-events: auto; }
+        .user-logo-frame { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #fff; object-fit: cover; }
+        .username-text { font-weight: 700; font-size: 15px; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 3px; }
+        .verified-icon { color: #1877F2; font-size: 16px; }
+        
+        .caption-text { font-size: 14px; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); opacity: 0.95; line-height: 1.3; }
+        
+        /* Music Scroll Area */
+        .vibe-music-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; width: 60%; overflow: hidden; }
+        .music-scroll-frame { white-space: nowrap; animation: scrollMusic 7s linear infinite; font-size: 13px; color: #fff; opacity: 0.8; }
+        @keyframes scrollMusic { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1500; }
+        /* Rotating Music Disk (Vibe Style) */
+        .music-disk-remix { position: absolute; bottom: 15px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(#444, #000); border: 3px solid #333; display: flex; align-items: center; justify-content: center; animation: rotateDisk 3s linear infinite; z-index: 110; }
+        .music-disk-remix i { font-size: 18px; color: #fff; }
+        @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* PURE VIBE COMMENT BOX (Pill Bottom Sheet) */
+        .comment-sheet-area { 
+            position: fixed; bottom: -100%; left: 0; width: 100%; 
+            background: #242526; border-radius: 18px 18px 0 0; z-index: 2000; 
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .comment-sheet-area.open { bottom: 0; }
+        .sheet-header-control { padding: 10px; text-align: center; border-bottom: 0.5px solid #333; position: relative; }
+        .sheet-handle { width: 35px; height: 4px; background: #555; border-radius: 10px; margin: 0 auto; }
+        .sheet-close-btn { position: absolute; right: 15px; top: 10px; font-size: 20px; color: #999; cursor: pointer; }
+        
+        /* Gol (Pill) Input Inside Sheet */
+        .comment-pill-container { padding: 12px 16px 30px; border-top: 0.5px solid #333; }
+        .vibe-pill-box { 
+            background: #3a3b3c; border-radius: 25px; 
+            padding: 10px 18px; 
+            display: flex; align-items: center; gap: 12px; 
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+        .vibe-pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 15px; }
+        .vibe-pill-box i { color: #1877F2; cursor: pointer; }
+
+        /* Bottom Menu System (Standard Vibe UI) */
+        .vibe-menu-item { display: flex; align-items: center; gap: 15px; padding: 16px 20px; color: #eee; font-size: 16px; border-bottom: 0.1px solid #333; cursor: pointer; }
+        .vibe-menu-item i { font-size: 24px; }
+
+        /* BOTTOM NAV BAR (Strict Vibe Copy) */
+        .vibe-bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1000; }
+        .vibe-nav-item { color: #fff; opacity: 0.6; cursor: pointer; }
+        .vibe-nav-item.active { opacity: 1; }
+        .vibe-add-btn { font-size: 40px !important; }
+
         .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 120px; color: #fff; z-index: 200; pointer-events: none; opacity: 0; }
         .pop { animation: popAnim 0.7s ease; }
         @keyframes popAnim { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
-        
-        .menu-row { display: flex; align-items: center; gap: 15px; padding: 18px 20px; color: #fff; font-size: 16px; border-bottom: 0.5px solid #333; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1500; }
     </style>
 </head>
 <body>
 
     <div id="feed"></div>
 
-    <nav class="bottom-nav">
-        <div class="nav-link active"><i class="material-icons">home</i></div>
-        <div class="nav-link"><i class="material-icons">explore</i></div>
-        <div class="nav-link" onclick="alert('Upload Vibe feature coming soon!')"><i class="material-icons-outlined" style="font-size:35px;">add_circle_outline</i></div>
-        <div class="nav-link"><i class="material-icons-outlined">subscriptions</i></div>
-        <div class="nav-link"><i class="material-icons">person_outline</i></div>
+    <nav class="vibe-bottom-nav">
+        <div class="vibe-nav-item active"><i class="material-icons">home</i></div>
+        <div class="vibe-nav-item"><i class="material-icons">search</i></div>
+        <div class="vibe-nav-item" onclick="alert('Upload feature in next update!')"><i class="material-icons vibe-add-btn">add_circle_outline</i></div>
+        <div class="vibe-nav-item"><i class="material-icons">subscriptions</i></div>
+        <div class="vibe-nav-item"><i class="material-icons">person_outline</i></div>
     </nav>
 
     <div class="overlay" id="overlay" onclick="closeSheets()"></div>
 
-    <div class="sheet" id="menuSheet">
-        <div class="sheet-header"><div class="handle"></div></div>
-        <div class="menu-row" id="dlVibe"><i class="material-icons">download</i> Download Vibe</div>
-        <div class="menu-row" onclick="closeSheets(); alert('Interested!')"><i class="material-icons">favorite_border</i> Interested</div>
-        <div class="menu-row" onclick="closeSheets(); alert('Reported')" style="color:#ff4d4d;"><i class="material-icons">report</i> Report</div>
+    <div class="comment-sheet-area" id="menuSheet">
+        <div class="sheet-header-control"><div class="sheet-handle"></div><i class="material-icons sheet-close-btn" onclick="closeSheets()">close</i></div>
+        <div class="vibe-menu-item" id="btnDownloadVibe"><i class="material-icons">download</i> Download Vibe</div>
+        <div class="vibe-menu-item" onclick="closeSheets(); alert('Interested')"><i class="material-icons">favorite_border</i> Interested</div>
+        <div class="vibe-menu-item" onclick="closeSheets(); alert('Reported')" style="color:#ff4d4d;"><i class="material-icons">report</i> Report</div>
     </div>
 
-    <div class="sheet" id="commentSheet">
-        <div class="sheet-header"><div class="handle"></div><span style="font-weight:bold;">Comments</span></div>
-        <div style="height:40vh; overflow-y:auto; padding:20px; text-align:center; color:#888;">No comments yet.</div>
-        <div class="pill-container">
-            <div class="pill-box">
-                <input type="text" placeholder="Write a comment...">
-                <i class="material-icons" style="color:#1877F2; cursor:pointer;">send</i>
+    <div class="comment-sheet-area" id="commentSheet">
+        <div class="sheet-header-control"><div class="sheet-handle"></div><span style="font-weight:bold; font-size:15px; color:#fff;">Comments</span><i class="material-icons sheet-close-btn" onclick="closeSheets()">close</i></div>
+        <div style="height:45vh; overflow-y:auto; padding:20px; text-align:center; color:#888;">Shuruaat karein, ek vibe dekar!</div>
+        <div class="comment-pill-container">
+            <div class="vibe-pill-box">
+                <input type="text" placeholder="Apna vibe likhein...">
+                <i class="material-icons">send</i>
             </div>
         </div>
     </div>
@@ -100,42 +119,40 @@
         const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
-        let activeVibeUrl = "";
+        let activeVideoUrl = "";
 
-        async function loadVibes() {
+        async function initFeed() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
-                    <div class="vibe-container">
-                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()" ondblclick="handleVibeLike(this)"></video>
+                    <div class="vibe-wrapper">
+                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()" ondblclick="vLike(this)"></video>
                         <div class="big-heart material-icons">favorite</div>
                         
-                        <div class="vibe-actions">
-                            <div class="action-btn" onclick="handleVibeLike(this.parentElement.parentElement.querySelector('video'))">
-                                <i class="material-icons-outlined heart-icon">favorite_border</i><span>1.2M</span>
+                        <div class="vibe-sidebar">
+                            <div class="sidebar-node" onclick="vLike(this.parentElement.parentElement.querySelector('video'))">
+                                <i class="material-icons h-icon">favorite</i><span>1.2M</span>
                             </div>
-                            <div class="action-btn" onclick="openSheet('commentSheet')">
+                            <div class="sidebar-node" onclick="openSheet('commentSheet')">
                                 <i class="material-icons-outlined">chat_bubble_outline</i><span>5K</span>
                             </div>
-                            <div class="action-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="action-btn" onclick="toggleSave(this)">
-                                <i class="material-icons-outlined save-icon">bookmark_border</i><span>Save</span>
-                            </div>
-                            <div class="action-btn" onclick="openMore('${v.video_url}')"><i class="material-icons-outlined">more_horiz</i></div>
+                            <div class="sidebar-node" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="sidebar-node" onclick="vSave(this)"><i class="material-icons-outlined s-icon">bookmark_border</i><span>Save</span></div>
+                            <div class="sidebar-node" onclick="openMenu('${v.video_url}')"><i class="material-icons">more_horiz</i></div>
                         </div>
 
-                        <div class="vibe-info">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
-                                <span class="username">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
+                        <div class="vibe-user-info">
+                            <div class="user-header-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-logo-frame">
+                                <span class="username-text">Vishnu Raj <i class="material-icons verified-icon">check_circle</i></span>
                             </div>
-                            <p style="font-size:14px; text-shadow:1px 1px 2px #000;">${v.caption || 'Feel the Vibe! #indivibe'}</p>
-                            <div class="music-scroll">
-                                <i class="material-icons" style="font-size:14px;">music_note</i>
-                                <div class="scrolling-txt">Original Audio - Vishnu Raj Vibe Track</div>
+                            <p class="caption-text">${v.caption || 'Naya vibe, nayi shuruaat! #indivibe'}</p>
+                            <div class="vibe-music-row">
+                                <i class="material-icons" style="font-size:16px;">music_note</i>
+                                <div class="music-scroll-frame">Original Audio - Vishnu Raj Track Remix Vibe</div>
                             </div>
                         </div>
-                        <div class="music-disk"><i class="material-icons" style="font-size:18px;">music_note</i></div>
+                        <div class="music-disk-remix"><i class="material-icons">music_note</i></div>
                     </div>
                 `).join('');
                 setupObserver();
@@ -147,35 +164,30 @@
             document.getElementById('overlay').style.display = 'block';
         }
 
-        function openMore(url) {
-            activeVibeUrl = url;
+        function openMenu(url) {
+            activeVideoUrl = url;
             openSheet('menuSheet');
         }
 
+        document.getElementById('btnDownloadVibe').onclick = () => { window.open(activeVideoUrl); closeSheets(); };
+
         function closeSheets() {
-            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.comment-sheet-area').forEach(s => s.classList.remove('open'));
             document.getElementById('overlay').style.display = 'none';
         }
 
-        function handleVibeLike(v) {
+        function vLike(v) {
             const h = v.parentElement.querySelector('.big-heart');
             h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 700);
-            const icon = v.parentElement.querySelector('.heart-icon');
-            icon.innerText = 'favorite'; icon.classList.add('liked');
+            const icon = v.parentElement.querySelector('.h-icon');
+            icon.classList.add('liked');
         }
 
-        function toggleSave(btn) {
-            const icon = btn.querySelector('.save-icon');
-            if (icon.innerText === 'bookmark_border') {
-                icon.innerText = 'bookmark';
-                btn.classList.add('saved');
-            } else {
-                icon.innerText = 'bookmark_border';
-                btn.classList.remove('saved');
-            }
+        function vSave(btn) {
+            const icon = btn.querySelector('.s-icon');
+            icon.innerText = (icon.innerText === 'bookmark') ? 'bookmark_border' : 'bookmark';
+            btn.classList.toggle('saved');
         }
-
-        document.getElementById('dlVibe').onclick = () => { window.open(activeVibeUrl); closeSheets(); };
 
         function setupObserver() {
             const obs = new IntersectionObserver(es => {
@@ -184,10 +196,10 @@
                     if(e.isIntersecting) vid.play(); else vid.pause();
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-container').forEach(r => obs.observe(r));
+            document.querySelectorAll('.vibe-wrapper').forEach(r => obs.observe(r));
         }
 
-        loadVibes();
+        initFeed();
     </script>
 </body>
 </html>
