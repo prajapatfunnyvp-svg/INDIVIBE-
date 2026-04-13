@@ -3,111 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe Official</title>
+    <title>Indivibe Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* 1. TOP NAVIGATION & STORIES (HOME STYLE) */
-        .home-header { position: absolute; top: 0; width: 100%; padding: 45px 15px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); z-index: 1000; display: flex; flex-direction: column; gap: 15px; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 20px; }
-        .logo-area img { width: 28px; height: 28px; border-radius: 6px; }
+        /* Multi-Page Navigation Logic */
+        .page { display: none; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; }
+        .page.active { display: block; }
 
-        .stories-container { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
-        .stories-container::-webkit-scrollbar { display: none; }
-        .story-ring { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #f09433; padding: 2px; flex-shrink: 0; cursor: pointer; }
-        .story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+        /* 1. HOME PAGE (Stories + Posts) */
+        .home-header { padding: 45px 15px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-box { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 20px; }
+        .logo-box img { width: 28px; height: 28px; border-radius: 6px; }
+        .story-bar { display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto; scrollbar-width: none; }
+        .story-circle { width: 66px; height: 66px; border-radius: 50%; border: 2px solid #f09433; padding: 2px; flex-shrink: 0; }
+        .story-circle img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
 
-        /* 2. MAIN VIDEO FEED */
-        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed::-webkit-scrollbar { display: none; }
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        /* 2. REELS / VIBE FEED (Full Screen) */
+        #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 3. RIGHT SIDEBAR (INTERACTION) */
-        .interaction-sidebar { position: absolute; right: 12px; bottom: 145px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .action-item i { font-size: 32px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .action-item span { font-size: 12px; margin-top: 4px; font-weight: 600; }
+        /* Sidebar & Footer */
+        .vibe-sidebar { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .vibe-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .vibe-btn i { font-size: 32px; color: #fff; text-shadow: 0 2px 4px #000; }
+        .vibe-btn span { font-size: 12px; margin-top: 4px; font-weight: 600; }
         .liked { color: #ff3040 !important; }
 
-        /* 4. FOOTER INFO (USER & CAPTION) */
-        .vibe-details { position: absolute; bottom: 130px; left: 15px; z-index: 100; width: 75%; }
-        .user-profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .profile-pic { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
-        .username-text { font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 4px; }
-        .follow-badge { border: 1px solid #fff; padding: 3px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .vibe-info { position: absolute; bottom: 130px; left: 16px; z-index: 100; width: 70%; }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fff; }
+        .follow-tag { border: 1px solid #fff; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
 
-        /* 5. THE PILL COMMENT BOX (TRANSLUCENT) */
-        .comment-pill-bar { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
-        .pill-wrapper { background: rgba(255,255,255,0.18); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
-        .pill-wrapper input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
-        .pill-wrapper input::placeholder { color: rgba(255,255,255,0.7); }
+        /* 3. PILL COMMENT BOX */
+        .pill-comment-fix { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
+        .pill-box { background: rgba(255,255,255,0.18); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; }
+        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
 
-        /* 6. BOTTOM SHEETS (REELS MENU) */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 2000; }
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2500; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); padding: 15px 0; }
-        .sheet.open { bottom: 0; }
-        .sheet-btn { padding: 16px 25px; display: flex; align-items: center; gap: 15px; color: #fff; cursor: pointer; border-bottom: 0.5px solid #333; }
-        .sheet-btn i { font-size: 24px; }
+        /* 4. UPLOAD PAGE (Functional) */
+        .upload-screen { padding: 60px 20px; text-align: center; }
+        .upload-btn { background: #0095f6; color: #fff; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-block; }
 
-        /* 7. BOTTOM NAVIGATION */
-        .main-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.3px solid #222; z-index: 1001; }
-        .main-nav i { color: #fff; font-size: 28px; opacity: 0.5; cursor: pointer; }
-        .active-tab { opacity: 1 !important; }
+        /* 5. BOTTOM NAVIGATION */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.3px solid #222; z-index: 2000; }
+        .nav-bar i { color: #fff; font-size: 28px; opacity: 0.5; cursor: pointer; }
+        .active-icon { opacity: 1 !important; }
+
+        /* Sheets & Overlay */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 2500; }
+        .menu-sheet { position: fixed; bottom: -100%; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 3000; transition: 0.3s; padding: 20px 0; }
+        .sheet-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; border-bottom: 0.1px solid #333; }
     </style>
 </head>
 <body>
 
-    <header class="home-header">
-        <div class="nav-top">
-            <div class="logo-area">
-                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" alt="Logo">
-                <span>Indivibe</span>
-            </div>
-            <div style="display:flex; gap:20px;">
-                <i class="material-icons-outlined">favorite_border</i>
-                <i class="material-icons-outlined" style="transform: rotate(-20deg);">send</i>
-            </div>
+    <div id="home" class="page active">
+        <div class="home-header">
+            <div class="logo-box"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"><span>Indivibe</span></div>
+            <i class="material-icons">send</i>
         </div>
-        <div class="stories-container">
-            <div class="story-ring"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a1"></div>
-            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a2"></div>
-            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a3"></div>
-            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a4"></div>
+        <div class="story-bar">
+            <div class="story-circle"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+            <div class="story-circle"><img src="https://i.pravatar.cc/100?u=1"></div>
+            <div class="story-circle"><img src="https://i.pravatar.cc/100?u=2"></div>
         </div>
-    </header>
+        <div style="padding: 100px 20px; text-align: center; opacity: 0.5;">No Posts Yet - Explore Vibes!</div>
+    </div>
 
-    <div id="feed"></div>
-
-    <div class="comment-pill-bar">
-        <div class="pill-wrapper">
-            <input type="text" id="commentInput" placeholder="कमेंट जोड़ें...">
-            <i class="material-icons" style="color:rgba(255,255,255,0.7);">sentiment_satisfied_alt</i>
+    <div id="vibes" class="page">
+        <div id="vibe-feed"></div>
+        <div class="pill-comment-fix">
+            <div class="pill-box">
+                <input type="text" id="vibeComment" placeholder="कमेंट जोड़ें...">
+                <i class="material-icons" style="opacity:0.7;">sentiment_satisfied_alt</i>
+            </div>
         </div>
     </div>
 
-    <nav class="main-nav">
-        <i class="material-icons active-tab">home</i>
-        <i class="material-icons">search</i>
-        <i class="material-icons" style="font-size:38px;">add_box</i>
-        <i class="material-icons">play_circle_outline</i>
-        <i class="material-icons">person_outline</i>
+    <div id="upload" class="page">
+        <div class="upload-screen">
+            <h2>Naya Vibe Banayein</h2>
+            <p style="margin: 20px 0; opacity: 0.7;">Apni video file select karein</p>
+            <label class="upload-btn">
+                Select Video <input type="file" hidden onchange="alert('Video Processing...')">
+            </label>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <i class="material-icons active-icon" onclick="showPage('home', this)">home</i>
+        <i class="material-icons" onclick="showPage('search', this)">search</i>
+        <i class="material-icons" onclick="showPage('upload', this)" style="font-size:35px;">add_box</i>
+        <i class="material-icons" onclick="showPage('vibes', this)">play_circle_outline</i>
+        <i class="material-icons" onclick="showPage('profile', this)">person_outline</i>
     </nav>
 
     <div class="overlay" id="overlay" onclick="closeSheet()"></div>
-
-    <div class="sheet" id="optionsSheet">
-        <div style="width:35px; height:4px; background:#555; margin:0 auto 15px; border-radius:10px;"></div>
-        <div class="sheet-btn" onclick="alert('Link Copied!')"><i class="material-icons">link</i><span>Copy Link</span></div>
-        <div class="sheet-btn" onclick="alert('Downloading...')"><i class="material-icons">file_download</i><span>Save to Device</span></div>
-        <div class="sheet-btn" onclick="alert('Added to Favorites')"><i class="material-icons">star_border</i><span>Add to Favorites</span></div>
-        <div class="sheet-btn" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i><span>Report Vibe</span></div>
+    <div class="menu-sheet" id="vibeMenu">
+        <div class="sheet-item" onclick="alert('Downloading...')"><i class="material-icons">file_download</i> Download</div>
+        <div class="sheet-item" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i> Report</div>
     </div>
 
     <script>
@@ -115,26 +113,53 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function loadFeed() {
-            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
-                document.getElementById('feed').innerHTML = data.map(v => `
+        // Functional Page Switcher
+        function showPage(pageId, icon) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-bar i').forEach(i => i.classList.remove('active-icon'));
+            icon.classList.add('active-icon');
+            if(pageId === 'vibes') loadVibes();
+        }
+
+        async function loadVibes() {
+            const { data } = await supa.from('videos').select('*').order('created_at', {ascending: false});
+            if(data) {
+                document.getElementById('vibe-feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        
-                        <div class="interaction-sidebar">
-                            <div class="action-item" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
-                            <div class="action-item" onclick="document.getElementById('commentInput').focus()"><i class="material-icons-outlined">chat_bubble_outline</i><span>1,155</span></div>
-                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>13.3K</span></div>
-                            <div class="action-item" onclick="this.querySelector('i').innerText='bookmark'"><i class="material-icons-outlined">bookmark_border</i><span>8,584</span></div>
-                            <div class="action-item" onclick="openSheet()"><i class="material-icons">more_horiz</i></div>
+                        <div class="vibe-sidebar">
+                            <div class="vibe-btn" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
+                            <div class="vibe-btn" onclick="document.getElementById('vibeComment').focus()"><i class="material-icons">chat_bubble_outline</i><span>540</span></div>
+                            <div class="vibe-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="vibe-btn" onclick="openSheet()"><i class="material-icons">more_horiz</i></div>
                         </div>
-
-                        <div class="vibe-details">
-                            <div class="user-profile-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-pic">
-                                <span class="username-text">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:16px;">check_circle</i></span>
-                                <div class="follow-badge" onclick="toggleFollow(this)">Follow</div>
+                        <div class="vibe-info">
+                            <div class="user-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
+                                <span style="font-weight:bold;">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
+                                <div class="follow-tag" onclick="this.innerText='Following'">Follow</div>
                             </div>
-                            <p class="caption-text">${v.caption || '
-        
+                            <p style="font-size:14px; opacity:0.9;">${v.caption || 'Naya Vibe! #indivibe'}</p>
+                        </div>
+                    </div>
+                `).join('');
+                setupIntersection();
+            }
+        }
+
+        function setupIntersection() {
+            const obs = new IntersectionObserver(es => {
+                es.forEach(e => { const vid = e.target.querySelector('video'); if(e.isIntersecting) vid.play(); else vid.pause(); });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
+        }
+
+        function openSheet() { document.getElementById('vibeMenu').style.bottom = '0'; document.getElementById('overlay').style.display = 'block'; }
+        function closeSheet() { document.getElementById('vibeMenu').style.bottom = '-100%'; document.getElementById('overlay').style.display = 'none'; }
+
+        loadVibes();
+    </script>
+</body>
+</html>
+
