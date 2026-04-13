@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe - Real Vibe App</title>
+    <title>Indivibe</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,41 +11,42 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Vibe Feed */
-        #feed { height: calc(100vh - 130px); overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        /* Full Screen Feed */
+        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
-        .vibe-card { height: calc(100vh - 130px); width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Real Watermark (Top Right) */
-        .vibe-watermark { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 8px; z-index: 100; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 8px; }
-        .vibe-watermark img { width: 20px; height: 20px; border-radius: 4px; }
-        .vibe-watermark span { font-size: 14px; font-weight: bold; opacity: 0.9; }
+        /* Instagram Style Watermark (Top Right) */
+        .vibe-header { position: absolute; top: 40px; right: 15px; display: flex; align-items: center; gap: 8px; z-index: 100; }
+        .vibe-header img { width: 24px; height: 24px; border-radius: 5px; }
+        .vibe-header span { font-weight: bold; font-size: 16px; text-shadow: 1px 1px 4px #000; }
 
-        /* Sidebar Buttons */
-        .vibe-sidebar { position: absolute; right: 12px; bottom: 40px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .sidebar-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
-        .sidebar-item i { font-size: 32px; color: #fff; }
-        .sidebar-item span { font-size: 11px; font-weight: 600; margin-top: 2px; }
-        .vibe-liked { color: #ff3040 !important; }
+        /* Sidebar Icons (Exactly like your Screenshot) */
+        .sidebar { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 100; }
+        .side-node { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .side-node i { font-size: 32px; color: #fff; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
+        .side-node span { font-size: 12px; margin-top: 4px; font-weight: 500; }
+        .red-heart { color: #ff3040 !important; }
 
-        /* User Footer Info */
-        .vibe-footer { position: absolute; bottom: 10px; left: 16px; z-index: 100; width: 75%; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .user-avatar { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
-        .username { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 4px; }
+        /* User & Caption (Bottom Left) */
+        .vibe-footer { position: absolute; bottom: 130px; left: 15px; z-index: 100; width: 80%; }
+        .user-block { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
+        .user-name { font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 4px; }
+        .caption { font-size: 14px; margin-top: 5px; line-height: 1.3; text-shadow: 1px 1px 2px #000; }
 
-        /* PERMANENT PILL COMMENT BOX (Bottom) */
-        .comment-pill-container { position: fixed; bottom: 65px; width: 100%; padding: 10px 15px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 1000; }
-        .comment-pill-box { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
-        .comment-pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
-        .comment-pill-box input::placeholder { color: rgba(255,255,255,0.7); }
-        .pill-icons { display: flex; gap: 12px; color: #fff; opacity: 0.8; }
+        /* INSTAGRAM PILL COMMENT BOX (Floating) */
+        .comment-area { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
+        .pill-input { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; }
+        .pill-input input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+        .pill-input input::placeholder { color: rgba(255,255,255,0.6); }
+        .pill-tools { display: flex; gap: 15px; color: rgba(255,255,255,0.8); }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1001; }
-        .nav-icon { color: #fff; opacity: 0.6; font-size: 28px; cursor: pointer; }
-        .nav-icon.active { opacity: 1; }
+        /* Bottom Navbar */
+        .nav-grid { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.2px solid #333; z-index: 1001; }
+        .nav-grid i { color: #fff; font-size: 28px; opacity: 0.6; cursor: pointer; }
+        .active-icon { opacity: 1 !important; }
     </style>
 </head>
 <body>
@@ -53,10 +54,10 @@
     <div id="feed">
         </div>
 
-    <div class="comment-pill-container">
-        <div class="comment-pill-box">
+    <div class="comment-area">
+        <div class="pill-input">
             <input type="text" placeholder="कमेंट जोड़ें...">
-            <div class="pill-icons">
+            <div class="pill-tools">
                 <i class="material-icons" style="font-size:20px;">alternate_email</i>
                 <i class="material-icons" style="font-size:20px;">sentiment_satisfied_alt</i>
                 <i class="material-icons" style="font-size:20px;">gif</i>
@@ -64,12 +65,12 @@
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <i class="material-icons nav-icon active">home</i>
-        <i class="material-icons nav-icon">search</i>
-        <i class="material-icons nav-icon" style="font-size:38px;">add_box</i>
-        <i class="material-icons nav-icon">play_circle_outline</i>
-        <i class="material-icons nav-icon">person_outline</i>
+    <nav class="nav-grid">
+        <i class="material-icons active-icon">home</i>
+        <i class="material-icons">search</i>
+        <i class="material-icons" style="font-size:35px;">add_box</i>
+        <i class="material-icons">play_circle_outline</i>
+        <i class="material-icons">person_outline</i>
     </nav>
 
     <script>
@@ -77,58 +78,53 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initApp() {
+        async function fetchVideos() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
                         
-                        <div class="vibe-watermark">
+                        <div class="vibe-header">
                             <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
                             <span>Indivibe</span>
                         </div>
 
-                        <div class="vibe-sidebar">
-                            <div class="sidebar-item" onclick="this.querySelector('i').classList.toggle('vibe-liked')">
+                        <div class="sidebar">
+                            <div class="side-node" onclick="this.querySelector('i').classList.toggle('red-heart')">
                                 <i class="material-icons">favorite</i><span>1.2M</span>
                             </div>
-                            <div class="sidebar-item">
-                                <i class="material-icons">chat_bubble</i><span>540</span>
+                            <div class="side-node">
+                                <i class="material-icons-outlined">chat_bubble_outline</i><span>540</span>
                             </div>
-                            <div class="sidebar-item" onclick="navigator.share({url:'${v.video_url}'})">
-                                <i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span>
+                            <div class="side-node" onclick="navigator.share({url:'${v.video_url}'})">
+                                <i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>Share</span>
                             </div>
-                            <div class="sidebar-item" onclick="this.querySelector('i').innerText='bookmark'">
+                            <div class="side-node" onclick="this.querySelector('i').innerText='bookmark'">
                                 <i class="material-icons-outlined">bookmark_border</i><span>Save</span>
                             </div>
-                            <div class="sidebar-item"><i class="material-icons">more_horiz</i></div>
+                            <div class="side-node"><i class="material-icons">more_horiz</i></div>
                         </div>
 
                         <div class="vibe-footer">
-                            <div class="user-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-avatar">
-                                <span class="username">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
+                            <div class="user-block">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
+                                <span class="user-name">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
                             </div>
-                            <p style="font-size:14px; text-shadow:1px 1px 2px #000;">${v.caption || 'Naya Vibe, Nayi Shuruaat! #indivibe'}</p>
+                            <p class="caption">${v.caption || 'Naya Vibe, Nayi Shuruaat! #indivibe'}</p>
                         </div>
                     </div>
                 `).join('');
-                setupObserver();
+                const obs = new IntersectionObserver(es => {
+                    es.forEach(e => {
+                        const vid = e.target.querySelector('video');
+                        if(e.isIntersecting) vid.play(); else vid.pause();
+                    });
+                }, { threshold: 0.8 });
+                document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
             }
         }
-
-        function setupObserver() {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => {
-                    const vid = e.target.querySelector('video');
-                    if(e.isIntersecting) vid.play(); else vid.pause();
-                });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(card => observer.observe(card));
-        }
-
-        initApp();
+        fetchVideos();
     </script>
 </body>
 </html>
