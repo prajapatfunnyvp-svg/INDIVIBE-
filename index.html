@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe Pro - Complete</title>
+    <title>Indivibe Official</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,85 +11,103 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Story Bar (Instagram Style) */
-        .story-bar { position: absolute; top: 40px; left: 0; width: 100%; display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto; z-index: 1000; }
-        .story-bar::-webkit-scrollbar { display: none; }
-        .story-item { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #f09433; padding: 2px; flex-shrink: 0; }
-        .story-item img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #000; }
+        /* 1. TOP NAVIGATION & STORIES (HOME STYLE) */
+        .home-header { position: absolute; top: 0; width: 100%; padding: 45px 15px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); z-index: 1000; display: flex; flex-direction: column; gap: 15px; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 20px; }
+        .logo-area img { width: 28px; height: 28px; border-radius: 6px; }
 
-        /* Full Screen Feed */
+        .stories-container { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .stories-container::-webkit-scrollbar { display: none; }
+        .story-ring { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #f09433; padding: 2px; flex-shrink: 0; cursor: pointer; }
+        .story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+
+        /* 2. MAIN VIDEO FEED */
         #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Sidebar Icons (Working) */
-        .sidebar { position: absolute; right: 12px; bottom: 150px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px #000; }
-        .side-btn i { font-size: 32px; color: #fff; }
-        .side-btn span { font-size: 12px; margin-top: 4px; font-weight: 500; }
+        /* 3. RIGHT SIDEBAR (INTERACTION) */
+        .interaction-sidebar { position: absolute; right: 12px; bottom: 145px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .action-item i { font-size: 32px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .action-item span { font-size: 12px; margin-top: 4px; font-weight: 600; }
         .liked { color: #ff3040 !important; }
 
-        /* Footer (Follow, Caption) */
-        .vibe-footer { position: absolute; bottom: 135px; left: 15px; z-index: 100; width: 80%; }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #fff; }
-        .follow-tag { border: 1px solid #fff; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        /* 4. FOOTER INFO (USER & CAPTION) */
+        .vibe-details { position: absolute; bottom: 130px; left: 15px; z-index: 100; width: 75%; }
+        .user-profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .profile-pic { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #fff; }
+        .username-text { font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 4px; }
+        .follow-badge { border: 1px solid #fff; padding: 3px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
 
-        /* PILL COMMENT BOX (Fixed & Working) */
-        .pill-container { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
-        .pill-inner { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; }
-        .pill-inner input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+        /* 5. THE PILL COMMENT BOX (TRANSLUCENT) */
+        .comment-pill-bar { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
+        .pill-wrapper { background: rgba(255,255,255,0.18); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+        .pill-wrapper input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+        .pill-wrapper input::placeholder { color: rgba(255,255,255,0.7); }
 
-        /* More Menu & Share Sheets */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1500; }
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2000; transition: 0.4s ease; padding: 20px 0; }
-        .show-sheet { bottom: 0 !important; }
-        .sheet-option { padding: 15px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; border-bottom: 0.2px solid #333; }
+        /* 6. BOTTOM SHEETS (REELS MENU) */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 2000; }
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2500; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); padding: 15px 0; }
+        .sheet.open { bottom: 0; }
+        .sheet-btn { padding: 16px 25px; display: flex; align-items: center; gap: 15px; color: #fff; cursor: pointer; border-bottom: 0.5px solid #333; }
+        .sheet-btn i { font-size: 24px; }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1001; }
-        .bottom-nav i { color: #fff; font-size: 28px; opacity: 0.6; }
+        /* 7. BOTTOM NAVIGATION */
+        .main-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.3px solid #222; z-index: 1001; }
+        .main-nav i { color: #fff; font-size: 28px; opacity: 0.5; cursor: pointer; }
+        .active-tab { opacity: 1 !important; }
     </style>
 </head>
 <body>
 
-    <div class="story-bar">
-        <div class="story-item"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
-        <div class="story-item"><img src="https://i.pravatar.cc/100?u=1"></div>
-        <div class="story-item"><img src="https://i.pravatar.cc/100?u=2"></div>
-    </div>
+    <header class="home-header">
+        <div class="nav-top">
+            <div class="logo-area">
+                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" alt="Logo">
+                <span>Indivibe</span>
+            </div>
+            <div style="display:flex; gap:20px;">
+                <i class="material-icons-outlined">favorite_border</i>
+                <i class="material-icons-outlined" style="transform: rotate(-20deg);">send</i>
+            </div>
+        </div>
+        <div class="stories-container">
+            <div class="story-ring"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a1"></div>
+            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a2"></div>
+            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a3"></div>
+            <div class="story-ring"><img src="https://i.pravatar.cc/100?u=a4"></div>
+        </div>
+    </header>
 
     <div id="feed"></div>
 
-    <div class="pill-container">
-        <div class="pill-inner">
-            <input type="text" id="commentTrigger" placeholder="कमेंट जोड़ें...">
-            <i class="material-icons" style="opacity:0.7;">sentiment_satisfied_alt</i>
+    <div class="comment-pill-bar">
+        <div class="pill-wrapper">
+            <input type="text" id="commentInput" placeholder="कमेंट जोड़ें...">
+            <i class="material-icons" style="color:rgba(255,255,255,0.7);">sentiment_satisfied_alt</i>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <i class="material-icons" style="opacity:1;">home</i>
+    <nav class="main-nav">
+        <i class="material-icons active-tab">home</i>
         <i class="material-icons">search</i>
         <i class="material-icons" style="font-size:38px;">add_box</i>
         <i class="material-icons">play_circle_outline</i>
         <i class="material-icons">person_outline</i>
     </nav>
 
-    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+    <div class="overlay" id="overlay" onclick="closeSheet()"></div>
 
-    <div class="bottom-sheet" id="moreMenu">
-        <div style="width:40px; height:4px; background:#555; margin:0 auto 10px; border-radius:10px;"></div>
-        <div class="sheet-option" onclick="alert('Downloading...')"><i class="material-icons">file_download</i> Download Watermark</div>
-        <div class="sheet-option" onclick="alert('Not Interested')"><i class="material-icons">visibility_off</i> Not Interested</div>
-        <div class="sheet-option" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i> Report Vibe</div>
-    </div>
-
-    <div class="bottom-sheet" id="shareSheet">
-        <div style="width:40px; height:4px; background:#555; margin:0 auto 10px; border-radius:10px;"></div>
-        <div class="sheet-option"><img src="https://i.pravatar.cc/100?u=5" width="30" style="border-radius:50%"> Rahul <button style="margin-left:auto; background:#0095f6; color:#fff; border:none; padding:5px 12px; border-radius:5px;">Send</button></div>
-        <div class="sheet-option"><img src="https://i.pravatar.cc/100?u=6" width="30" style="border-radius:50%"> Priya <button style="margin-left:auto; background:#0095f6; color:#fff; border:none; padding:5px 12px; border-radius:5px;">Send</button></div>
+    <div class="sheet" id="optionsSheet">
+        <div style="width:35px; height:4px; background:#555; margin:0 auto 15px; border-radius:10px;"></div>
+        <div class="sheet-btn" onclick="alert('Link Copied!')"><i class="material-icons">link</i><span>Copy Link</span></div>
+        <div class="sheet-btn" onclick="alert('Downloading...')"><i class="material-icons">file_download</i><span>Save to Device</span></div>
+        <div class="sheet-btn" onclick="alert('Added to Favorites')"><i class="material-icons">star_border</i><span>Add to Favorites</span></div>
+        <div class="sheet-btn" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i><span>Report Vibe</span></div>
     </div>
 
     <script>
@@ -97,47 +115,26 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initApp() {
-            const { data } = await supa.from('videos').select('*').order('created_at', {ascending: false});
-            if(data) {
+        async function loadFeed() {
+            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
+            if (data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="sidebar">
-                            <div class="side-btn" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
-                            <div class="side-btn" onclick="document.getElementById('commentTrigger').focus()"><i class="material-icons-outlined">chat_bubble_outline</i><span>540</span></div>
-                            <div class="side-btn" onclick="openSheet('shareSheet')"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="side-btn" onclick="this.querySelector('i').innerText='bookmark'"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
-                            <div class="side-btn" onclick="openSheet('moreMenu')"><i class="material-icons">more_horiz</i></div>
+                        
+                        <div class="interaction-sidebar">
+                            <div class="action-item" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
+                            <div class="action-item" onclick="document.getElementById('commentInput').focus()"><i class="material-icons-outlined">chat_bubble_outline</i><span>1,155</span></div>
+                            <div class="action-item" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons-outlined" style="transform:scaleX(-1)">reply</i><span>13.3K</span></div>
+                            <div class="action-item" onclick="this.querySelector('i').innerText='bookmark'"><i class="material-icons-outlined">bookmark_border</i><span>8,584</span></div>
+                            <div class="action-item" onclick="openSheet()"><i class="material-icons">more_horiz</i></div>
                         </div>
-                        <div class="vibe-footer">
-                            <div class="user-info">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
-                                <span style="font-weight:bold; font-size:14px;">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
-                                <div class="follow-tag" onclick="this.innerText='Following'; this.style.color='#aaa'">Follow</div>
+
+                        <div class="vibe-details">
+                            <div class="user-profile-row">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="profile-pic">
+                                <span class="username-text">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:16px;">check_circle</i></span>
+                                <div class="follow-badge" onclick="toggleFollow(this)">Follow</div>
                             </div>
-                            <p style="font-size:14px; opacity:0.9;">${v.caption || 'Feel the Vibe! #indivibe'}</p>
-                        </div>
-                    </div>
-                `).join('');
-                setupPlayer();
-            }
-        }
-
-        function setupPlayer() {
-            const obs = new IntersectionObserver(es => {
-                es.forEach(e => {
-                    const vid = e.target.querySelector('video');
-                    if(e.isIntersecting) vid.play(); else vid.pause();
-                });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
-        }
-
-        function openSheet(id) { document.getElementById(id).classList.add('show-sheet'); document.getElementById('overlay').style.display='block'; }
-        function closeAll() { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('show-sheet')); document.getElementById('overlay').style.display='none'; }
-
-        initApp();
-    </script>
-</body>
-</html>
+                            <p class="caption-text">${v.caption || '
+        
