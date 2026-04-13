@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe - Pro Reels</title>
+    <title>Indivibe Pro - Complete</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,75 +11,85 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Full Screen Video Feed */
+        /* Story Bar (Instagram Style) */
+        .story-bar { position: absolute; top: 40px; left: 0; width: 100%; display: flex; gap: 12px; padding: 10px 15px; overflow-x: auto; z-index: 1000; }
+        .story-bar::-webkit-scrollbar { display: none; }
+        .story-item { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #f09433; padding: 2px; flex-shrink: 0; }
+        .story-item img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #000; }
+
+        /* Full Screen Feed */
         #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Top Watermark */
-        .vibe-header { position: absolute; top: 45px; right: 15px; display: flex; align-items: center; gap: 8px; z-index: 100; }
-        .vibe-header img { width: 24px; height: 24px; border-radius: 5px; }
-        .vibe-header span { font-weight: bold; font-size: 16px; text-shadow: 1px 1px 4px #000; }
-
-        /* Instagram Sidebar */
-        .sidebar { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .side-btn i { font-size: 32px; color: #fff; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
+        /* Sidebar Icons (Working) */
+        .sidebar { position: absolute; right: 12px; bottom: 150px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
+        .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-shadow: 0 1px 4px #000; }
+        .side-btn i { font-size: 32px; color: #fff; }
         .side-btn span { font-size: 12px; margin-top: 4px; font-weight: 500; }
         .liked { color: #ff3040 !important; }
 
-        /* User Footer */
-        .vibe-footer { position: absolute; bottom: 130px; left: 15px; z-index: 100; width: 80%; }
+        /* Footer (Follow, Caption) */
+        .vibe-footer { position: absolute; bottom: 135px; left: 15px; z-index: 100; width: 80%; }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
-        .user-name { font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 4px; }
-        .caption { font-size: 14px; margin-top: 5px; text-shadow: 1px 1px 2px #000; opacity: 0.9; }
+        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #fff; }
+        .follow-tag { border: 1px solid #fff; padding: 2px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; }
 
-        /* FLOATING PILL COMMENT BOX */
-        .comment-pill-area { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
-        .pill-box { background: rgba(255,255,255,0.2); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; }
-        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
-        .pill-box input::placeholder { color: rgba(255,255,255,0.7); }
+        /* PILL COMMENT BOX (Fixed & Working) */
+        .pill-container { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
+        .pill-inner { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; }
+        .pill-inner input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
 
-        /* Instagram Style Bottom Sheet */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 2000; transition: 0.3s ease; padding: 10px 0; }
-        .bottom-sheet.show { bottom: 0; }
-        .sheet-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #fff; text-decoration: none; cursor: pointer; }
-        .sheet-item i { font-size: 24px; }
+        /* More Menu & Share Sheets */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1500; }
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 20px 20px 0 0; z-index: 2000; transition: 0.4s ease; padding: 20px 0; }
+        .show-sheet { bottom: 0 !important; }
+        .sheet-option { padding: 15px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; border-bottom: 0.2px solid #333; }
 
-        /* Bottom Nav Bar */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.2px solid #333; z-index: 1001; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1001; }
         .bottom-nav i { color: #fff; font-size: 28px; opacity: 0.6; }
-        .active-nav { opacity: 1 !important; }
     </style>
 </head>
 <body>
 
+    <div class="story-bar">
+        <div class="story-item"><img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png"></div>
+        <div class="story-item"><img src="https://i.pravatar.cc/100?u=1"></div>
+        <div class="story-item"><img src="https://i.pravatar.cc/100?u=2"></div>
+    </div>
+
     <div id="feed"></div>
 
-    <div class="comment-pill-area">
-        <div class="pill-box">
-            <input type="text" placeholder="कमेंट जोड़ें...">
-            <i class="material-icons" style="font-size:22px; color:rgba(255,255,255,0.8);">sentiment_satisfied_alt</i>
+    <div class="pill-container">
+        <div class="pill-inner">
+            <input type="text" id="commentTrigger" placeholder="कमेंट जोड़ें...">
+            <i class="material-icons" style="opacity:0.7;">sentiment_satisfied_alt</i>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <i class="material-icons active-nav">home</i>
+        <i class="material-icons" style="opacity:1;">home</i>
         <i class="material-icons">search</i>
         <i class="material-icons" style="font-size:38px;">add_box</i>
         <i class="material-icons">play_circle_outline</i>
         <i class="material-icons">person_outline</i>
     </nav>
 
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
     <div class="bottom-sheet" id="moreMenu">
-        <div style="width:40px; height:4px; background:#555; margin:10px auto; border-radius:10px;"></div>
-        <div class="sheet-item" onclick="alert('Downloading...')"><i class="material-icons">file_download</i><span>Download Video</span></div>
-        <div class="sheet-item" onclick="alert('Not Interested')"><i class="material-icons">visibility_off</i><span>Not Interested</span></div>
-        <div class="sheet-item" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i><span>Report</span></div>
+        <div style="width:40px; height:4px; background:#555; margin:0 auto 10px; border-radius:10px;"></div>
+        <div class="sheet-option" onclick="alert('Downloading...')"><i class="material-icons">file_download</i> Download Watermark</div>
+        <div class="sheet-option" onclick="alert('Not Interested')"><i class="material-icons">visibility_off</i> Not Interested</div>
+        <div class="sheet-option" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i> Report Vibe</div>
+    </div>
+
+    <div class="bottom-sheet" id="shareSheet">
+        <div style="width:40px; height:4px; background:#555; margin:0 auto 10px; border-radius:10px;"></div>
+        <div class="sheet-option"><img src="https://i.pravatar.cc/100?u=5" width="30" style="border-radius:50%"> Rahul <button style="margin-left:auto; background:#0095f6; color:#fff; border:none; padding:5px 12px; border-radius:5px;">Send</button></div>
+        <div class="sheet-option"><img src="https://i.pravatar.cc/100?u=6" width="30" style="border-radius:50%"> Priya <button style="margin-left:auto; background:#0095f6; color:#fff; border:none; padding:5px 12px; border-radius:5px;">Send</button></div>
     </div>
 
     <script>
@@ -87,37 +97,34 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function initFeed() {
-            const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
-            if (data) {
+        async function initApp() {
+            const { data } = await supa.from('videos').select('*').order('created_at', {ascending: false});
+            if(data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
                     <div class="vibe-card">
                         <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="vibe-header">
-                            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png">
-                            <span>Indivibe</span>
-                        </div>
                         <div class="sidebar">
                             <div class="side-btn" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
-                            <div class="side-btn"><i class="material-icons">chat_bubble</i><span>540</span></div>
-                            <div class="side-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="side-btn" onclick="document.getElementById('commentTrigger').focus()"><i class="material-icons-outlined">chat_bubble_outline</i><span>540</span></div>
+                            <div class="side-btn" onclick="openSheet('shareSheet')"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
                             <div class="side-btn" onclick="this.querySelector('i').innerText='bookmark'"><i class="material-icons-outlined">bookmark_border</i><span>Save</span></div>
-                            <div class="side-btn" onclick="toggleMenu()"><i class="material-icons">more_horiz</i></div>
+                            <div class="side-btn" onclick="openSheet('moreMenu')"><i class="material-icons">more_horiz</i></div>
                         </div>
                         <div class="vibe-footer">
                             <div class="user-info">
                                 <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="user-pic">
-                                <span class="user-name">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
+                                <span style="font-weight:bold; font-size:14px;">Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></span>
+                                <div class="follow-tag" onclick="this.innerText='Following'; this.style.color='#aaa'">Follow</div>
                             </div>
-                            <p class="caption">${v.caption || 'Feel the Vibe! #indivibe'}</p>
+                            <p style="font-size:14px; opacity:0.9;">${v.caption || 'Feel the Vibe! #indivibe'}</p>
                         </div>
                     </div>
                 `).join('');
-                setupIntersectionObserver();
+                setupPlayer();
             }
         }
 
-        function setupIntersectionObserver() {
+        function setupPlayer() {
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const vid = e.target.querySelector('video');
@@ -127,14 +134,10 @@
             document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
         }
 
-        function toggleMenu() {
-            const sheet = document.getElementById('moreMenu');
-            const overlay = document.getElementById('overlay');
-            sheet.classList.toggle('show');
-            overlay.style.display = sheet.classList.contains('show') ? 'block' : 'none';
-        }
+        function openSheet(id) { document.getElementById(id).classList.add('show-sheet'); document.getElementById('overlay').style.display='block'; }
+        function closeAll() { document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('show-sheet')); document.getElementById('overlay').style.display='none'; }
 
-        initFeed();
+        initApp();
     </script>
 </body>
 </html>
