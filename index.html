@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe</title>
+    <title>Indivibe - Pro Reels</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,50 +11,48 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Full Screen Feed */
+        /* Full Screen Video Feed */
         #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         #feed::-webkit-scrollbar { display: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Watermark (Top Right) */
-        .vibe-header { position: absolute; top: 40px; right: 15px; display: flex; align-items: center; gap: 8px; z-index: 100; }
-        .vibe-header img { width: 22px; height: 22px; border-radius: 4px; }
+        /* Top Watermark */
+        .vibe-header { position: absolute; top: 45px; right: 15px; display: flex; align-items: center; gap: 8px; z-index: 100; }
+        .vibe-header img { width: 24px; height: 24px; border-radius: 5px; }
         .vibe-header span { font-weight: bold; font-size: 16px; text-shadow: 1px 1px 4px #000; }
 
-        /* Sidebar Icons (Working) */
+        /* Instagram Sidebar */
         .sidebar { position: absolute; right: 12px; bottom: 140px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .side-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .side-btn i { font-size: 32px; color: #fff; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
         .side-btn span { font-size: 12px; margin-top: 4px; font-weight: 500; }
         .liked { color: #ff3040 !important; }
 
-        /* User Footer Info */
+        /* User Footer */
         .vibe-footer { position: absolute; bottom: 130px; left: 15px; z-index: 100; width: 80%; }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
         .user-name { font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 4px; }
         .caption { font-size: 14px; margin-top: 5px; text-shadow: 1px 1px 2px #000; opacity: 0.9; }
 
-        /* CIRCULAR PILL COMMENT BOX (Bottom) */
+        /* FLOATING PILL COMMENT BOX */
         .comment-pill-area { position: fixed; bottom: 75px; width: 100%; padding: 0 15px; z-index: 1000; }
-        .pill-box { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; }
+        .pill-box { background: rgba(255,255,255,0.2); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; }
         .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
         .pill-box input::placeholder { color: rgba(255,255,255,0.7); }
-        .pill-emoji { display: flex; gap: 15px; color: rgba(255,255,255,0.8); }
 
-        /* Bottom Sheet (3-Dot Menu) */
+        /* Instagram Style Bottom Sheet */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
         .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 2000; transition: 0.3s ease; padding: 10px 0; }
         .bottom-sheet.show { bottom: 0; }
-        .sheet-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 0.2px solid #333; }
-        .sheet-item:last-child { border: none; }
+        .sheet-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #fff; text-decoration: none; cursor: pointer; }
         .sheet-item i { font-size: 24px; }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; z-index: 1001; }
-        .bottom-nav i { color: #fff; font-size: 28px; opacity: 0.6; cursor: pointer; }
-        .nav-active { opacity: 1 !important; }
+        /* Bottom Nav Bar */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.2px solid #333; z-index: 1001; }
+        .bottom-nav i { color: #fff; font-size: 28px; opacity: 0.6; }
+        .active-nav { opacity: 1 !important; }
     </style>
 </head>
 <body>
@@ -64,16 +62,12 @@
     <div class="comment-pill-area">
         <div class="pill-box">
             <input type="text" placeholder="कमेंट जोड़ें...">
-            <div class="pill-emoji">
-                <i class="material-icons" style="font-size:20px;">alternate_email</i>
-                <i class="material-icons" style="font-size:20px;">sentiment_satisfied_alt</i>
-                <i class="material-icons" style="font-size:20px;">gif</i>
-            </div>
+            <i class="material-icons" style="font-size:22px; color:rgba(255,255,255,0.8);">sentiment_satisfied_alt</i>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <i class="material-icons nav-active">home</i>
+        <i class="material-icons active-nav">home</i>
         <i class="material-icons">search</i>
         <i class="material-icons" style="font-size:38px;">add_box</i>
         <i class="material-icons">play_circle_outline</i>
@@ -83,9 +77,9 @@
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="bottom-sheet" id="moreMenu">
         <div style="width:40px; height:4px; background:#555; margin:10px auto; border-radius:10px;"></div>
-        <div class="sheet-item" onclick="alert('Downloading...')"><i class="material-icons">file_download</i><span>Download Watermark</span></div>
-        <div class="sheet-item" onclick="alert('Marked as Not Interested')"><i class="material-icons">visibility_off</i><span>Not Interested</span></div>
-        <div class="sheet-item" style="color:#ff3040;" onclick="alert('Report Sent')"><i class="material-icons">report_problem</i><span>Report Vibe</span></div>
+        <div class="sheet-item" onclick="alert('Downloading...')"><i class="material-icons">file_download</i><span>Download Video</span></div>
+        <div class="sheet-item" onclick="alert('Not Interested')"><i class="material-icons">visibility_off</i><span>Not Interested</span></div>
+        <div class="sheet-item" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report_problem</i><span>Report</span></div>
     </div>
 
     <script>
@@ -93,7 +87,7 @@
         const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
         const supa = supabase.createClient(S_URL, S_KEY);
 
-        async function loadVibes() {
+        async function initFeed() {
             const { data } = await supa.from('videos').select('*').order('created_at', { ascending: false });
             if (data) {
                 document.getElementById('feed').innerHTML = data.map(v => `
@@ -124,26 +118,23 @@
         }
 
         function setupIntersectionObserver() {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => {
+            const obs = new IntersectionObserver(es => {
+                es.forEach(e => {
                     const vid = e.target.querySelector('video');
                     if(e.isIntersecting) vid.play(); else vid.pause();
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(card => observer.observe(card));
+            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
         }
 
         function toggleMenu() {
             const sheet = document.getElementById('moreMenu');
             const overlay = document.getElementById('overlay');
-            if(sheet.classList.contains('show')) {
-                sheet.classList.remove('show'); overlay.style.display = 'none';
-            } else {
-                sheet.classList.add('show'); overlay.style.display = 'block';
-            }
+            sheet.classList.toggle('show');
+            overlay.style.display = sheet.classList.contains('show') ? 'block' : 'none';
         }
 
-        loadVibes();
+        initFeed();
     </script>
 </body>
 </html>
