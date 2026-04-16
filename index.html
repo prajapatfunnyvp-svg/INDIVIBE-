@@ -3,118 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
         /* Full Screen Feed */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Transparent Sidebar Buttons */
-        .sidebar { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        /* Sidebar - Transparent System */
+        .sidebar { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .v-btn { text-align: center; cursor: pointer; color: #fff; }
-        .v-btn i { font-size: 32px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
-        .v-btn span { font-size: 11px; display: block; margin-top: 2px; }
-
-        /* Save Button Logic: Transparent to White */
-        .save-btn i { font-variation-settings: 'FILL' 0; transition: 0.2s; }
-        .save-btn.active i { font-variation-settings: 'FILL' 1; color: #fff; } /* Fill white on click */
+        .v-btn i { font-size: 32px; text-shadow: 0 0 8px rgba(0,0,0,0.7); font-variation-settings: 'FILL' 0; transition: 0.2s; }
+        .v-btn span { font-size: 12px; font-weight: 500; margin-top: 2px; display: block; }
         
-        /* Like Button Logic */
-        .like-btn.active i { color: #ff3040; font-variation-settings: 'FILL' 1; }
+        /* Fill Logic (Instagram Style) */
+        .v-btn.active i { font-variation-settings: 'FILL' 1; }
+        .like-btn.active i { color: #ff3040; }
+        .save-btn.active i { color: #fff; }
 
-        /* Instagram Style Gol (Pill) Comment Box */
-        .com-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 2000; }
-        .com-sheet { position: fixed; bottom: -100%; width: 100%; height: 60%; background: #1a1a1a; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s; display: flex; flex-direction: column; }
-        .com-sheet.active { bottom: 0; }
-        
-        /* Chota aur Gol Comment Input */
-        .pill-container { padding: 12px 16px; background: #1a1a1a; border-top: 0.5px solid #333; display: flex; align-items: center; gap: 10px; }
-        .pill-input { flex: 1; background: #333; border-radius: 25px; padding: 8px 15px; display: flex; align-items: center; }
-        .pill-input input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+        /* Meta Data */
+        .meta { position: absolute; bottom: 100px; left: 16px; z-index: 100; width: 70%; pointer-events: none; }
+        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
+        .u-pic { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #fff; }
 
-        /* 3-Dot Menu jaisa photo mein hai */
-        .menu-sheet { position: fixed; bottom: -100%; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 3500; transition: 0.3s; padding: 15px 0; }
-        .menu-sheet.active { bottom: 0; }
-        .m-row { display: flex; justify-content: space-around; padding-bottom: 15px; border-bottom: 0.1px solid #383838; }
-        .m-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; }
+        /* THE GOL (PILL) COMMENT BOX - ONLY IN SHEET */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 2000; }
+        .sheet { position: fixed; bottom: -100%; width: 100%; background: #1a1a1a; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); }
+        .sheet.active { bottom: 0; }
+        .com-sheet { height: 60%; display: flex; flex-direction: column; }
+        .handle { width: 40px; height: 4px; background: #444; margin: 10px auto; border-radius: 10px; }
+
+        /* Pill Input System */
+        .pill-footer { padding: 10px 16px; border-top: 0.5px solid #333; display: flex; align-items: center; gap: 10px; }
+        .pill-box { flex: 1; background: #333; border-radius: 30px; padding: 8px 15px; display: flex; align-items: center; }
+        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+
+        /* 3-DOT MENU */
+        .m-row { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 0.1px solid #333; }
+        .m-icon { text-align: center; }
+        .m-icon i { background: #333; padding: 12px; border-radius: 12px; margin-bottom: 5px; }
+        .m-opt { padding: 16px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; }
 
         /* Double Tap Heart */
-        .pop-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #fff; font-size: 100px; opacity: 0; pointer-events: none; }
-        .animate { animation: heartPop 0.7s; }
-        @keyframes heartPop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.2; opacity: 1; } 100% { scale: 1; opacity: 0; } }
+        .pop-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #fff; font-size: 100px; opacity: 0; pointer-events: none; z-index: 1000; }
+        .animate { animation: pop 0.8s ease-out; }
+        @keyframes pop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.3; opacity: 1; } 100% { scale: 1; opacity: 0; } }
     </style>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
 
-    <div id="vibe-feed">
-        </div>
+    <div id="vibe-feed"></div>
+    <i class="material-icons pop-heart" id="hAnim">favorite</i>
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
-    <i class="material-icons pop-heart" id="ph">favorite</i>
-    <div class="com-overlay" id="ovl" onclick="closeAll()"></div>
-
-    <div class="menu-sheet" id="mSheet">
-        <div style="width:40px; height:4px; background:#444; margin:0 auto 15px; border-radius:10px;"></div>
-        <div class="m-row">
-            <div style="text-align:center;"><i class="material-icons" style="background:#333; padding:12px; border-radius:10px;">loop</i><p>Remix</p></div>
-            <div style="text-align:center;"><i class="material-icons" style="background:#333; padding:12px; border-radius:10px;">layers</i><p>Sequence</p></div>
-            <div style="text-align:center;"><i class="material-icons" style="background:#333; padding:12px; border-radius:10px;">sync</i><p>Auto-scroll</p></div>
-        </div>
-        <div class="m-item" onclick="alert('Downloading...')"><i class="material-icons">download</i> Download Video</div>
-        <div class="m-item" onclick="alert('Interested')"><i class="material-icons">star_outline</i> Interested</div>
-        <div class="m-item" onclick="alert('Not Interested')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
-        <div class="m-item" style="color:#ff3040;"><i class="material-icons">report</i> Report Video</div>
-    </div>
-
-    <div class="com-sheet" id="cSheet">
-        <div style="width:40px; height:4px; background:#444; margin:10px auto; border-radius:10px;"></div>
-        <div style="flex:1; padding:20px; color:#888; text-align:center;">Comments</div>
-        <div class="pill-container">
-            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:30px; border-radius:50%;">
-            <div class="pill-input">
-                <input type="text" placeholder="Add a comment...">
-                <i class="material-icons" style="color:#0095f6;">send</i>
+    <div class="sheet com-sheet" id="comSheet">
+        <div class="handle"></div>
+        <div id="cBox" style="flex:1; overflow-y:auto; padding:20px; color:#888; text-align:center;">Abhi koi comment nahi hai.</div>
+        <div class="pill-footer">
+            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:32px; border-radius:50%;">
+            <div class="pill-box">
+                <input type="text" id="cInp" placeholder="Comment jodein...">
+                <i class="material-icons" style="color:#0095f6;" onclick="sendC()">send</i>
             </div>
         </div>
     </div>
 
-    <script>
-        // Data and Sidebar Rendering Logic
-        const videos = [
-            { url: "https://your-video-url.mp4", user: "Vishnu Raj", likes: "1.2M", comms: "1,155" }
-        ];
+    <div class="sheet" id="menuSheet" style="padding-bottom:20px;">
+        <div class="handle"></div>
+        <div class="m-row">
+            <div class="m-icon" onclick="alert('Remixing...')"><i class="material-icons">loop</i><p>Remix</p></div>
+            <div class="m-icon" onclick="alert('Sequence On')"><i class="material-icons">layers</i><p>Sequence</p></div>
+            <div class="m-icon" onclick="alert('Auto Scroll On')"><i class="material-icons">sync</i><p>Auto-scroll</p></div>
+        </div>
+        <div class="m-opt" onclick="alert('Downloading...')"><i class="material-icons">download</i> Download Video</div>
+        <div class="m-opt" onclick="alert('Interested')"><i class="material-icons">star_outline</i> Interested</div>
+        <div class="m-opt" onclick="alert('Not Interested')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
+        <div class="m-opt" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report</i> Report</div>
+    </div>
 
-        function render() {
-            document.getElementById('vibe-feed').innerHTML = videos.map(v => `
-                <div class="vibe-card" ondblclick="doLike(this)">
-                    <video src="${v.url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                    <div class="sidebar">
-                        <div class="v-btn like-btn" onclick="this.classList.toggle('active')"><i class="material-icons">favorite</i><span>${v.likes}</span></div>
-                        <div class="v-btn" onclick="openC()"><i class="material-icons">chat_bubble_outline</i><span>${v.comms}</span></div>
-                        <div class="v-btn"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                        <div class="v-btn save-btn" onclick="this.classList.toggle('active')"><i class="material-icons">bookmark_border</i><span>Save</span></div>
-                        <div class="v-btn" onclick="openM()"><i class="material-icons">more_horiz</i></div>
+    <script>
+        const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
+        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
+        const supa = supabase.createClient(S_URL, S_KEY);
+
+        async function getVibes() {
+            const { data } = await supa.from('videos').select('*').order('created_at',{ascending:false});
+            if(data) {
+                document.getElementById('vibe-feed').innerHTML = data.map(v => `
+                    <div class="vibe-card" ondblclick="doLike(this)">
+                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
+                        <div class="sidebar">
+                            <div class="v-btn like-btn" onclick="this.classList.toggle('active')"><i class="material-icons">favorite</i><span>1.2M</span></div>
+                            <div class="v-btn" onclick="openS('comSheet')"><i class="material-icons">chat_bubble_outline</i><span>1,155</span></div>
+                            <div class="v-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
+                            <div class="v-btn save-btn" onclick="this.classList.toggle('active')"><i class="material-icons">bookmark_border</i><span>Save</span></div>
+                            <div class="v-btn" onclick="openS('menuSheet')"><i class="material-icons">more_horiz</i></div>
+                        </div>
+                        <div class="meta">
+                            <div class="u-info">
+                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
+                                <b>Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></b>
+                            </div>
+                            <p>${v.caption || 'Indivibe!'}</p>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+                playLogic();
+            }
         }
 
         function doLike(c) {
             c.querySelector('.like-btn').classList.add('active');
-            const h = document.getElementById('ph');
+            const h = document.getElementById('hAnim');
             h.classList.add('animate');
-            setTimeout(() => h.classList.remove('animate'), 700);
+            setTimeout(() => h.classList.remove('animate'), 800);
         }
 
-        function openC() { document.getElementById('cSheet').classList.add('active'); document.getElementById('ovl').style.display='block'; }
-        function openM() { document.getElementById('mSheet').classList.add('active'); document.getElementById('ovl').style.display='block'; }
-        function closeAll() { document.querySelectorAll('.com-sheet, .menu-sheet').forEach(s => s.classList.remove('active')); document.getElementById('ovl').style.display='none'; }
+        function openS(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').style.display='block'; }
+        function closeAll() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('active')); document.getElementById('overlay').style.display='none'; }
         
-        render();
+        function sendC() {
+            const val = document.getElementById('cInp').value;
+            if(val) {
+                document.getElementById('cBox').innerHTML = `<div style="text-align:left; margin-bottom:10px;"><b>Me:</b> ${val}</div>` + document.getElementById('cBox').innerHTML;
+                document.getElementById('cInp').value = '';
+            }
+        }
+
+        function playLogic() {
+            const obs = new IntersectionObserver(es => { es.forEach(e => { const v = e.target.querySelector('video'); if(e.isIntersecting) v.play(); else v.pause(); }); }, { threshold: 0.8 });
+            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
+        }
+
+        getVibes();
     </script>
 </body>
-    </html>
-    
+</html>
