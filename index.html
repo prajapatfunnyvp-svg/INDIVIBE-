@@ -6,46 +6,55 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Top Bar: Vibes Branding & Friends Switch */
+        /* Top Navigation: Vibes Branding & Friends Switch */
         .top-nav { position: absolute; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 20px; z-index: 500; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
-        .vibe-text { font-size: 22px; font-weight: bold; }
-        .friends-toggle { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.2); }
-        .sw-track { width: 32px; height: 18px; background: #444; border-radius: 20px; position: relative; transition: 0.3s; cursor: pointer; }
-        .sw-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .vibe-brand { font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
+        .friends-btn { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 0.5px solid rgba(255,255,255,0.2); }
+        .sw-track { width: 32px; height: 16px; background: #444; border-radius: 20px; position: relative; transition: 0.3s; }
+        .sw-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: 0.3s; }
         .sw-track.active { background: #0095f6; }
         .sw-track.active::after { left: 16px; }
 
-        /* Vibe Feed */
-        #vibe-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        /* Vibe Feed Layout */
+        #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
 
-        /* Sidebar Buttons */
+        /* Transparent Sidebar */
         .sidebar { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
         .v-btn { text-align: center; cursor: pointer; color: #fff; }
-        .v-btn i { font-size: 32px; text-shadow: 0 0 10px rgba(0,0,0,0.8); transition: 0.2s; }
+        .v-btn i { font-size: 32px; text-shadow: 0 0 10px rgba(0,0,0,0.8); font-variation-settings: 'FILL' 0; transition: 0.2s; }
         .v-btn span { font-size: 11px; font-weight: bold; margin-top: 2px; display: block; }
-        
-        /* Metadata */
-        .meta { position: absolute; bottom: 120px; left: 16px; z-index: 100; width: 70%; }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .user-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fff; }
 
-        /* Sheets & Overlays */
+        /* Interactive Colors */
+        .v-btn.active i { font-variation-settings: 'FILL' 1; }
+        .like-btn.active i { color: #ff3040; }
+        .save-btn.active i { color: #fff; } /* Solid white on click */
+
+        /* User Info & Translate */
+        .meta { position: absolute; bottom: 120px; left: 16px; z-index: 100; width: 70%; pointer-events: none; }
+        .u-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; pointer-events: auto; }
+        .u-pic { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fff; }
+        .translate-link { font-size: 13px; font-weight: bold; margin-top: 8px; cursor: pointer; opacity: 0.9; pointer-events: auto; display: inline-block; }
+
+        /* PILL COMMENT SHEET (Gol & Chota) */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 2000; }
-        .sheet { position: fixed; bottom: -100%; width: 100%; background: #1a1a1a; border-radius: 20px 20px 0 0; z-index: 3000; transition: 0.3s ease; }
+        .sheet { position: fixed; bottom: -100%; width: 100%; background: #1a1a1a; border-radius: 20px 20px 0 0; z-index: 3000; transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); }
         .sheet.active { bottom: 0; }
-        
-        /* Internal Share List Style */
+        .pill-container { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-top: 0.5px solid #333; }
+        .pill-box { flex: 1; background: #333; border-radius: 25px; padding: 10px 18px; display: flex; align-items: center; }
+        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+
+        /* Share & Options Menu */
         .share-list { padding: 20px; max-height: 40vh; overflow-y: auto; }
         .friend-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.1px solid #333; }
-        .send-btn { background: #0095f6; color: #fff; padding: 6px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; }
-
-        /* Options Menu */
-        .menu-opt { padding: 16px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; cursor: pointer; }
+        .send-btn { background: #0095f6; color: #fff; padding: 6px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
         .m-row { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 0.1px solid #333; }
+        .m-icon { text-align: center; }
+        .m-icon i { background: #333; padding: 12px; border-radius: 12px; margin-bottom: 5px; }
+        .m-opt { padding: 16px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; cursor: pointer; }
 
         .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 2500; border-top: 0.1px solid #222; }
     </style>
@@ -54,40 +63,55 @@
 
     <div class="top-nav">
         <i class="material-icons">add_box</i>
-        <div style="display:flex; align-items:center; gap:15px;">
-            <span class="vibe-text">Vibes</span>
-            <div class="friends-toggle" onclick="document.getElementById('sw').classList.toggle('active')">
-                <span>Friends</span> <div class="sw-track" id="sw"></div>
-            </div>
+        <div class="vibe-brand">Vibes</div>
+        <div class="friends-btn" onclick="document.getElementById('swTrack').classList.toggle('active')">
+            <span>Friends</span>
+            <div class="sw-track" id="swTrack"></div>
         </div>
         <i class="material-icons">camera_alt</i>
     </div>
 
-    <div id="vibe-container">
+    <div id="vibe-feed">
         <div class="vibe-card">
             <video id="v1" src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1230-large.mp4" loop autoplay muted playsinline></video>
+            
             <div class="sidebar">
-                <div class="v-btn" onclick="this.style.color=this.style.color=='red'?'white':'red'"><i class="material-icons">favorite</i><span>1.2M</span></div>
+                <div class="v-btn like-btn" onclick="this.classList.toggle('active')"><i class="material-icons">favorite</i><span>1.2M</span></div>
                 <div class="v-btn" onclick="openS('comSheet')"><i class="material-icons">chat_bubble_outline</i><span>1,155</span></div>
                 <div class="v-btn" onclick="openS('shareSheet')"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                <div class="v-btn" onclick="this.style.color=this.style.color=='gold'?'white':'gold'"><i class="material-icons">bookmark_border</i><span>Save</span></div>
+                <div class="v-btn save-btn" onclick="this.classList.toggle('active')"><i class="material-icons">bookmark_border</i><span>Save</span></div>
                 <div class="v-btn" onclick="openS('menuSheet')"><i class="material-icons">more_horiz</i></div>
             </div>
+
             <div class="meta">
-                <div class="user-info">
-                    <img src="https://prajapatfunnyvp-svg.github.io/INDivibe-/1000033710.png" class="user-pic">
+                <div class="u-info">
+                    <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
                     <b>Vishnu Raj <i class="material-icons" style="color:#1877F2; font-size:14px;">check_circle</i></b>
                 </div>
-                <p>New Vibe alert! #indivibe</p>
+                <p id="cap">See you soon on Indivibe! #Viral</p>
+                <div class="translate-link" onclick="translateNow()">See translation</div>
             </div>
         </div>
     </div>
 
     <div class="overlay" id="bg" onclick="closeAll()"></div>
 
+    <div class="sheet" id="comSheet" style="height:55vh; display:flex; flex-direction:column;">
+        <div style="width:40px; height:4px; background:#444; margin:10px auto; border-radius:10px;"></div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888;">Comments...</div>
+        <div class="pill-container">
+            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:30px; border-radius:50%;">
+            <div class="pill-box">
+                <input type="text" id="cInp" placeholder="Comment jodein...">
+                <i class="material-icons" style="color:#0095f6;" onclick="this.parentElement.firstElementChild.value='Sent!'; setTimeout(()=>this.parentElement.firstElementChild.value='',1000);">send</i>
+            </div>
+        </div>
+    </div>
+
     <div class="sheet" id="shareSheet">
         <div style="width:40px; height:4px; background:#444; margin:10px auto; border-radius:10px;"></div>
-        <h3 style="text-align:center; padding:10px;">Send Vibe to Friends</h3>
+        <h3 style="text-align:center; padding:10px; border-bottom:0.1px solid #333;">Share Vibe</h3>
+        <div class="m-opt" style="border-bottom:0.1px solid #333;" onclick="shareVibeExternal()"><i class="material-icons">apps</i> Share to other Apps</div>
         <div class="share-list">
             <div class="friend-item">
                 <div style="display:flex; align-items:center; gap:10px;"><img src="https://i.pravatar.cc/150?u=1" style="width:35px; border-radius:50%;"> <span>Rahul Kumar</span></div>
@@ -100,16 +124,15 @@
         </div>
     </div>
 
-    <div class="sheet" id="menuSheet">
+    <div class="sheet" id="menuSheet" style="padding-bottom:15px;">
         <div class="m-row">
-            <div style="text-align:center;" onclick="alert('Remixing...')"><i class="material-icons" style="background:#333; padding:12px; border-radius:12px;">loop</i><p>Remix</p></div>
-            <div style="text-align:center;" onclick="alert('Sequence On')"><i class="material-icons" style="background:#333; padding:12px; border-radius:12px;">layers</i><p>Sequence</p></div>
-            <div style="text-align:center;" onclick="alert('Auto-scroll On')"><i class="material-icons" style="background:#333; padding:12px; border-radius:12px;">sync</i><p>Auto-scroll</p></div>
+            <div class="m-icon" onclick="alert('Vibe Remixing...')"><i class="material-icons">loop</i><p>Remix</p></div>
+            <div class="m-icon" onclick="alert('Vibe Sequence On')"><i class="material-icons">layers</i><p>Sequence</p></div>
+            <div class="m-icon" onclick="alert('Auto-scroll On')"><i class="material-icons">sync</i><p>Auto-scroll</p></div>
         </div>
-        <div class="menu-opt" onclick="alert('Downloading...')"><i class="material-icons">download</i> Download Video</div>
-        <div class="menu-opt" onclick="alert('Interested')"><i class="material-icons">star_border</i> Interested</div>
-        <div class="menu-opt" onclick="alert('Not Interested')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
-        <div class="menu-opt" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report</i> Report Video</div>
+        <div class="m-opt" onclick="alert('Downloading Vibe...')"><i class="material-icons">download</i> Download Video</div>
+        <div class="m-opt" onclick="alert('Marked as Not Interested')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
+        <div class="m-opt" style="color:#ff3040;" onclick="alert('Reported Vibe')"><i class="material-icons">report</i> Report Vibe</div>
     </div>
 
     <nav class="nav">
@@ -120,9 +143,24 @@
     </nav>
 
     <script>
+        // Auto-play video on load
+        window.onload = () => { document.getElementById('v1').play(); };
+
         function openS(id) { document.getElementById(id).classList.add('active'); document.getElementById('bg').style.display='block'; }
         function closeAll() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('active')); document.getElementById('bg').style.display='none'; }
-        window.onload = () => { document.getElementById('v1').play(); };
+        
+        // Final Translate Function
+        function translateNow() {
+            document.getElementById('cap').innerText = "Jald hi milte hain Indivibe par! #Viral";
+            alert('Vibe caption translated!');
+        }
+
+        // Final Native Share Function
+        async function shareVibeExternal() {
+            if (navigator.share) {
+                await navigator.share({ title: 'Indivibe', text: 'Check out this Vibe!', url: window.location.href });
+            } else { alert('Native share not supported in this browser.'); }
+        }
     </script>
 </body>
 </html>
