@@ -3,143 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indivibe Official</title>
+    <title>Indivibe Pro Official</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Full Screen Feed */
+        /* Full Screen Feed Logic */
         #vibe-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Double Tap Heart Animation */
-        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #fff; font-size: 100px; opacity: 0; z-index: 1000; transition: 0.3s; pointer-events: none; }
-        .heart-pop.animate { animation: pop 0.8s ease-out; }
-        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+        /* Double Tap & Heart Animation */
+        .big-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #fff; font-size: 110px; opacity: 0; pointer-events: none; z-index: 1000; }
+        .animate-heart { animation: pop 0.8s ease-out; }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.9; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
 
-        /* Sidebar - Instagram Style */
-        .sidebar { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 100; }
-        .v-btn { text-align: center; cursor: pointer; }
-        .v-btn i { font-size: 32px; color: #fff; text-shadow: 0 0 10px #000; }
+        /* Sidebar - All Buttons Active */
+        .sidebar { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; align-items: center; z-index: 100; }
+        .v-btn { text-align: center; cursor: pointer; transition: 0.2s; }
+        .v-btn i { font-size: 34px; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
         .v-btn span { font-size: 11px; font-weight: 600; margin-top: 4px; display: block; }
         .liked { color: #ff3040 !important; font-variation-settings: 'FILL' 1; }
+        .saved { color: #ffd700 !important; font-variation-settings: 'FILL' 1; }
 
-        /* User Info */
-        .meta { position: absolute; bottom: 100px; left: 16px; z-index: 100; width: 70%; }
-        .u-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .u-pic { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
-        .v-tick { color: #1877F2; font-size: 15px; }
+        /* User & Caption */
+        .meta { position: absolute; bottom: 100px; left: 16px; z-index: 100; width: 75%; pointer-events: none; }
+        .u-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; pointer-events: auto; }
+        .u-pic { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; }
+        .v-tick { color: #1877F2; font-size: 16px; }
 
-        /* INSTAGRAM STYLE GOL (PILL) COMMENT SHEET */
+        /* THE GOL (PILL) COMMENT SHEET */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 2000; }
-        .com-sheet { position: fixed; bottom: -100%; width: 100%; height: 60%; background: #1a1a1a; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s; display: flex; flex-direction: column; }
-        .com-sheet.active { bottom: 0; }
-        .com-body { flex: 1; padding: 20px; overflow-y: auto; text-align: center; color: #888; }
-        .pill-box { padding: 12px 16px; background: #1a1a1a; border-top: 0.5px solid #333; display: flex; align-items: center; gap: 12px; }
-        .pill { flex: 1; background: #333; border-radius: 50px; padding: 10px 18px; display: flex; align-items: center; }
-        .pill input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+        .sheet { position: fixed; bottom: -100%; width: 100%; background: #1a1a1a; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s cubic-bezier(0.17, 0.84, 0.44, 1); }
+        .com-sheet { height: 65%; display: flex; flex-direction: column; }
+        .sheet.active { bottom: 0; }
+        .handle { width: 40px; height: 4px; background: #444; margin: 10px auto; border-radius: 10px; }
+        
+        /* GOL (PILL) INPUT */
+        .pill-footer { padding: 12px 16px; background: #1a1a1a; border-top: 0.5px solid #333; display: flex; align-items: center; gap: 12px; }
+        .pill-box { flex: 1; background: #333; border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; }
+        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
 
-        /* 3-DOT MENU */
-        .menu-sheet { position: fixed; bottom: -100%; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 3500; transition: 0.3s; padding: 10px 0; }
-        .menu-sheet.active { bottom: 0; }
-        .m-item { padding: 16px 24px; display: flex; align-items: center; gap: 15px; font-size: 16px; border-bottom: 0.1px solid #383838; }
+        /* 3-DOT MENU (Full Setup) */
+        .menu-sheet { padding-bottom: 30px; }
+        .m-row { display: flex; justify-content: space-around; padding: 20px 0; border-bottom: 0.1px solid #333; }
+        .m-icon-box { text-align: center; cursor: pointer; }
+        .m-icon-box i { background: #333; padding: 12px; border-radius: 10px; margin-bottom: 6px; }
+        .m-list-opt { padding: 16px 25px; display: flex; align-items: center; gap: 15px; font-size: 16px; cursor: pointer; }
+        .m-list-opt:active { background: #333; }
 
         /* Nav Bar */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 2500; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 2500; border-top: 0.1px solid #222; }
         .nav i { font-size: 28px; color: #fff; opacity: 0.5; }
-        .active { opacity: 1 !important; }
     </style>
 </head>
 <body>
 
     <div id="vibe-feed"></div>
-
-    <i class="material-icons heart-pop" id="popHeart">favorite</i>
+    <i class="material-icons big-heart" id="bigHeart">favorite</i>
 
     <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
-    <div class="com-sheet" id="comSheet">
-        <div style="width:40px; height:4px; background:#444; margin:10px auto; border-radius:10px;"></div>
-        <div class="com-body" id="list">Comments will appear here...</div>
-        <div class="pill-box">
-            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:30px; border-radius:50%;">
-            <div class="pill">
-                <input type="text" id="cInput" placeholder="कमेंट जोड़ें...">
-                <i class="material-icons" style="color:#0095f6;" onclick="send()">send</i>
-            </div>
-        </div>
-    </div>
-
-    <div class="menu-sheet" id="mSheet">
-        <div style="width:40px; height:4px; background:#444; margin:10px auto; border-radius:10px;"></div>
-        <div class="m-item" onclick="alert('Added to Interest')"><i class="material-icons">star_outline</i> Interested</div>
-        <div class="m-item" onclick="alert('Added to Not Interested')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
-        <div class="m-item" onclick="alert('Downloading...')"><i class="material-icons">download</i> Download</div>
-        <div class="m-item" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report</i> Report</div>
-    </div>
-
-    <nav class="nav">
-        <i class="material-icons">home</i><i class="material-icons">search</i>
-        <i class="material-icons" style="font-size:36px;">add_box</i>
-        <i class="material-icons active">play_circle_outline</i>
-        <i class="material-icons">person_outline</i>
-    </nav>
-
-    <script>
-        const S_URL = "https://jxjbmjburdksqfjyhrxp.supabase.co";
-        const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4amJtamJ1cmRrc3FmanlocnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMTM0MTksImV4cCI6MjA4ODg4OTQxOX0.GrspI5dWCP6Tugzuqdhcs11Zrr7ZR6E5awFZbPDNVC4";
-        const supa = supabase.createClient(S_URL, S_KEY);
-
-        async function loadVibes() {
-            const { data } = await supa.from('videos').select('*').order('created_at', {ascending: false});
-            if(data) {
-                document.getElementById('vibe-feed').innerHTML = data.map(v => `
-                    <div class="vibe-card" ondblclick="doLike(this)">
-                        <video src="${v.video_url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="sidebar">
-                            <div class="v-btn" onclick="this.querySelector('i').classList.toggle('liked')"><i class="material-icons">favorite</i><span>1.2M</span></div>
-                            <div class="v-btn" onclick="openCom()"><i class="material-icons">chat_bubble_outline</i><span>1,155</span></div>
-                            <div class="v-btn" onclick="navigator.share({url:'${v.video_url}'})"><i class="material-icons" style="transform:scaleX(-1)">reply</i><span>Share</span></div>
-                            <div class="v-btn" onclick="openMenu()"><i class="material-icons">more_horiz</i></div>
-                        </div>
-                        <div class="meta">
-                            <div class="u-row">
-                                <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" class="u-pic">
-                                <strong>Vishnu Raj <i class="material-icons v-tick">check_circle</i></strong>
-                            </div>
-                            <p>${v.caption || 'Naya Vibe! #indivibe'}</p>
-                        </div>
-                    </div>
-                `).join('');
-                initAuto();
-            }
-        }
-
-        function doLike(card) {
-            card.querySelector('.sidebar .material-icons').classList.add('liked');
-            const h = document.getElementById('popHeart');
-            h.classList.add('animate');
-            setTimeout(() => h.classList.remove('animate'), 800);
-        }
-
-        function openCom() { document.getElementById('comSheet').classList.add('active'); document.getElementById('overlay').style.display='block'; }
-        function openMenu() { document.getElementById('mSheet').classList.add('active'); document.getElementById('overlay').style.display='block'; }
-        function closeAll() { document.querySelectorAll('.com-sheet, .menu-sheet').forEach(s=>s.classList.remove('active')); document.getElementById('overlay').style.display='none'; }
-        
-        function send() {
-            const v = document.getElementById('cInput').value;
-            if(v) { document.getElementById('list').innerHTML = `<div style="text-align:left; margin-bottom:10px; color:#fff;"><b>Aap:</b> ${v}</div>` + document.getElementById('list').innerHTML; document.getElementById('cInput').value = ''; }
-        }
-
-        function initAuto() {
-            const obs = new IntersectionObserver(es => { es.forEach(e => { const v = e.target.querySelector('video'); if(e.isIntersecting) v.play(); else v.pause(); }); }, { threshold: 0.8 });
-            document.querySelectorAll('.vibe-card').forEach(c => obs.observe(c));
-        }
-
-        loadVibes();
-    </script>
-</body>
-</html>
+    <div class="sheet com-sheet" id="comSheet">
+        <div class="handle"></div>
+        <div style="text-align:center; padding:10px; font-weight:bold; border-bottom:0.1px solid #333;">Comments</div>
+        <div id="comList" style="flex:1; overflow-y:auto; padding:20px; color:#888; text-align:center;">No comments yet.</div>
+        <div class="pill-footer">
+            <img src="https://prajapatfunnyvp-svg.github.io/INDIVIBE-/1000033710.png" style="width:34px; border-radius:5
+                
