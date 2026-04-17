@@ -6,180 +6,137 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
+        body, html { height: 100%; width: 100%; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
 
-        /* --- UI STRUCTURE --- */
-        .app-container { height: 100vh; width: 100vw; position: relative; display: flex; flex-direction: column; }
+        /* Top Header */
+        .header { position: absolute; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 20px; z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        .vibe-logo { font-size: 26px; font-weight: bold; font-style: italic; }
 
-        /* Top Bar: Vibes & Camera */
-        .top-header { position: absolute; top: 0; width: 100%; display: flex; justify-content: space-between; padding: 15px 20px; z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); }
-        .vibe-text { font-size: 24px; font-weight: bold; font-family: 'Billabong', cursive, sans-serif; }
-
-        /* Main Reel Feed */
-        .reel-feed { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .reel-feed::-webkit-scrollbar { display: none; }
-        .reel-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #111; }
+        /* Feed & Video */
+        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .vibe-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Sidebar Buttons (Like, Comment, Share, Save) */
+        /* Sidebar Buttons */
         .sidebar { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 500; }
-        .action-btn { text-align: center; cursor: pointer; }
-        .action-btn i { font-size: 32px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: 0.2s; }
-        .action-btn span { font-size: 12px; display: block; margin-top: 4px; font-weight: 500; }
-        .liked i { color: #ff3040; font-variation-settings: 'FILL' 1; }
+        .action { text-align: center; cursor: pointer; }
+        .action i { font-size: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .action span { font-size: 12px; display: block; margin-top: 2px; }
 
-        /* Meta Info (User & Music) */
-        .reel-meta { position: absolute; bottom: 90px; left: 15px; width: 70%; z-index: 500; }
-        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; }
-        .music-tag { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 15px; width: fit-content; margin-top: 10px; cursor: pointer; border: 0.5px solid rgba(255,255,255,0.2); }
-        .music-tag marquee { width: 100px; font-size: 13px; }
-
-        /* --- BOTTOM SHEETS (Slide Up) --- */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 2000; }
-        .bottom-sheet { position: fixed; bottom: -100%; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s ease; max-height: 70vh; }
-        .bottom-sheet.active { bottom: 0; }
-        .sheet-handle { width: 40px; height: 4px; background: #555; margin: 10px auto; border-radius: 10px; }
-
-        /* Comment Box (Pill Shape) */
-        .comment-area { flex: 1; overflow-y: auto; padding: 20px; color: #ccc; text-align: center; }
-        .pill-input-container { padding: 15px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; }
-        .pill-box { flex: 1; background: #3a3a3a; border-radius: 25px; padding: 10px 15px; display: flex; align-items: center; }
-        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; }
-
-        /* Menu Options */
-        .menu-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 16px; border-bottom: 0.5px solid #333; cursor: pointer; }
-        .menu-item i { font-size: 24px; }
-
-        /* Bottom Nav Bar */
-        .bottom-nav { height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; }
-        .bottom-nav i { font-size: 28px; cursor: pointer; }
-
-        /* Use Audio/Song Image [Small square at corner] */
-        .music-disk { position: absolute; right: 12px; bottom: 25px; width: 35px; height: 35px; border-radius: 8px; border: 2px solid #fff; animation: rotate 5s linear infinite; }
+        /* Meta Info & Audio */
+        .meta { position: absolute; bottom: 95px; left: 15px; z-index: 500; width: 70%; }
+        .user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .user img { width: 35px; height: 35px; border-radius: 50%; border: 1.5px solid #fff; }
+        .audio-box { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 15px; width: fit-content; margin-top: 8px; font-size: 13px; cursor: pointer; }
+        
+        /* Rotating Music Disk */
+        .music-disk { position: absolute; right: 12px; bottom: 20px; width: 32px; height: 32px; border-radius: 8px; border: 2px solid #fff; animation: rotate 4s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Sheets (Comment & Menu) */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 2000; }
+        .sheet { position: fixed; bottom: -100%; width: 100%; background: #262626; border-radius: 15px 15px 0 0; z-index: 3000; transition: 0.3s; padding-bottom: 20px; }
+        .sheet.active { bottom: 0; }
+        .handle { width: 40px; height: 4px; background: #555; margin: 10px auto; border-radius: 10px; }
+
+        /* Pill Comment Box (Chota & Goll) */
+        .pill-container { padding: 15px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #333; }
+        .pill-box { flex: 1; background: #3a3a3a; border-radius: 25px; padding: 8px 15px; display: flex; align-items: center; }
+        .pill-box input { flex: 1; background: none; border: none; color: #fff; outline: none; font-size: 14px; }
+
+        /* Menu Items */
+        .menu-opt { padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 16px; cursor: pointer; }
+        .menu-opt i { font-size: 24px; }
+
+        /* Bottom Nav */
+        .nav { height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #222; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="top-header">
-        <div class="vibe-text">Vibes</div>
-        <i class="material-icons">photo_camera</i>
-    </div>
-
-    <div class="reel-feed" id="mainFeed">
-        <div class="reel-card">
-            <video src="https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-under-the-sun-1241-large.mp4" loop autoplay muted playsinline></video>
-            
-            <div class="sidebar">
-                <div class="action-btn" onclick="toggleLike(this)"><i class="material-icons">favorite_border</i><span>145K</span></div>
-                <div class="action-btn" onclick="openSheet('commentSheet')"><i class="material-icons">chat_bubble_outline</i><span>1,200</span></div>
-                <div class="action-btn" onclick="shareNative()"><i class="material-icons" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
-                <div class="action-btn" onclick="toggleSave(this)"><i class="material-icons">bookmark_border</i><span>Save</span></div>
-                <div class="action-btn" onclick="openSheet('menuSheet')"><i class="material-icons">more_horiz</i></div>
-            </div>
-
-            <div class="reel-meta">
-                <div class="user-row">
-                    <img src="https://i.pravatar.cc/100?u=1" class="user-pic">
-                    <b>vishnu_raj • <span style="color:#0095f6">Follow</span></b>
-                </div>
-                <p>Enjoying the vibe... <span onclick="alert('Translated: Vibe ka maza le rahe hain...')" style="font-weight:bold; cursor:pointer;">See translation</span></p>
-                <div class="music-tag" onclick="alert('Opening Audio Page...')">
-                    <i class="material-icons" style="font-size:16px;">music_note</i>
-                    <marquee scrollamount="3">Original Audio - Artist Name</marquee>
-                </div>
-            </div>
-            <img src="https://i.pravatar.cc/100?u=1" class="music-disk" onclick="alert('Use this audio to make video?')">
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <i class="material-icons">home</i>
-        <i class="material-icons">search</i>
-        <i class="material-icons" style="font-size:35px; border:2px solid #fff; border-radius:10px;">add_box</i>
-        <i class="material-icons">play_circle_outline</i>
-        <img src="https://i.pravatar.cc/100?u=1" style="width:30px; border-radius:50%;">
-    </nav>
+<div class="header">
+    <div class="vibe-logo">Vibes</div>
+    <i class="material-icons">photo_camera</i>
 </div>
 
-<div class="overlay" id="overlayBg" onclick="closeSheets()"></div>
+<div class="feed" id="feed">
+    <div class="vibe-card">
+        <video id="v1" src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-1230-large.mp4" loop autoplay muted playsinline onclick="toggleV(this)"></video>
+        
+        <div class="sidebar">
+            <div class="action" onclick="like(this)"><i class="material-icons">favorite_border</i><span>1.2M</span></div>
+            <div class="action" onclick="openS('comSheet')"><i class="material-icons">chat_bubble_outline</i><span>1,155</span></div>
+            <div class="action" onclick="shareEx()"><i class="material-icons" style="transform: scaleX(-1);">reply</i><span>Share</span></div>
+            <div class="action" onclick="save(this)"><i class="material-icons">bookmark_border</i><span>Save</span></div>
+            <div class="action" onclick="openS('menuSheet')"><i class="material-icons">more_horiz</i></div>
+        </div>
 
-<div class="bottom-sheet" id="commentSheet">
-    <div class="sheet-handle"></div>
-    <h4 style="text-align:center; padding:10px;">Comments</h4>
-    <div class="comment-area">Abhi tak koi comment nahi hai.</div>
-    <div class="pill-input-container">
-        <img src="https://i.pravatar.cc/100?u=1" style="width:35px; border-radius:50%;">
+        <div class="meta">
+            <div class="user">
+                <img src="https://i.pravatar.cc/100?u=vishnu" alt="user">
+                <b>vishnu_raj • <span style="color:#0095f6">Follow</span></b>
+            </div>
+            <p>Perfect vibe 100% working! <span style="font-weight:bold" onclick="alert('Translated')">See translation</span></p>
+            <div class="audio-box" onclick="alert('Use this song?')">
+                <i class="material-icons" style="font-size:16px;">music_note</i>
+                <marquee scrollamount="3" width="100">Original Audio - Vishnu Raj</marquee>
+            </div>
+        </div>
+        <img src="https://i.pravatar.cc/100?u=vishnu" class="music-disk">
+    </div>
+</div>
+
+<div class="overlay" id="bg" onclick="closeAll()"></div>
+
+<div class="sheet" id="comSheet" style="height:50vh; display:flex; flex-direction:column;">
+    <div class="handle"></div>
+    <div style="flex:1; padding:20px; color:#888;">Comments...</div>
+    <div class="pill-container">
+        <img src="https://i.pravatar.cc/100?u=vishnu" style="width:30px; border-radius:50%;">
         <div class="pill-box">
-            <input type="text" placeholder="Comment jodein..." id="cInput">
-            <i class="material-icons" style="color:#0095f6;" onclick="sendComment()">send</i>
+            <input type="text" placeholder="Add a comment...">
+            <i class="material-icons" style="color:#0095f6;">send</i>
         </div>
     </div>
 </div>
 
-<div class="bottom-sheet" id="menuSheet">
-    <div class="sheet-handle"></div>
-    <div class="menu-item" style="color:#ff3040;"><i class="material-icons">report</i> Report</div>
-    <div class="menu-item" onclick="alert('Hidden')"><i class="material-icons">visibility_off</i> Not Interested</div>
-    <div class="menu-item" onclick="alert('Downloading...')"><i class="material-icons">file_download</i> Download</div>
-    <div class="menu-item" onclick="alert('Remix mode on')"><i class="material-icons">movie_filter</i> Remix this reel</div>
+<div class="sheet" id="menuSheet">
+    <div class="handle"></div>
+    <div class="menu-opt" style="color:#ff3040;" onclick="alert('Reported')"><i class="material-icons">report</i> Report Video</div>
+    <div class="menu-opt" onclick="alert('Added to Interested')"><i class="material-icons">star_border</i> Interested</div>
+    <div class="menu-opt" onclick="alert('Hidden')"><i class="material-icons">sentiment_dissatisfied</i> Not Interested</div>
+    <div class="menu-opt" onclick="alert('Downloading...')"><i class="material-icons">file_download</i> Download Video</div>
+    <div class="menu-opt" onclick="alert('Remix mode on')"><i class="material-icons">rebase_edit</i> Remix this vibe</div>
 </div>
+
+<nav class="nav">
+    <i class="material-icons">home</i>
+    <i class="material-icons">search</i>
+    <i class="material-icons" style="font-size:35px;">add_box</i>
+    <i class="material-icons">play_circle_outline</i>
+    <i class="material-icons">person_outline</i>
+</nav>
 
 <script>
-    // Sheet Control Functions
-    function openSheet(id) {
-        document.getElementById('overlayBg').style.display = 'block';
-        document.getElementById(id).classList.add('active');
+    function toggleV(v) { v.paused ? v.play() : v.pause(); }
+    function openS(id) { document.getElementById(id).classList.add('active'); document.getElementById('bg').style.display='block'; }
+    function closeAll() { document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('active')); document.getElementById('bg').style.display='none'; }
+    
+    function like(e) { 
+        let i = e.querySelector('i');
+        i.innerText = i.innerText === 'favorite' ? 'favorite_border' : 'favorite';
+        i.style.color = i.innerText === 'favorite' ? '#ff3040' : '#fff';
     }
 
-    function closeSheets() {
-        document.getElementById('overlayBg').style.display = 'none';
-        document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active'));
+    function save(e) {
+        let i = e.querySelector('i');
+        i.innerText = i.innerText === 'bookmark' ? 'bookmark_border' : 'bookmark';
     }
 
-    // Like & Save Toggle
-    function toggleLike(btn) {
-        btn.classList.toggle('liked');
-        let icon = btn.querySelector('i');
-        icon.innerText = btn.classList.contains('liked') ? 'favorite' : 'favorite_border';
-    }
-
-    function toggleSave(btn) {
-        let icon = btn.querySelector('i');
-        if(icon.innerText === 'bookmark_border') {
-            icon.innerText = 'bookmark';
-            btn.style.color = '#fff';
-        } else {
-            icon.innerText = 'bookmark_border';
-            btn.style.color = '#fff';
-        }
-    }
-
-    // Native Social Share (All Apps)
-    async function shareNative() {
+    async function shareEx() {
         if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Indivibe Reel',
-                    text: 'Check out this awesome vibe!',
-                    url: window.location.href
-                });
-            } catch (err) { console.log("Share cancelled"); }
-        } else {
-            alert("Share feature only works on mobile devices/HTTPS.");
-        }
-    }
-
-    // Comment Function
-    function sendComment() {
-        let inp = document.getElementById('cInput');
-        if(inp.value.trim() !== "") {
-            alert("Comment Sent: " + inp.value);
-            inp.value = "";
-            closeSheets();
-        }
+            await navigator.share({ title: 'Indivibe', url: window.location.href });
+        } else { alert('External share triggered!'); }
     }
 </script>
 
